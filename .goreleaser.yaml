@@ -1,0 +1,105 @@
+version: 2
+project_name: anyrow
+
+before:
+  hooks:
+    - bash -c 'cd ../../private && bun scripts/codegen.ts'
+    - bash -c 'cd ../sdk-go && go mod tidy'
+    - go mod tidy
+
+builds:
+  - id: anyrow
+    dir: .
+    main: .
+    binary: anyrow
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - formats: [tar.gz]
+    name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}'
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: '{{incpatch .Version}}-next'
+
+changelog:
+  disable: true
+
+nfpms:
+  - id: anyrow-linux-packages
+    formats: [deb, rpm, apk]
+    vendor: Anyrow
+    homepage: https://anyrow.ai
+    maintainer: Anyrow OSS <oss@anyrow.ai>
+    description: CLI for the Anyrow extraction API.
+    license: MIT
+
+snapcrafts:
+  - name: anyrow
+    title: Anyrow
+    summary: CLI for the Anyrow extraction API
+    description: |
+      Command-line client for Anyrow. Extract structured data from PDFs,
+      images, and emails. Manages tables, rows, batches, and live
+      extraction streams. Config via ~/.config/anyrow/config.toml or
+      ANYROW_API_KEY.
+    license: MIT
+    base: core24
+    grade: stable
+    confinement: strict
+    publish: true
+    channel_templates: [stable]
+    # NOTE: website/contact/issues/source-code/donation (snapcraft.yaml
+    # top-level keys visible in the store sidebar) are NOT exposed by
+    # goreleaser today. Three mitigations:
+    #  1. set these on the snapcraft.io publisher account — propagates
+    #     to every snap under the publisher, no yaml change needed
+    #  2. upstream PR to goreleaser's Snapcraft struct (~30 LOC)
+    #  3. build snap outside goreleaser with a hand-rolled snapcraft.yaml
+    apps:
+      anyrow:
+        command: anyrow
+        plugs: [network, home]
+
+brews:
+  - repository:
+      owner: anyrow
+      name: homebrew-tap
+    commit_author:
+      name: anyrow-bot
+      email: oss@anyrow.ai
+    homepage: https://anyrow.ai
+    description: CLI for the Anyrow extraction API
+    license: MIT
+    test: |
+      system "#{bin}/anyrow --version"
+
+scoops:
+  - repository:
+      owner: anyrow
+      name: scoop-bucket
+    commit_author:
+      name: anyrow-bot
+      email: oss@anyrow.ai
+    homepage: https://anyrow.ai
+    description: CLI for the Anyrow extraction API
+    license: MIT
+
+release:
+  github:
+    owner: anyrow
+    name: cli
+  draft: true
+  prerelease: auto
+  extra_files:
+    - glob: ./CHANGELOG.md
