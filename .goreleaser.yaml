@@ -1,6 +1,10 @@
 version: 2
 project_name: anyrow
 
+monorepo:
+  tag_prefix: cli-
+  dir: projects/anyrow/engineering/public/cli
+
 before:
   hooks:
     - bash -c 'cd ../../private && bun scripts/codegen.ts'
