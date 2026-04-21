@@ -101,5 +101,6 @@ release:
     name: cli
   draft: false
   prerelease: auto
+  replace_existing_artifacts: true
   extra_files:
     - glob: ./CHANGELOG.md
