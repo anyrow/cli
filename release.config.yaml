@@ -1,0 +1,53 @@
+name:         anyrow
+display_name: Anyrow CLI
+version:      1.0.0
+summary:      AI-native document extraction CLI
+description: |
+  Command-line client for Anyrow. Extract structured data from PDFs,
+  images, emails, calls, and websites. Manages tables, rows, batches,
+  and live extraction streams. Config via ~/.config/anyrow/config.toml
+  or ANYROW_API_KEY.
+homepage:     https://anyrow.ai
+license:      MIT
+license_url:  https://github.com/anyrow/cli/blob/main/LICENSE
+
+github:
+  org:          anyrow
+  repo:         cli
+  release_tag:  v1.0.0
+
+artifacts:
+  linux_x86_64:   anyrow_1.0.0_Linux_amd64.tar.gz
+  linux_arm64:    anyrow_1.0.0_Linux_arm64.tar.gz
+  darwin_x86_64:  anyrow_1.0.0_Darwin_amd64.tar.gz
+  darwin_arm64:   anyrow_1.0.0_Darwin_arm64.tar.gz
+  windows_x86_64: anyrow_1.0.0_Windows_amd64.zip
+
+binary_in_archive: anyrow
+
+tags:
+  - anyrow
+  - ai
+  - document-extraction
+  - operations-platform
+  - cli
+  - airtable-alternative
+  - parseur-alternative
+
+publish:
+  jsr:        true
+  npm:        true
+  aur:        true
+  snapcraft:  true
+  chocolatey: true
+  macports:   true
+
+sdk_typescript:
+  dir:       ../sdk-typescript
+  jsr_scope: "@anyrow"
+  jsr_name:  sdk
+
+author:
+  name:  Anyrow
+  email: oss@anyrow.ai
+  url:   https://anyrow.ai
