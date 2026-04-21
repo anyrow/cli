@@ -41,11 +41,16 @@ publish:
   snapcraft:  true
   chocolatey: true
   macports:   true
+  go:         true
 
 sdk_typescript:
   dir:       ../sdk-typescript
   jsr_scope: "@anyrow"
   jsr_name:  sdk
+
+sdk_go:
+  dir:         ../sdk-go
+  module_path: github.com/anyrow/sdk-go
 
 author:
   name:  Anyrow
