@@ -99,7 +99,7 @@ release:
   github:
     owner: anyrow
     name: cli
-  draft: true
+  draft: false
   prerelease: auto
   extra_files:
     - glob: ./CHANGELOG.md

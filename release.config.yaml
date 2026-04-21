@@ -17,11 +17,11 @@ github:
   release_tag:  v1.0.0
 
 artifacts:
-  linux_x86_64:   anyrow_1.0.0_Linux_amd64.tar.gz
-  linux_arm64:    anyrow_1.0.0_Linux_arm64.tar.gz
-  darwin_x86_64:  anyrow_1.0.0_Darwin_amd64.tar.gz
-  darwin_arm64:   anyrow_1.0.0_Darwin_arm64.tar.gz
-  windows_x86_64: anyrow_1.0.0_Windows_amd64.zip
+  linux_x86_64:   anyrow_1.0.0_linux_amd64.tar.gz
+  linux_arm64:    anyrow_1.0.0_linux_arm64.tar.gz
+  darwin_x86_64:  anyrow_1.0.0_darwin_amd64.tar.gz
+  darwin_arm64:   anyrow_1.0.0_darwin_arm64.tar.gz
+  windows_x86_64: anyrow_1.0.0_windows_amd64.zip
 
 binary_in_archive: anyrow
 
