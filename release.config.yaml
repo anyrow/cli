@@ -36,7 +36,7 @@ tags:
 
 publish:
   jsr:        true
-  npm:        true
+  npm:        false
   aur:        true
   snapcraft:  true
   chocolatey: true
