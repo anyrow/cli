@@ -11,6 +11,20 @@ homepage:     https://anyrow.ai
 license:      MIT
 license_url:  https://github.com/anyrow/cli/blob/main/LICENSE
 
+maintainer:
+  github:     lovrozagar
+  email_user: lovro.zagar5
+  email_host: gmail.com
+
+categories:
+  - sysutils
+
+long_description: |
+  Command-line client for Anyrow. Extract structured data from PDFs,
+  images, emails, calls, and websites. Manages tables, rows, batches,
+  and live extraction streams. Config via ~/.config/anyrow/config.toml
+  or ANYROW_API_KEY.
+
 github:
   org:          anyrow
   repo:         cli
