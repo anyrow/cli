@@ -46,7 +46,6 @@ var tableListCmdLangVar string
 var tableListCmdOrderVar string
 var tableListCmdPageVar int64
 var tableListCmdQVar string
-var tableListCmdSelectVar string
 var tableListCmdLimitVar int64
 
 var tableListCmd = &cobra.Command{
@@ -74,7 +73,6 @@ var tableListCmd = &cobra.Command{
 		if cmd.Flags().Changed("order") { q.Set("order", tableListCmdOrderVar) }
 		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", tableListCmdPageVar)) }
 		if cmd.Flags().Changed("q") { q.Set("q", tableListCmdQVar) }
-		if cmd.Flags().Changed("select") { q.Set("select", tableListCmdSelectVar) }
 		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", tableListCmdLimitVar)) }
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
 		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
@@ -498,7 +496,6 @@ func init() {
 	tableListCmd.Flags().StringVar(&tableListCmdOrderVar, "order", "", "Query param order")
 	tableListCmd.Flags().Int64Var(&tableListCmdPageVar, "page", 0, "Query param page")
 	tableListCmd.Flags().StringVar(&tableListCmdQVar, "q", "", "Query param q")
-	tableListCmd.Flags().StringVar(&tableListCmdSelectVar, "select", "", "Query param select")
 	tableListCmd.Flags().Int64Var(&tableListCmdLimitVar, "limit", 20, "Query param limit")
 	/* Path flag — Use: "project_id" */
 	tableCreateCmd.Flags().StringVar(&tableCreateCmdProjectIdVar, "project-id", "", "Path parameter project_id")

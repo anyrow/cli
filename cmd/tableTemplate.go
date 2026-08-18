@@ -46,7 +46,6 @@ var tableTemplateProjectListCmdLangVar string
 var tableTemplateProjectListCmdOrderVar string
 var tableTemplateProjectListCmdPageVar int64
 var tableTemplateProjectListCmdQVar string
-var tableTemplateProjectListCmdSelectVar string
 var tableTemplateProjectListCmdLimitVar int64
 
 var tableTemplateProjectListCmd = &cobra.Command{
@@ -74,7 +73,6 @@ var tableTemplateProjectListCmd = &cobra.Command{
 		if cmd.Flags().Changed("order") { q.Set("order", tableTemplateProjectListCmdOrderVar) }
 		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", tableTemplateProjectListCmdPageVar)) }
 		if cmd.Flags().Changed("q") { q.Set("q", tableTemplateProjectListCmdQVar) }
-		if cmd.Flags().Changed("select") { q.Set("select", tableTemplateProjectListCmdSelectVar) }
 		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", tableTemplateProjectListCmdLimitVar)) }
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
 		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
@@ -418,7 +416,6 @@ func init() {
 	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdOrderVar, "order", "", "Query param order")
 	tableTemplateProjectListCmd.Flags().Int64Var(&tableTemplateProjectListCmdPageVar, "page", 0, "Query param page")
 	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdQVar, "q", "", "Query param q")
-	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdSelectVar, "select", "", "Query param select")
 	tableTemplateProjectListCmd.Flags().Int64Var(&tableTemplateProjectListCmdLimitVar, "limit", 20, "Query param limit")
 	/* Path flag — Use: "project_id" */
 	tableTemplateProjectGetCmd.Flags().StringVar(&tableTemplateProjectGetCmdProjectIdVar, "project-id", "", "Path parameter project_id")

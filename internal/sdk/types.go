@@ -13,7 +13,7 @@ type CreateOrganizationsWebhookRequest struct {
 type CreateOrganizationsWebhookResponse201 struct {
 	Active bool `json:"active"`
 	CreatedAt int64 `json:"created_at"`
-	EventsJson []CreateOrganizationsWebhookResponse201EventsJson `json:"events_json"`
+	Events []CreateOrganizationsWebhookResponse201Events `json:"events"`
 	FailureCount int64 `json:"failure_count"`
 	Id string `json:"id"`
 	LastTriggeredAt *int64 `json:"last_triggered_at"`
@@ -31,11 +31,21 @@ type CreateOrganizationsWebhooksTestResponse200 struct {
 	Status CreateOrganizationsWebhooksTestResponse200Status `json:"status"`
 }
 
+type CreateProjectsExtractRequest struct {
+	Columns string `json:"columns"`
+	File *string `json:"file,omitempty"`
+	Instruction *string `json:"instruction,omitempty"`
+	Schema *string `json:"schema,omitempty"`
+	Strictness *CreateProjectsExtractRequestStrictness `json:"strictness,omitempty"`
+	Text *string `json:"text,omitempty"`
+}
+
 type CreateProjectsExtractResponse200 struct {
 	BatchId *string `json:"batch_id,omitempty"`
 	Confidence *float64 `json:"confidence"`
 	DurationMs *float64 `json:"duration_ms"`
 	FailCount float64 `json:"fail_count"`
+	FileType *CreateProjectsExtractResponse200FileType `json:"file_type,omitempty"`
 	Files []struct {
 	Confidence *float64 `json:"confidence,omitempty"`
 	Error *json.RawMessage `json:"error,omitempty"`
@@ -46,10 +56,18 @@ type CreateProjectsExtractResponse200 struct {
 	Result *CreateProjectsExtractResponse200Result `json:"result,omitempty"`
 	Status string `json:"status"`
 	SuccessCount float64 `json:"success_count"`
+	TableId string `json:"table_id"`
 	TotalRows float64 `json:"total_rows"`
 }
 
 type CreateProjectsExtractResponse200Result map[string]json.RawMessage
+
+type CreateProjectsExtractStreamResponse200 = string
+
+type CreateProjectsSuggestSchemaRequest struct {
+	File *string `json:"file,omitempty"`
+	Text *string `json:"text,omitempty"`
+}
 
 type CreateProjectsSuggestSchemaResponse200 struct {
 	Columns []struct {
@@ -74,7 +92,6 @@ type CreateProjectsTableRequest struct {
 	Searchable *bool `json:"searchable,omitempty"`
 	Type *CreateProjectsTableRequestColumnsJsonType `json:"type,omitempty"`
 } `json:"columns_json"`
-	DefaultSort *string `json:"default_sort,omitempty"`
 	InsertMode *CreateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
 	Instruction *string `json:"instruction,omitempty"`
 	MergeColumnsJson []string `json:"merge_columns_json,omitempty"`
@@ -101,7 +118,11 @@ type CreateProjectsTablesRestoreRequest struct {
 	Slug *string `json:"slug,omitempty"`
 }
 
-type CreateProjectsTablesRowRequest map[string]json.RawMessage
+type CreateProjectsTablesRowRequest struct {
+	Amount *string `json:"amount,omitempty"`
+	Date *string `json:"date,omitempty"`
+	Vendor *string `json:"vendor,omitempty"`
+}
 
 type CreateProjectsTablesRowRequestDbbb57 struct {
 	Creates []map[string]json.RawMessage `json:"creates,omitempty"`
@@ -117,6 +138,8 @@ type CreateProjectsTablesRowResponse200 struct {
 	Deleted []string `json:"deleted,omitempty"`
 	Updated []map[string]json.RawMessage `json:"updated,omitempty"`
 }
+
+type CreateProjectsTablesRowResponse201 map[string]json.RawMessage
 
 type CreateProjectsTableTemplatesUseRequest struct {
 	Name string `json:"name"`
@@ -220,6 +243,136 @@ type Err403EmailNotVerifiedForbidden struct {
 	Success bool `json:"success"`
 }
 
+type Err403EmailNotVerifiedForbiddenTableTemplateForbidden struct {
+	ErrorKey Err403EmailNotVerifiedForbiddenTableTemplateForbiddenErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err403EmailNotVerifiedForbiddenTableTemplateForbiddenStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err404BatchNotFound struct {
+	ErrorKey Err404BatchNotFoundErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err404BatchNotFoundStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err404ColumnNotFoundTableNotFound struct {
+	ErrorKey Err404ColumnNotFoundTableNotFoundErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err404ColumnNotFoundTableNotFoundStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err404NotFound struct {
+	ErrorKey Err404NotFoundErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err404NotFoundStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err404NotFoundTableTemplateNotFound struct {
+	ErrorKey Err404NotFoundTableTemplateNotFoundErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err404NotFoundTableTemplateNotFoundStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err404NotFoundWebhookNotFound struct {
+	ErrorKey Err404NotFoundWebhookNotFoundErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err404NotFoundWebhookNotFoundStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err404RowNotFoundTableNotFound struct {
+	ErrorKey Err404RowNotFoundTableNotFoundErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err404RowNotFoundTableNotFoundStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err404TableNotFound struct {
+	ErrorKey Err404TableNotFoundErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err404TableNotFoundStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err408RequestTimeout struct {
+	ErrorKey Err408RequestTimeoutErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err408RequestTimeoutStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err409OptimisticLockConflict struct {
+	ErrorKey Err409OptimisticLockConflictErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err409OptimisticLockConflictStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
 type Err413ContentTooLarge struct {
 	ErrorKey Err413ContentTooLargeErrorKey `json:"error_key"`
 	Fields map[string][]struct {
@@ -246,6 +399,32 @@ type Err415UnsupportedMediaType struct {
 	Success bool `json:"success"`
 }
 
+type Err422UnprocessableEntity struct {
+	ErrorKey Err422UnprocessableEntityErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err422UnprocessableEntityStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err429TooManyRequests struct {
+	ErrorKey Err429TooManyRequestsErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err429TooManyRequestsStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
 type Err500InternalServerError struct {
 	ErrorKey Err500InternalServerErrorErrorKey `json:"error_key"`
 	Fields map[string][]struct {
@@ -259,10 +438,49 @@ type Err500InternalServerError struct {
 	Success bool `json:"success"`
 }
 
+type Err502BadGateway struct {
+	ErrorKey Err502BadGatewayErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err502BadGatewayStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err503ServiceUnavailable struct {
+	ErrorKey Err503ServiceUnavailableErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err503ServiceUnavailableStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
+type Err504GatewayTimeout struct {
+	ErrorKey Err504GatewayTimeoutErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status Err504GatewayTimeoutStatus `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
 type GetOrganizationsWebhookResponse200 struct {
 	Active bool `json:"active"`
 	CreatedAt int64 `json:"created_at"`
-	EventsJson []GetOrganizationsWebhookResponse200EventsJson `json:"events_json"`
+	Events []GetOrganizationsWebhookResponse200Events `json:"events"`
 	FailureCount int64 `json:"failure_count"`
 	Id string `json:"id"`
 	LastTriggeredAt *int64 `json:"last_triggered_at"`
@@ -338,6 +556,19 @@ type GetProjectsExportResponse200 struct {
 	XlsxKey *string `json:"xlsx_key"`
 }
 
+type GetProjectsExportResponse404 struct {
+	ErrorKey GetProjectsExportResponse404ErrorKey `json:"error_key"`
+	Fields map[string][]struct {
+	ErrorKey string `json:"error_key"`
+	Message string `json:"message"`
+	Path string `json:"path"`
+} `json:"fields"`
+	Message string `json:"message"`
+	Status GetProjectsExportResponse404Status `json:"status"`
+	StatusKey string `json:"status_key"`
+	Success bool `json:"success"`
+}
+
 type GetProjectsTableTemplateResponse200 struct {
 	Category string `json:"category"`
 	ColumnsJson []struct {
@@ -396,7 +627,7 @@ type ListOrganizationsWebhooksResponse200 struct {
 	Webhooks []struct {
 	Active bool `json:"active"`
 	CreatedAt int64 `json:"created_at"`
-	EventsJson []ListOrganizationsWebhooksResponse200WebhooksEventsJson `json:"events_json"`
+	Events []ListOrganizationsWebhooksResponse200WebhooksEvents `json:"events"`
 	FailureCount int64 `json:"failure_count"`
 	Id string `json:"id"`
 	LastTriggeredAt *int64 `json:"last_triggered_at"`
@@ -449,6 +680,11 @@ type ListProjectsBatchesResponse200 struct {
 
 type ListProjectsTablesColumnsDistinctResponse200 struct {
 	Values []json.RawMessage `json:"values"`
+}
+
+type ListProjectsTablesExportResponse200 struct {
+	Id string `json:"id"`
+	Status string `json:"status"`
 }
 
 type ListProjectsTablesResponse200 struct {
@@ -597,12 +833,12 @@ const (
 	CreateOrganizationsWebhookRequestEventsPing CreateOrganizationsWebhookRequestEvents = "ping"
 )
 
-type CreateOrganizationsWebhookResponse201EventsJson string
+type CreateOrganizationsWebhookResponse201Events string
 const (
-	CreateOrganizationsWebhookResponse201EventsJsonBatchComplete CreateOrganizationsWebhookResponse201EventsJson = "batch.complete"
-	CreateOrganizationsWebhookResponse201EventsJsonBatchFailed CreateOrganizationsWebhookResponse201EventsJson = "batch.failed"
-	CreateOrganizationsWebhookResponse201EventsJsonBatchPartial CreateOrganizationsWebhookResponse201EventsJson = "batch.partial"
-	CreateOrganizationsWebhookResponse201EventsJsonPing CreateOrganizationsWebhookResponse201EventsJson = "ping"
+	CreateOrganizationsWebhookResponse201EventsBatchComplete CreateOrganizationsWebhookResponse201Events = "batch.complete"
+	CreateOrganizationsWebhookResponse201EventsBatchFailed CreateOrganizationsWebhookResponse201Events = "batch.failed"
+	CreateOrganizationsWebhookResponse201EventsBatchPartial CreateOrganizationsWebhookResponse201Events = "batch.partial"
+	CreateOrganizationsWebhookResponse201EventsPing CreateOrganizationsWebhookResponse201Events = "ping"
 )
 
 type CreateOrganizationsWebhooksTestResponse200Status string
@@ -610,6 +846,23 @@ const (
 	CreateOrganizationsWebhooksTestResponse200StatusError CreateOrganizationsWebhooksTestResponse200Status = "error"
 	CreateOrganizationsWebhooksTestResponse200StatusSuccess CreateOrganizationsWebhooksTestResponse200Status = "success"
 	CreateOrganizationsWebhooksTestResponse200StatusTimeout CreateOrganizationsWebhooksTestResponse200Status = "timeout"
+)
+
+type CreateProjectsExtractRequestStrictness string
+const (
+	CreateProjectsExtractRequestStrictnessStrict CreateProjectsExtractRequestStrictness = "strict"
+	CreateProjectsExtractRequestStrictnessBalanced CreateProjectsExtractRequestStrictness = "balanced"
+	CreateProjectsExtractRequestStrictnessFlexible CreateProjectsExtractRequestStrictness = "flexible"
+)
+
+type CreateProjectsExtractResponse200FileType string
+const (
+	CreateProjectsExtractResponse200FileTypeTextPdf CreateProjectsExtractResponse200FileType = "text_pdf"
+	CreateProjectsExtractResponse200FileTypeScanned CreateProjectsExtractResponse200FileType = "scanned"
+	CreateProjectsExtractResponse200FileTypeImage CreateProjectsExtractResponse200FileType = "image"
+	CreateProjectsExtractResponse200FileTypeText CreateProjectsExtractResponse200FileType = "text"
+	CreateProjectsExtractResponse200FileTypeDocument CreateProjectsExtractResponse200FileType = "document"
+	CreateProjectsExtractResponse200FileTypeUnknown CreateProjectsExtractResponse200FileType = "unknown"
 )
 
 type CreateProjectsTableRequestColumnsJsonType string
@@ -748,6 +1001,112 @@ const (
 	Err403EmailNotVerifiedForbiddenStatus403 Err403EmailNotVerifiedForbiddenStatus = 403
 )
 
+type Err403EmailNotVerifiedForbiddenTableTemplateForbiddenErrorKey string
+const (
+	Err403EmailNotVerifiedForbiddenTableTemplateForbiddenErrorKeyEmailNotVerified Err403EmailNotVerifiedForbiddenTableTemplateForbiddenErrorKey = "email_not_verified"
+	Err403EmailNotVerifiedForbiddenTableTemplateForbiddenErrorKeyForbidden Err403EmailNotVerifiedForbiddenTableTemplateForbiddenErrorKey = "forbidden"
+	Err403EmailNotVerifiedForbiddenTableTemplateForbiddenErrorKeyTableTemplateForbidden Err403EmailNotVerifiedForbiddenTableTemplateForbiddenErrorKey = "table_template_forbidden"
+)
+
+type Err403EmailNotVerifiedForbiddenTableTemplateForbiddenStatus int
+const (
+	Err403EmailNotVerifiedForbiddenTableTemplateForbiddenStatus403 Err403EmailNotVerifiedForbiddenTableTemplateForbiddenStatus = 403
+)
+
+type Err404BatchNotFoundErrorKey string
+const (
+	Err404BatchNotFoundErrorKeyBatchNotFound Err404BatchNotFoundErrorKey = "batch_not_found"
+)
+
+type Err404BatchNotFoundStatus int
+const (
+	Err404BatchNotFoundStatus404 Err404BatchNotFoundStatus = 404
+)
+
+type Err404ColumnNotFoundTableNotFoundErrorKey string
+const (
+	Err404ColumnNotFoundTableNotFoundErrorKeyColumnNotFound Err404ColumnNotFoundTableNotFoundErrorKey = "column_not_found"
+	Err404ColumnNotFoundTableNotFoundErrorKeyTableNotFound Err404ColumnNotFoundTableNotFoundErrorKey = "table_not_found"
+)
+
+type Err404ColumnNotFoundTableNotFoundStatus int
+const (
+	Err404ColumnNotFoundTableNotFoundStatus404 Err404ColumnNotFoundTableNotFoundStatus = 404
+)
+
+type Err404NotFoundErrorKey string
+const (
+	Err404NotFoundErrorKeyNotFound Err404NotFoundErrorKey = "not_found"
+)
+
+type Err404NotFoundStatus int
+const (
+	Err404NotFoundStatus404 Err404NotFoundStatus = 404
+)
+
+type Err404NotFoundTableTemplateNotFoundErrorKey string
+const (
+	Err404NotFoundTableTemplateNotFoundErrorKeyNotFound Err404NotFoundTableTemplateNotFoundErrorKey = "not_found"
+	Err404NotFoundTableTemplateNotFoundErrorKeyTableTemplateNotFound Err404NotFoundTableTemplateNotFoundErrorKey = "table_template_not_found"
+)
+
+type Err404NotFoundTableTemplateNotFoundStatus int
+const (
+	Err404NotFoundTableTemplateNotFoundStatus404 Err404NotFoundTableTemplateNotFoundStatus = 404
+)
+
+type Err404NotFoundWebhookNotFoundErrorKey string
+const (
+	Err404NotFoundWebhookNotFoundErrorKeyNotFound Err404NotFoundWebhookNotFoundErrorKey = "not_found"
+	Err404NotFoundWebhookNotFoundErrorKeyWebhookNotFound Err404NotFoundWebhookNotFoundErrorKey = "webhook_not_found"
+)
+
+type Err404NotFoundWebhookNotFoundStatus int
+const (
+	Err404NotFoundWebhookNotFoundStatus404 Err404NotFoundWebhookNotFoundStatus = 404
+)
+
+type Err404RowNotFoundTableNotFoundErrorKey string
+const (
+	Err404RowNotFoundTableNotFoundErrorKeyRowNotFound Err404RowNotFoundTableNotFoundErrorKey = "row_not_found"
+	Err404RowNotFoundTableNotFoundErrorKeyTableNotFound Err404RowNotFoundTableNotFoundErrorKey = "table_not_found"
+)
+
+type Err404RowNotFoundTableNotFoundStatus int
+const (
+	Err404RowNotFoundTableNotFoundStatus404 Err404RowNotFoundTableNotFoundStatus = 404
+)
+
+type Err404TableNotFoundErrorKey string
+const (
+	Err404TableNotFoundErrorKeyTableNotFound Err404TableNotFoundErrorKey = "table_not_found"
+)
+
+type Err404TableNotFoundStatus int
+const (
+	Err404TableNotFoundStatus404 Err404TableNotFoundStatus = 404
+)
+
+type Err408RequestTimeoutErrorKey string
+const (
+	Err408RequestTimeoutErrorKeyRequestTimeout Err408RequestTimeoutErrorKey = "request_timeout"
+)
+
+type Err408RequestTimeoutStatus int
+const (
+	Err408RequestTimeoutStatus408 Err408RequestTimeoutStatus = 408
+)
+
+type Err409OptimisticLockConflictErrorKey string
+const (
+	Err409OptimisticLockConflictErrorKeyOptimisticLockConflict Err409OptimisticLockConflictErrorKey = "optimistic_lock_conflict"
+)
+
+type Err409OptimisticLockConflictStatus int
+const (
+	Err409OptimisticLockConflictStatus409 Err409OptimisticLockConflictStatus = 409
+)
+
 type Err413ContentTooLargeErrorKey string
 const (
 	Err413ContentTooLargeErrorKeyContentTooLarge Err413ContentTooLargeErrorKey = "content_too_large"
@@ -768,6 +1127,26 @@ const (
 	Err415UnsupportedMediaTypeStatus415 Err415UnsupportedMediaTypeStatus = 415
 )
 
+type Err422UnprocessableEntityErrorKey string
+const (
+	Err422UnprocessableEntityErrorKeyUnprocessableEntity Err422UnprocessableEntityErrorKey = "unprocessable_entity"
+)
+
+type Err422UnprocessableEntityStatus int
+const (
+	Err422UnprocessableEntityStatus422 Err422UnprocessableEntityStatus = 422
+)
+
+type Err429TooManyRequestsErrorKey string
+const (
+	Err429TooManyRequestsErrorKeyTooManyRequests Err429TooManyRequestsErrorKey = "too_many_requests"
+)
+
+type Err429TooManyRequestsStatus int
+const (
+	Err429TooManyRequestsStatus429 Err429TooManyRequestsStatus = 429
+)
+
 type Err500InternalServerErrorErrorKey string
 const (
 	Err500InternalServerErrorErrorKeyInternalServerError Err500InternalServerErrorErrorKey = "internal_server_error"
@@ -778,12 +1157,42 @@ const (
 	Err500InternalServerErrorStatus500 Err500InternalServerErrorStatus = 500
 )
 
-type GetOrganizationsWebhookResponse200EventsJson string
+type Err502BadGatewayErrorKey string
 const (
-	GetOrganizationsWebhookResponse200EventsJsonBatchComplete GetOrganizationsWebhookResponse200EventsJson = "batch.complete"
-	GetOrganizationsWebhookResponse200EventsJsonBatchFailed GetOrganizationsWebhookResponse200EventsJson = "batch.failed"
-	GetOrganizationsWebhookResponse200EventsJsonBatchPartial GetOrganizationsWebhookResponse200EventsJson = "batch.partial"
-	GetOrganizationsWebhookResponse200EventsJsonPing GetOrganizationsWebhookResponse200EventsJson = "ping"
+	Err502BadGatewayErrorKeyBadGateway Err502BadGatewayErrorKey = "bad_gateway"
+)
+
+type Err502BadGatewayStatus int
+const (
+	Err502BadGatewayStatus502 Err502BadGatewayStatus = 502
+)
+
+type Err503ServiceUnavailableErrorKey string
+const (
+	Err503ServiceUnavailableErrorKeyServiceUnavailable Err503ServiceUnavailableErrorKey = "service_unavailable"
+)
+
+type Err503ServiceUnavailableStatus int
+const (
+	Err503ServiceUnavailableStatus503 Err503ServiceUnavailableStatus = 503
+)
+
+type Err504GatewayTimeoutErrorKey string
+const (
+	Err504GatewayTimeoutErrorKeyGatewayTimeout Err504GatewayTimeoutErrorKey = "gateway_timeout"
+)
+
+type Err504GatewayTimeoutStatus int
+const (
+	Err504GatewayTimeoutStatus504 Err504GatewayTimeoutStatus = 504
+)
+
+type GetOrganizationsWebhookResponse200Events string
+const (
+	GetOrganizationsWebhookResponse200EventsBatchComplete GetOrganizationsWebhookResponse200Events = "batch.complete"
+	GetOrganizationsWebhookResponse200EventsBatchFailed GetOrganizationsWebhookResponse200Events = "batch.failed"
+	GetOrganizationsWebhookResponse200EventsBatchPartial GetOrganizationsWebhookResponse200Events = "batch.partial"
+	GetOrganizationsWebhookResponse200EventsPing GetOrganizationsWebhookResponse200Events = "ping"
 )
 
 type GetProjectsBatcheResponse200ActorType string
@@ -857,6 +1266,16 @@ const (
 	GetProjectsExportResponse200StatusFailed GetProjectsExportResponse200Status = "failed"
 )
 
+type GetProjectsExportResponse404ErrorKey string
+const (
+	GetProjectsExportResponse404ErrorKeyExportNotFound GetProjectsExportResponse404ErrorKey = "export_not_found"
+)
+
+type GetProjectsExportResponse404Status int
+const (
+	GetProjectsExportResponse404Status404 GetProjectsExportResponse404Status = 404
+)
+
 type GetProjectsTableTemplateResponse200ColumnsJsonType string
 const (
 	GetProjectsTableTemplateResponse200ColumnsJsonTypeArray GetProjectsTableTemplateResponse200ColumnsJsonType = "array"
@@ -902,12 +1321,12 @@ const (
 	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesStatusFailed ListOrganizationsWebhooksDeliveriesResponse200DeliveriesStatus = "failed"
 )
 
-type ListOrganizationsWebhooksResponse200WebhooksEventsJson string
+type ListOrganizationsWebhooksResponse200WebhooksEvents string
 const (
-	ListOrganizationsWebhooksResponse200WebhooksEventsJsonBatchComplete ListOrganizationsWebhooksResponse200WebhooksEventsJson = "batch.complete"
-	ListOrganizationsWebhooksResponse200WebhooksEventsJsonBatchFailed ListOrganizationsWebhooksResponse200WebhooksEventsJson = "batch.failed"
-	ListOrganizationsWebhooksResponse200WebhooksEventsJsonBatchPartial ListOrganizationsWebhooksResponse200WebhooksEventsJson = "batch.partial"
-	ListOrganizationsWebhooksResponse200WebhooksEventsJsonPing ListOrganizationsWebhooksResponse200WebhooksEventsJson = "ping"
+	ListOrganizationsWebhooksResponse200WebhooksEventsBatchComplete ListOrganizationsWebhooksResponse200WebhooksEvents = "batch.complete"
+	ListOrganizationsWebhooksResponse200WebhooksEventsBatchFailed ListOrganizationsWebhooksResponse200WebhooksEvents = "batch.failed"
+	ListOrganizationsWebhooksResponse200WebhooksEventsBatchPartial ListOrganizationsWebhooksResponse200WebhooksEvents = "batch.partial"
+	ListOrganizationsWebhooksResponse200WebhooksEventsPing ListOrganizationsWebhooksResponse200WebhooksEvents = "ping"
 )
 
 type ListProjectsBatchesResponse200BatchesActorType string

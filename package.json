@@ -1,8 +1,15 @@
 {
-	"name": "@anyrow/cli",
-	"version": "1.0.0",
-	"private": true,
+	"author": {
+		"email": "oss@anyrow.ai",
+		"name": "Anyrow",
+		"url": "https://anyrow.ai"
+	},
+	"bugs": {
+		"email": "oss@anyrow.ai",
+		"url": "https://github.com/anyrow/cli/issues"
+	},
 	"description": "AI-native operations platform — extract, store, review, sync. Turn any document, photo, call, email, or website into a row in your table.",
+	"homepage": "https://anyrow.ai",
 	"keywords": [
 		"anyrow",
 		"operations-platform",
@@ -20,24 +27,17 @@
 		"command-line",
 		"terminal"
 	],
-	"homepage": "https://anyrow.ai",
+	"license": "MIT",
+	"name": "@anyrow/cli",
+	"private": true,
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/anyrow/cli.git"
 	},
-	"bugs": {
-		"url": "https://github.com/anyrow/cli/issues",
-		"email": "oss@anyrow.ai"
-	},
-	"license": "MIT",
-	"author": {
-		"name": "Anyrow",
-		"email": "oss@anyrow.ai",
-		"url": "https://anyrow.ai"
-	},
-	"type": "module",
 	"scripts": {
 		"release": "goreleaser release --clean",
 		"release:snapshot": "goreleaser release --snapshot --clean --skip=publish"
-	}
+	},
+	"type": "module",
+	"version": "1.0.0"
 }

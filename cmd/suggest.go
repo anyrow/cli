@@ -40,6 +40,8 @@ var suggestCmd = &cobra.Command{
 }
 
 var suggestSchemaCmdProjectIdVar string
+var suggestSchemaCmdTextVar string
+var suggestSchemaCmdFileVar string
 
 var suggestSchemaCmd = &cobra.Command{
 	Use:   "schema",
@@ -61,8 +63,16 @@ var suggestSchemaCmd = &cobra.Command{
 		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/suggest-schema"
 		q := url.Values{}
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
+		fields := map[string]string{}
+		if cmd.Flags().Changed("text") { fields["text"] = suggestSchemaCmdTextVar }
+		files := map[string]string{}
+		if suggestSchemaCmdFileVar != "" { files["file"] = suggestSchemaCmdFileVar }
+		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
+		if mpErr != nil { return mpErr }
+		_ = mpCT
+		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, mpReader)
 		if rerr != nil { return rerr }
+		req.Header.Set("Content-Type", mpCT) // multipart/form-data; boundary=...
 		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
 		resp, herr := httpClient.Do(req)
 		if herr != nil { return herr }
@@ -85,4 +95,6 @@ func init() {
 	/* Path flag — Use: "project_id" */
 	suggestSchemaCmd.Flags().StringVar(&suggestSchemaCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	suggestSchemaCmd.MarkFlagRequired("project-id")
+	suggestSchemaCmd.Flags().StringVar(&suggestSchemaCmdTextVar, "text", "", "Body field text")
+	suggestSchemaCmd.Flags().StringVar(&suggestSchemaCmdFileVar, "file", "", "Path to file to upload")
 }

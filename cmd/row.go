@@ -97,12 +97,15 @@ var rowListCmd = &cobra.Command{
 var rowCreateCmdProjectIdVar string
 var rowCreateCmdTableIdVar string
 var rowCreateCmdDataVar string
+var rowCreateCmdAmountVar string
+var rowCreateCmdDateVar string
+var rowCreateCmdVendorVar string
 
 var rowCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create row",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if rowCreateCmdDataVar == "" && !(false) {
+		if rowCreateCmdDataVar == "" && !(cmd.Flags().Changed("amount") || cmd.Flags().Changed("date") || cmd.Flags().Changed("vendor")) {
 			return fmt.Errorf("body required: pass --data or per-field flags")
 		}
 		return nil
@@ -134,6 +137,9 @@ var rowCreateCmd = &cobra.Command{
 				if jerr := json.Unmarshal(dataBytes, &merged); jerr != nil { return fmt.Errorf("parse --data: %w", jerr) }
 			}
 		}
+		if cmd.Flags().Changed("amount") { merged["amount"] = rowCreateCmdAmountVar }
+		if cmd.Flags().Changed("date") { merged["date"] = rowCreateCmdDateVar }
+		if cmd.Flags().Changed("vendor") { merged["vendor"] = rowCreateCmdVendorVar }
 		bodyBytes, merr := json.Marshal(merged)
 		if merr != nil { return merr }
 		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
@@ -305,12 +311,15 @@ var rowUpdateCmdProjectIdVar string
 var rowUpdateCmdTableIdVar string
 var rowUpdateCmdRowIdVar string
 var rowUpdateCmdDataVar string
+var rowUpdateCmdAmountVar string
+var rowUpdateCmdDateVar string
+var rowUpdateCmdVendorVar string
 
 var rowUpdateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update row",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if rowUpdateCmdDataVar == "" && !(false) {
+		if rowUpdateCmdDataVar == "" && !(cmd.Flags().Changed("amount") || cmd.Flags().Changed("date") || cmd.Flags().Changed("vendor")) {
 			return fmt.Errorf("body required: pass --data or per-field flags")
 		}
 		return nil
@@ -343,6 +352,9 @@ var rowUpdateCmd = &cobra.Command{
 				if jerr := json.Unmarshal(dataBytes, &merged); jerr != nil { return fmt.Errorf("parse --data: %w", jerr) }
 			}
 		}
+		if cmd.Flags().Changed("amount") { merged["amount"] = rowUpdateCmdAmountVar }
+		if cmd.Flags().Changed("date") { merged["date"] = rowUpdateCmdDateVar }
+		if cmd.Flags().Changed("vendor") { merged["vendor"] = rowUpdateCmdVendorVar }
 		bodyBytes, merr := json.Marshal(merged)
 		if merr != nil { return merr }
 		req, rerr := http.NewRequestWithContext(ctx, "PATCH", reqURL, bytes.NewReader(bodyBytes))
@@ -437,6 +449,9 @@ func init() {
 	rowCreateCmd.Flags().StringVar(&rowCreateCmdTableIdVar, "table-id", "", "Path parameter table_id")
 	rowCreateCmd.MarkFlagRequired("table-id")
 	rowCreateCmd.Flags().StringVar(&rowCreateCmdDataVar, "data", "", "Request body: JSON literal, @file, or - for stdin")
+	rowCreateCmd.Flags().StringVar(&rowCreateCmdAmountVar, "amount", "", "Body field amount")
+	rowCreateCmd.Flags().StringVar(&rowCreateCmdDateVar, "date", "", "Body field date")
+	rowCreateCmd.Flags().StringVar(&rowCreateCmdVendorVar, "vendor", "", "Body field vendor")
 	/* Path flag — Use: "project_id" */
 	rowAggregateCmd.Flags().StringVar(&rowAggregateCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	rowAggregateCmd.MarkFlagRequired("project-id")
@@ -472,6 +487,9 @@ func init() {
 	rowUpdateCmd.Flags().StringVar(&rowUpdateCmdRowIdVar, "row-id", "", "Path parameter row_id")
 	rowUpdateCmd.MarkFlagRequired("row-id")
 	rowUpdateCmd.Flags().StringVar(&rowUpdateCmdDataVar, "data", "", "Request body: JSON literal, @file, or - for stdin")
+	rowUpdateCmd.Flags().StringVar(&rowUpdateCmdAmountVar, "amount", "", "Body field amount")
+	rowUpdateCmd.Flags().StringVar(&rowUpdateCmdDateVar, "date", "", "Body field date")
+	rowUpdateCmd.Flags().StringVar(&rowUpdateCmdVendorVar, "vendor", "", "Body field vendor")
 	/* Path flag — Use: "project_id" */
 	rowDeleteCmd.Flags().StringVar(&rowDeleteCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	rowDeleteCmd.MarkFlagRequired("project-id")

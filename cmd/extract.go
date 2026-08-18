@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"iter"
 	"net/http"
 	"net/url"
 	"os"
@@ -33,6 +34,7 @@ var _ = strings.NewReader
 var _ = time.Second
 var _ = sdk.SSEEvent{}
 var _ = cli.Version
+var _ iter.Seq2[cli.SSEEvent, error]
 
 var extractCmd = &cobra.Command{
 	Use:   "extract",
@@ -40,6 +42,12 @@ var extractCmd = &cobra.Command{
 }
 
 var extractOnceCmdProjectIdVar string
+var extractOnceCmdColumnsVar string
+var extractOnceCmdInstructionVar string
+var extractOnceCmdSchemaVar string
+var extractOnceCmdStrictnessVar string
+var extractOnceCmdTextVar string
+var extractOnceCmdFileVar string
 
 var extractOnceCmd = &cobra.Command{
 	Use:   "once",
@@ -61,8 +69,20 @@ var extractOnceCmd = &cobra.Command{
 		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/extract"
 		q := url.Values{}
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
+		fields := map[string]string{}
+		if cmd.Flags().Changed("columns") { fields["columns"] = extractOnceCmdColumnsVar }
+		if cmd.Flags().Changed("instruction") { fields["instruction"] = extractOnceCmdInstructionVar }
+		if cmd.Flags().Changed("schema") { fields["schema"] = extractOnceCmdSchemaVar }
+		if cmd.Flags().Changed("strictness") { fields["strictness"] = extractOnceCmdStrictnessVar }
+		if cmd.Flags().Changed("text") { fields["text"] = extractOnceCmdTextVar }
+		files := map[string]string{}
+		if extractOnceCmdFileVar != "" { files["file"] = extractOnceCmdFileVar }
+		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
+		if mpErr != nil { return mpErr }
+		_ = mpCT
+		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, mpReader)
 		if rerr != nil { return rerr }
+		req.Header.Set("Content-Type", mpCT) // multipart/form-data; boundary=...
 		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
 		resp, herr := httpClient.Do(req)
 		if herr != nil { return herr }
@@ -81,6 +101,12 @@ var extractOnceCmd = &cobra.Command{
 }
 
 var extractStreamCmdProjectIdVar string
+var extractStreamCmdColumnsVar string
+var extractStreamCmdInstructionVar string
+var extractStreamCmdSchemaVar string
+var extractStreamCmdStrictnessVar string
+var extractStreamCmdTextVar string
+var extractStreamCmdFileVar string
 
 var extractStreamCmd = &cobra.Command{
 	Use:   "stream",
@@ -102,23 +128,40 @@ var extractStreamCmd = &cobra.Command{
 		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/extract-stream"
 		q := url.Values{}
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
+		fields := map[string]string{}
+		if cmd.Flags().Changed("columns") { fields["columns"] = extractStreamCmdColumnsVar }
+		if cmd.Flags().Changed("instruction") { fields["instruction"] = extractStreamCmdInstructionVar }
+		if cmd.Flags().Changed("schema") { fields["schema"] = extractStreamCmdSchemaVar }
+		if cmd.Flags().Changed("strictness") { fields["strictness"] = extractStreamCmdStrictnessVar }
+		if cmd.Flags().Changed("text") { fields["text"] = extractStreamCmdTextVar }
+		files := map[string]string{}
+		if extractStreamCmdFileVar != "" { files["file"] = extractStreamCmdFileVar }
+		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
+		if mpErr != nil { return mpErr }
+		_ = mpCT
+		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
 		if rerr != nil { return rerr }
+		req.Header.Set("Accept", "text/event-stream")
 		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
 		resp, herr := httpClient.Do(req)
 		if herr != nil { return herr }
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		it := sdk.ParseSSEStreamExported(ctx, resp)
+		wrapped := func(yield func(cli.SSEEvent, error) bool) {
+			for ev, iterErr := range it {
+				if !yield(cli.SSEEvent{Data: ev.Data, Event: ev.Event, ID: ev.ID, Retry: ev.Retry}, iterErr) {
+					return
+				}
+			}
 		}
-		return nil
+		return cli.StreamSSE(wrapped, os.Stdout, cfg.Output)
 	},
 }
 
 var extractTableOnceCmdProjectIdVar string
 var extractTableOnceCmdTableIdVar string
+var extractTableOnceCmdTextVar string
+var extractTableOnceCmdFileVar string
 
 var extractTableOnceCmd = &cobra.Command{
 	Use:   "table-once",
@@ -141,8 +184,16 @@ var extractTableOnceCmd = &cobra.Command{
 		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/tables/" + url.PathEscape(tableID) + "/extract"
 		q := url.Values{}
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
+		fields := map[string]string{}
+		if cmd.Flags().Changed("text") { fields["text"] = extractTableOnceCmdTextVar }
+		files := map[string]string{}
+		if extractTableOnceCmdFileVar != "" { files["file"] = extractTableOnceCmdFileVar }
+		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
+		if mpErr != nil { return mpErr }
+		_ = mpCT
+		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, mpReader)
 		if rerr != nil { return rerr }
+		req.Header.Set("Content-Type", mpCT) // multipart/form-data; boundary=...
 		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
 		resp, herr := httpClient.Do(req)
 		if herr != nil { return herr }
@@ -162,6 +213,8 @@ var extractTableOnceCmd = &cobra.Command{
 
 var extractTableStreamCmdProjectIdVar string
 var extractTableStreamCmdTableIdVar string
+var extractTableStreamCmdTextVar string
+var extractTableStreamCmdFileVar string
 
 var extractTableStreamCmd = &cobra.Command{
 	Use:   "table-stream",
@@ -184,18 +237,29 @@ var extractTableStreamCmd = &cobra.Command{
 		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/tables/" + url.PathEscape(tableID) + "/extract-stream"
 		q := url.Values{}
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
+		fields := map[string]string{}
+		if cmd.Flags().Changed("text") { fields["text"] = extractTableStreamCmdTextVar }
+		files := map[string]string{}
+		if extractTableStreamCmdFileVar != "" { files["file"] = extractTableStreamCmdFileVar }
+		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
+		if mpErr != nil { return mpErr }
+		_ = mpCT
+		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
 		if rerr != nil { return rerr }
+		req.Header.Set("Accept", "text/event-stream")
 		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
 		resp, herr := httpClient.Do(req)
 		if herr != nil { return herr }
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		it := sdk.ParseSSEStreamExported(ctx, resp)
+		wrapped := func(yield func(cli.SSEEvent, error) bool) {
+			for ev, iterErr := range it {
+				if !yield(cli.SSEEvent{Data: ev.Data, Event: ev.Event, ID: ev.ID, Retry: ev.Retry}, iterErr) {
+					return
+				}
+			}
 		}
-		return nil
+		return cli.StreamSSE(wrapped, os.Stdout, cfg.Output)
 	},
 }
 
@@ -207,19 +271,35 @@ func init() {
 	/* Path flag — Use: "project_id" */
 	extractOnceCmd.Flags().StringVar(&extractOnceCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	extractOnceCmd.MarkFlagRequired("project-id")
+	extractOnceCmd.Flags().StringVar(&extractOnceCmdColumnsVar, "columns", "", "Body field columns")
+	extractOnceCmd.Flags().StringVar(&extractOnceCmdInstructionVar, "instruction", "", "Body field instruction")
+	extractOnceCmd.Flags().StringVar(&extractOnceCmdSchemaVar, "schema", "", "Body field schema")
+	extractOnceCmd.Flags().StringVar(&extractOnceCmdStrictnessVar, "strictness", "", "Body field strictness (one of: strict, balanced, flexible)")
+	extractOnceCmd.Flags().StringVar(&extractOnceCmdTextVar, "text", "", "Body field text")
+	extractOnceCmd.Flags().StringVar(&extractOnceCmdFileVar, "file", "", "Path to file to upload")
 	/* Path flag — Use: "project_id" */
 	extractStreamCmd.Flags().StringVar(&extractStreamCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	extractStreamCmd.MarkFlagRequired("project-id")
+	extractStreamCmd.Flags().StringVar(&extractStreamCmdColumnsVar, "columns", "", "Body field columns")
+	extractStreamCmd.Flags().StringVar(&extractStreamCmdInstructionVar, "instruction", "", "Body field instruction")
+	extractStreamCmd.Flags().StringVar(&extractStreamCmdSchemaVar, "schema", "", "Body field schema")
+	extractStreamCmd.Flags().StringVar(&extractStreamCmdStrictnessVar, "strictness", "", "Body field strictness (one of: strict, balanced, flexible)")
+	extractStreamCmd.Flags().StringVar(&extractStreamCmdTextVar, "text", "", "Body field text")
+	extractStreamCmd.Flags().StringVar(&extractStreamCmdFileVar, "file", "", "Path to file to upload")
 	/* Path flag — Use: "project_id" */
 	extractTableOnceCmd.Flags().StringVar(&extractTableOnceCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	extractTableOnceCmd.MarkFlagRequired("project-id")
 	/* Path flag — Use: "table_id" */
 	extractTableOnceCmd.Flags().StringVar(&extractTableOnceCmdTableIdVar, "table-id", "", "Path parameter table_id")
 	extractTableOnceCmd.MarkFlagRequired("table-id")
+	extractTableOnceCmd.Flags().StringVar(&extractTableOnceCmdTextVar, "text", "", "Body field text")
+	extractTableOnceCmd.Flags().StringVar(&extractTableOnceCmdFileVar, "file", "", "Path to file to upload")
 	/* Path flag — Use: "project_id" */
 	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	extractTableStreamCmd.MarkFlagRequired("project-id")
 	/* Path flag — Use: "table_id" */
 	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdTableIdVar, "table-id", "", "Path parameter table_id")
 	extractTableStreamCmd.MarkFlagRequired("table-id")
+	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdTextVar, "text", "", "Body field text")
+	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdFileVar, "file", "", "Path to file to upload")
 }

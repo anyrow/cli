@@ -46,7 +46,6 @@ var batchListCmdLangVar string
 var batchListCmdOrderVar string
 var batchListCmdPageVar int64
 var batchListCmdQVar string
-var batchListCmdSelectVar string
 var batchListCmdLimitVar int64
 var batchListCmdStatusVar string
 
@@ -81,7 +80,6 @@ var batchListCmd = &cobra.Command{
 		if cmd.Flags().Changed("order") { q.Set("order", batchListCmdOrderVar) }
 		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", batchListCmdPageVar)) }
 		if cmd.Flags().Changed("q") { q.Set("q", batchListCmdQVar) }
-		if cmd.Flags().Changed("select") { q.Set("select", batchListCmdSelectVar) }
 		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", batchListCmdLimitVar)) }
 		if cmd.Flags().Changed("status") { q.Set("status", batchListCmdStatusVar) }
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
@@ -279,7 +277,6 @@ func init() {
 	batchListCmd.Flags().StringVar(&batchListCmdOrderVar, "order", "", "Query param order")
 	batchListCmd.Flags().Int64Var(&batchListCmdPageVar, "page", 0, "Query param page")
 	batchListCmd.Flags().StringVar(&batchListCmdQVar, "q", "", "Query param q")
-	batchListCmd.Flags().StringVar(&batchListCmdSelectVar, "select", "", "Query param select")
 	batchListCmd.Flags().Int64Var(&batchListCmdLimitVar, "limit", 20, "Query param limit")
 	batchListCmd.Flags().StringVar(&batchListCmdStatusVar, "status", "", "Query param status (one of: uploading, processing, merging, complete, partial, failed)")
 	/* Path flag — Use: "project_id" */

@@ -97,7 +97,6 @@ var webhookListCmdLangVar string
 var webhookListCmdOrderVar string
 var webhookListCmdPageVar int64
 var webhookListCmdQVar string
-var webhookListCmdSelectVar string
 var webhookListCmdLimitVar int64
 
 var webhookListCmd = &cobra.Command{
@@ -125,7 +124,6 @@ var webhookListCmd = &cobra.Command{
 		if cmd.Flags().Changed("order") { q.Set("order", webhookListCmdOrderVar) }
 		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", webhookListCmdPageVar)) }
 		if cmd.Flags().Changed("q") { q.Set("q", webhookListCmdQVar) }
-		if cmd.Flags().Changed("select") { q.Set("select", webhookListCmdSelectVar) }
 		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", webhookListCmdLimitVar)) }
 		if len(q) > 0 { reqURL += "?" + q.Encode() }
 		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
@@ -294,7 +292,6 @@ var webhookDeliveriesCmdLangVar string
 var webhookDeliveriesCmdOrderVar string
 var webhookDeliveriesCmdPageVar int64
 var webhookDeliveriesCmdQVar string
-var webhookDeliveriesCmdSelectVar string
 var webhookDeliveriesCmdLimitVar int64
 var webhookDeliveriesCmdEventVar string
 var webhookDeliveriesCmdStatusVar string
@@ -334,7 +331,6 @@ var webhookDeliveriesCmd = &cobra.Command{
 		if cmd.Flags().Changed("order") { q.Set("order", webhookDeliveriesCmdOrderVar) }
 		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", webhookDeliveriesCmdPageVar)) }
 		if cmd.Flags().Changed("q") { q.Set("q", webhookDeliveriesCmdQVar) }
-		if cmd.Flags().Changed("select") { q.Set("select", webhookDeliveriesCmdSelectVar) }
 		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", webhookDeliveriesCmdLimitVar)) }
 		if cmd.Flags().Changed("event") { q.Set("event", webhookDeliveriesCmdEventVar) }
 		if cmd.Flags().Changed("status") { q.Set("status", webhookDeliveriesCmdStatusVar) }
@@ -466,7 +462,6 @@ func init() {
 	webhookListCmd.Flags().StringVar(&webhookListCmdOrderVar, "order", "", "Query param order")
 	webhookListCmd.Flags().Int64Var(&webhookListCmdPageVar, "page", 0, "Query param page")
 	webhookListCmd.Flags().StringVar(&webhookListCmdQVar, "q", "", "Query param q")
-	webhookListCmd.Flags().StringVar(&webhookListCmdSelectVar, "select", "", "Query param select")
 	webhookListCmd.Flags().Int64Var(&webhookListCmdLimitVar, "limit", 20, "Query param limit")
 	/* Path flag — Use: "organization_id" */
 	webhookGetCmd.Flags().StringVar(&webhookGetCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
@@ -499,7 +494,6 @@ func init() {
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdOrderVar, "order", "", "Query param order")
 	webhookDeliveriesCmd.Flags().Int64Var(&webhookDeliveriesCmdPageVar, "page", 0, "Query param page")
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdQVar, "q", "", "Query param q")
-	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdSelectVar, "select", "", "Query param select")
 	webhookDeliveriesCmd.Flags().Int64Var(&webhookDeliveriesCmdLimitVar, "limit", 20, "Query param limit")
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdEventVar, "event", "", "Query param event (one of: batch.complete, batch.failed, batch.partial, ping)")
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdStatusVar, "status", "", "Query param status (one of: pending, success, failed)")
