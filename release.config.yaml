@@ -1,18 +1,18 @@
-name:         anyrow
+name: anyrow
 display_name: Anyrow CLI
-version:      1.0.0
-summary:      AI-native document extraction CLI
+version: 1.0.0
+summary: AI-native document extraction CLI
 description: |
   Command-line client for Anyrow. Extract structured data from PDFs,
   images, emails, calls, and websites. Manages tables, rows, batches,
   and live extraction streams. Config via ~/.config/anyrow/config.toml
   or ANYROW_API_KEY.
-homepage:     https://anyrow.ai
-license:      MIT
-license_url:  https://github.com/anyrow/cli/blob/main/LICENSE
+homepage: https://anyrow.ai
+license: MIT
+license_url: https://github.com/anyrow/cli/blob/main/LICENSE
 
 maintainer:
-  github:     lovrozagar
+  github: lovrozagar
   email_user: lovro.zagar5
   email_host: gmail.com
 
@@ -26,15 +26,15 @@ long_description: |
   or ANYROW_API_KEY.
 
 github:
-  org:          anyrow
-  repo:         cli
-  release_tag:  v1.0.0
+  org: anyrow
+  repo: cli
+  release_tag: v1.0.0
 
 artifacts:
-  linux_x86_64:   anyrow_1.0.0_linux_amd64.tar.gz
-  linux_arm64:    anyrow_1.0.0_linux_arm64.tar.gz
-  darwin_x86_64:  anyrow_1.0.0_darwin_amd64.tar.gz
-  darwin_arm64:   anyrow_1.0.0_darwin_arm64.tar.gz
+  linux_x86_64: anyrow_1.0.0_linux_amd64.tar.gz
+  linux_arm64: anyrow_1.0.0_linux_arm64.tar.gz
+  darwin_x86_64: anyrow_1.0.0_darwin_amd64.tar.gz
+  darwin_arm64: anyrow_1.0.0_darwin_arm64.tar.gz
   windows_x86_64: anyrow_1.0.0_windows_amd64.zip
 
 binary_in_archive: anyrow
@@ -49,24 +49,24 @@ tags:
   - parseur-alternative
 
 publish:
-  jsr:        true
-  npm:        false
-  aur:        true
-  snapcraft:  true
+  jsr: true
+  npm: false
+  aur: true
+  snapcraft: true
   chocolatey: true
-  macports:   true
-  go:         true
+  macports: true
+  go: true
 
 sdk_typescript:
-  dir:       ../sdk-typescript
+  dir: ../sdk-typescript
   jsr_scope: "@anyrow"
-  jsr_name:  sdk
+  jsr_name: sdk
 
 sdk_go:
-  dir:         ../sdk-go
+  dir: ../sdk-go
   module_path: github.com/anyrow/sdk-go
 
 author:
-  name:  Anyrow
+  name: Anyrow
   email: oss@anyrow.ai
-  url:   https://anyrow.ai
+  url: https://anyrow.ai
