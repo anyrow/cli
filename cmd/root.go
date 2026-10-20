@@ -4,15 +4,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
+	"net/http"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	cli "github.com/anyrow/cli/internal/cli"
 )
-
-var _ = fmt.Sprintf
-var _ = os.Exit
 
 // EnvPrefix is the prefix used for all <PREFIX>_<FLAG> environment variables.
 const EnvPrefix = "ANYROW"
@@ -23,6 +21,11 @@ const ConfigName = "anyrow"
 // DefaultBaseURL is used when neither --base-url, env var, nor the config file provide one.
 const DefaultBaseURL = "https://api.anyrow.ai"
 
+// AuthHeaderName and AuthHeaderPrefix come from the API's security scheme.
+const AuthHeaderName = "Authorization"
+
+const AuthHeaderPrefix = "ApiKey "
+
 type configKey struct{}
 
 // runtimeConfig is the resolved CLI config stashed on the cobra context.
@@ -30,19 +33,36 @@ type runtimeConfig struct {
 	Cfg cli.Config
 }
 
-// rootCmd is the top-level cobra command for the anyrow CLI.
+// started is set once flags, args and required flags are valid; any error
+// before that is a usage error (exit 4), whatever cobra calls it.
+var started bool
+
+// rootCmd is the top-level cobra command for the CLI.
 var rootCmd = &cobra.Command{
 	Use:     "anyrow",
 	Short:   "anyrow CLI",
 	Version: cli.Version,
 	SilenceUsage: true,
+	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		/* cobra checks required flags only after this hook, so a missing one would
+		   surface as a generic error (exit 3): check them here, as usage errors */
+		if err := cmd.ValidateRequiredFlags(); err != nil {
+			return cli.Usage(err)
+		}
+		if err := cmd.ValidateFlagGroups(); err != nil {
+			return cli.Usage(err)
+		}
+		started = true
 		cfg, err := cli.LoadConfig(cmd.Flags(), EnvPrefix, ConfigName)
 		if err != nil {
 			return err
 		}
 		if cfg.BaseURL == "" {
 			cfg.BaseURL = DefaultBaseURL
+		}
+		if _, err := time.ParseDuration(cfg.Timeout); err != nil {
+			return cli.Usage(err)
 		}
 		ctx := context.WithValue(cmd.Context(), configKey{}, runtimeConfig{Cfg: cfg})
 		cmd.SetContext(ctx)
@@ -52,7 +72,20 @@ var rootCmd = &cobra.Command{
 
 // Execute runs the root command.
 func Execute() error {
-	return rootCmd.Execute()
+	err := rootCmd.Execute()
+	if err != nil && !started {
+		return cli.Usage(err)
+	}
+	return err
+}
+
+// groupRun shows a bare group's help and rejects an unknown subcommand as a
+// usage error (cobra would print help and exit 0).
+func groupRun(cmd *cobra.Command, args []string) error {
+	if len(args) > 0 {
+		return cli.Usage(fmt.Errorf("unknown command %q for %q", args[0], cmd.CommandPath()))
+	}
+	return cmd.Help()
 }
 
 func configFromCtx(ctx context.Context) cli.Config {
@@ -62,13 +95,30 @@ func configFromCtx(ctx context.Context) cli.Config {
 	return cli.Config{}
 }
 
+// newHTTPClient returns a client without an overall timeout: regular calls
+// bound themselves with --timeout, streams and uploads do not.
+func newHTTPClient() *http.Client {
+	return &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			/* never forward the API key to another host */
+			if len(via) >= 10 || req.URL.Host != via[0].URL.Host || req.URL.Scheme != via[0].URL.Scheme {
+				return http.ErrUseLastResponse
+			}
+			return nil
+		},
+	}
+}
+
 func init() {
-	rootCmd.PersistentFlags().String("api-key", "", "API key (overrides env + config file)")
+	rootCmd.PersistentFlags().String("api-key", "", "API key (overrides env + config file; visible to other local users in the process list, prefer the env var)")
 	rootCmd.PersistentFlags().String("base-url", "", "Override API base URL")
 	rootCmd.PersistentFlags().String("output", "json", "Output mode: json|ndjson|yaml|table")
 	rootCmd.PersistentFlags().Bool("verbose", false, "Print request metadata to stderr")
 	rootCmd.PersistentFlags().String("config", "", "Path to config file")
-	rootCmd.PersistentFlags().String("timeout", "30s", "Request timeout (Go duration)")
+	rootCmd.PersistentFlags().String("timeout", "30s", "Request timeout (Go duration); streams are not bounded")
+	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		return cli.Usage(err)
+	})
 	rootCmd.AddCommand(batchCmd)
 	rootCmd.AddCommand(columnCmd)
 	rootCmd.AddCommand(exportCmd)

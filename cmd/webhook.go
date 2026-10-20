@@ -4,14 +4,12 @@ package cmd
 import (
 	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"slices"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -20,23 +18,90 @@ import (
 	sdk "github.com/anyrow/cli/internal/sdk"
 )
 
-var _ = bytes.NewReader
-var _ = context.TODO
-var _ = json.Marshal
-var _ = fmt.Sprintf
-var _ = io.Discard
-var _ = http.MethodGet
-var _ = url.PathEscape
-var _ = os.Stdout
-var _ = slices.Contains[[]string]
-var _ = strings.NewReader
-var _ = time.Second
-var _ = sdk.SSEEvent{}
-var _ = cli.Version
-
 var webhookCmd = &cobra.Command{
 	Use:   "webhook",
-	Short: "Create webhook",
+	Short: "List webhooks",
+	Args:  cobra.ArbitraryArgs,
+	RunE:  groupRun,
+}
+
+var webhookListCmdOrganizationIdVar string
+var webhookListCmdCursorVar string
+var webhookListCmdFilterVar string
+var webhookListCmdLimitVar int64
+var webhookListCmdOrderVar string
+var webhookListCmdPageVar int64
+var webhookListCmdQVar string
+
+var webhookListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List webhooks",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+		cfg := configFromCtx(ctx)
+		apiKey, err := cli.ResolveAPIKey(cfg)
+		if err != nil {
+			return err
+		}
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/organizations/{organization_id}/webhooks", map[string]string{"organization_id": webhookListCmdOrganizationIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		if cmd.Flags().Changed("cursor") {
+			query = append(query, [2]string{"cursor", webhookListCmdCursorVar})
+		}
+		if cmd.Flags().Changed("filter") {
+			query = append(query, [2]string{"filter", webhookListCmdFilterVar})
+		}
+		if cmd.Flags().Changed("limit") {
+			query = append(query, [2]string{"limit", strconv.FormatInt(webhookListCmdLimitVar, 10)})
+		}
+		if cmd.Flags().Changed("order") {
+			query = append(query, [2]string{"order", webhookListCmdOrderVar})
+		}
+		if cmd.Flags().Changed("page") {
+			query = append(query, [2]string{"page", strconv.FormatInt(webhookListCmdPageVar, 10)})
+		}
+		if cmd.Flags().Changed("q") {
+			query = append(query, [2]string{"q", webhookListCmdQVar})
+		}
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
+		}
+		return cli.Emit(out, cfg.Output, os.Stdout)
+	},
 }
 
 var webhookCreateCmdOrganizationIdVar string
@@ -47,7 +112,7 @@ var webhookCreateCmd = &cobra.Command{
 	Short: "Create webhook",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if webhookCreateCmdDataVar == "" && !(false) {
-			return fmt.Errorf("body required: pass --data or per-field flags")
+			return cli.Usage(errors.New("body required: pass --data or per-field flags"))
 		}
 		return nil
 	},
@@ -55,91 +120,52 @@ var webhookCreateCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		organizationID := webhookCreateCmdOrganizationIdVar
-		reqURL := baseURL + "/v1/organizations/" + url.PathEscape(organizationID) + "/webhooks"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		bodyBytes, derr := cli.ReadDataFlag(webhookCreateCmdDataVar)
-		if derr != nil { return derr }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
-		if rerr != nil { return rerr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/organizations/{organization_id}/webhooks", map[string]string{"organization_id": webhookCreateCmdOrganizationIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		bodyBytes, err := cli.ReadDataFlag(webhookCreateCmdDataVar)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
+		if err != nil {
+			return err
+		}
 		req.Header.Set("Content-Type", "application/json")
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
 		}
-		return cli.Emit(out, cfg.Output, os.Stdout)
-	},
-}
-
-var webhookListCmdOrganizationIdVar string
-var webhookListCmdCursorVar string
-var webhookListCmdFilterVar string
-var webhookListCmdLangVar string
-var webhookListCmdOrderVar string
-var webhookListCmdPageVar int64
-var webhookListCmdQVar string
-var webhookListCmdLimitVar int64
-
-var webhookListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List webhooks",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx := cmd.Context()
-		cfg := configFromCtx(ctx)
-		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
-		}
-		httpClient := &http.Client{Timeout: timeout}
-		organizationID := webhookListCmdOrganizationIdVar
-		reqURL := baseURL + "/v1/organizations/" + url.PathEscape(organizationID) + "/webhooks"
-		q := url.Values{}
-		if cmd.Flags().Changed("cursor") { q.Set("cursor", webhookListCmdCursorVar) }
-		if cmd.Flags().Changed("filter") { q.Set("filter", webhookListCmdFilterVar) }
-		if cmd.Flags().Changed("lang") { q.Set("lang", webhookListCmdLangVar) }
-		if cmd.Flags().Changed("order") { q.Set("order", webhookListCmdOrderVar) }
-		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", webhookListCmdPageVar)) }
-		if cmd.Flags().Changed("q") { q.Set("q", webhookListCmdQVar) }
-		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", webhookListCmdLimitVar)) }
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
-		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
-		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -155,34 +181,47 @@ var webhookGetCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		organizationID := webhookGetCmdOrganizationIdVar
-		iD := webhookGetCmdIdVar
-		reqURL := baseURL + "/v1/organizations/" + url.PathEscape(organizationID) + "/webhooks/" + url.PathEscape(iD)
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/organizations/{organization_id}/webhooks/{id}", map[string]string{"organization_id": webhookGetCmdOrganizationIdVar, "id": webhookGetCmdIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -197,7 +236,7 @@ var webhookUpdateCmd = &cobra.Command{
 	Short: "Update webhook",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if webhookUpdateCmdDataVar == "" && !(false) {
-			return fmt.Errorf("body required: pass --data or per-field flags")
+			return cli.Usage(errors.New("body required: pass --data or per-field flags"))
 		}
 		return nil
 	},
@@ -205,37 +244,52 @@ var webhookUpdateCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		organizationID := webhookUpdateCmdOrganizationIdVar
-		iD := webhookUpdateCmdIdVar
-		reqURL := baseURL + "/v1/organizations/" + url.PathEscape(organizationID) + "/webhooks/" + url.PathEscape(iD)
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		bodyBytes, derr := cli.ReadDataFlag(webhookUpdateCmdDataVar)
-		if derr != nil { return derr }
-		req, rerr := http.NewRequestWithContext(ctx, "PATCH", reqURL, bytes.NewReader(bodyBytes))
-		if rerr != nil { return rerr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/organizations/{organization_id}/webhooks/{id}", map[string]string{"organization_id": webhookUpdateCmdOrganizationIdVar, "id": webhookUpdateCmdIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		bodyBytes, err := cli.ReadDataFlag(webhookUpdateCmdDataVar)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "PATCH", reqURL, bytes.NewReader(bodyBytes))
+		if err != nil {
+			return err
+		}
 		req.Header.Set("Content-Type", "application/json")
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
-		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -251,34 +305,47 @@ var webhookDeleteCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		organizationID := webhookDeleteCmdOrganizationIdVar
-		iD := webhookDeleteCmdIdVar
-		reqURL := baseURL + "/v1/organizations/" + url.PathEscape(organizationID) + "/webhooks/" + url.PathEscape(iD)
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "DELETE", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/organizations/{organization_id}/webhooks/{id}", map[string]string{"organization_id": webhookDeleteCmdOrganizationIdVar, "id": webhookDeleteCmdIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "DELETE", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -287,13 +354,10 @@ var webhookDeleteCmd = &cobra.Command{
 var webhookDeliveriesCmdOrganizationIdVar string
 var webhookDeliveriesCmdIdVar string
 var webhookDeliveriesCmdCursorVar string
-var webhookDeliveriesCmdFilterVar string
-var webhookDeliveriesCmdLangVar string
+var webhookDeliveriesCmdEventVar string
+var webhookDeliveriesCmdLimitVar int64
 var webhookDeliveriesCmdOrderVar string
 var webhookDeliveriesCmdPageVar int64
-var webhookDeliveriesCmdQVar string
-var webhookDeliveriesCmdLimitVar int64
-var webhookDeliveriesCmdEventVar string
 var webhookDeliveriesCmdStatusVar string
 
 var webhookDeliveriesCmd = &cobra.Command{
@@ -301,10 +365,10 @@ var webhookDeliveriesCmd = &cobra.Command{
 	Short: "List webhook deliveries",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if cmd.Flags().Changed("event") && !slices.Contains([]string{"batch.complete", "batch.failed", "batch.partial", "ping"}, webhookDeliveriesCmdEventVar) {
-			return fmt.Errorf("--event must be one of: batch.complete, batch.failed, batch.partial, ping")
+			return cli.Usage(errors.New("--event must be one of: batch.complete, batch.failed, batch.partial, ping"))
 		}
 		if cmd.Flags().Changed("status") && !slices.Contains([]string{"pending", "success", "failed"}, webhookDeliveriesCmdStatusVar) {
-			return fmt.Errorf("--status must be one of: pending, success, failed")
+			return cli.Usage(errors.New("--status must be one of: pending, success, failed"))
 		}
 		return nil
 	},
@@ -312,43 +376,65 @@ var webhookDeliveriesCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		organizationID := webhookDeliveriesCmdOrganizationIdVar
-		iD := webhookDeliveriesCmdIdVar
-		reqURL := baseURL + "/v1/organizations/" + url.PathEscape(organizationID) + "/webhooks/" + url.PathEscape(iD) + "/deliveries"
-		q := url.Values{}
-		if cmd.Flags().Changed("cursor") { q.Set("cursor", webhookDeliveriesCmdCursorVar) }
-		if cmd.Flags().Changed("filter") { q.Set("filter", webhookDeliveriesCmdFilterVar) }
-		if cmd.Flags().Changed("lang") { q.Set("lang", webhookDeliveriesCmdLangVar) }
-		if cmd.Flags().Changed("order") { q.Set("order", webhookDeliveriesCmdOrderVar) }
-		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", webhookDeliveriesCmdPageVar)) }
-		if cmd.Flags().Changed("q") { q.Set("q", webhookDeliveriesCmdQVar) }
-		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", webhookDeliveriesCmdLimitVar)) }
-		if cmd.Flags().Changed("event") { q.Set("event", webhookDeliveriesCmdEventVar) }
-		if cmd.Flags().Changed("status") { q.Set("status", webhookDeliveriesCmdStatusVar) }
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/organizations/{organization_id}/webhooks/{id}/deliveries", map[string]string{"organization_id": webhookDeliveriesCmdOrganizationIdVar, "id": webhookDeliveriesCmdIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		if cmd.Flags().Changed("cursor") {
+			query = append(query, [2]string{"cursor", webhookDeliveriesCmdCursorVar})
+		}
+		if cmd.Flags().Changed("event") {
+			query = append(query, [2]string{"event", webhookDeliveriesCmdEventVar})
+		}
+		if cmd.Flags().Changed("limit") {
+			query = append(query, [2]string{"limit", strconv.FormatInt(webhookDeliveriesCmdLimitVar, 10)})
+		}
+		if cmd.Flags().Changed("order") {
+			query = append(query, [2]string{"order", webhookDeliveriesCmdOrderVar})
+		}
+		if cmd.Flags().Changed("page") {
+			query = append(query, [2]string{"page", strconv.FormatInt(webhookDeliveriesCmdPageVar, 10)})
+		}
+		if cmd.Flags().Changed("status") {
+			query = append(query, [2]string{"status", webhookDeliveriesCmdStatusVar})
+		}
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -364,34 +450,47 @@ var webhookRotateSecretCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		organizationID := webhookRotateSecretCmdOrganizationIdVar
-		iD := webhookRotateSecretCmdIdVar
-		reqURL := baseURL + "/v1/organizations/" + url.PathEscape(organizationID) + "/webhooks/" + url.PathEscape(iD) + "/rotate-secret"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/organizations/{organization_id}/webhooks/{id}/rotate-secret", map[string]string{"organization_id": webhookRotateSecretCmdOrganizationIdVar, "id": webhookRotateSecretCmdIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -407,106 +506,101 @@ var webhookTestCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		organizationID := webhookTestCmdOrganizationIdVar
-		iD := webhookTestCmdIdVar
-		reqURL := baseURL + "/v1/organizations/" + url.PathEscape(organizationID) + "/webhooks/" + url.PathEscape(iD) + "/test"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/organizations/{organization_id}/webhooks/{id}/test", map[string]string{"organization_id": webhookTestCmdOrganizationIdVar, "id": webhookTestCmdIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
 }
 
 func init() {
-	webhookCmd.AddCommand(webhookCreateCmd)
 	webhookCmd.AddCommand(webhookListCmd)
+	webhookCmd.AddCommand(webhookCreateCmd)
 	webhookCmd.AddCommand(webhookGetCmd)
 	webhookCmd.AddCommand(webhookUpdateCmd)
 	webhookCmd.AddCommand(webhookDeleteCmd)
 	webhookCmd.AddCommand(webhookDeliveriesCmd)
 	webhookCmd.AddCommand(webhookRotateSecretCmd)
 	webhookCmd.AddCommand(webhookTestCmd)
-	/* Path flag — Use: "organization_id" */
-	webhookCreateCmd.Flags().StringVar(&webhookCreateCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
-	webhookCreateCmd.MarkFlagRequired("organization-id")
-	webhookCreateCmd.Flags().StringVar(&webhookCreateCmdDataVar, "data", "", "Request body: JSON literal, @file, or - for stdin")
-	/* Path flag — Use: "organization_id" */
 	webhookListCmd.Flags().StringVar(&webhookListCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
 	webhookListCmd.MarkFlagRequired("organization-id")
 	webhookListCmd.Flags().StringVar(&webhookListCmdCursorVar, "cursor", "", "Query param cursor")
 	webhookListCmd.Flags().StringVar(&webhookListCmdFilterVar, "filter", "", "Query param filter")
-	webhookListCmd.Flags().StringVar(&webhookListCmdLangVar, "lang", "", "Query param lang")
+	webhookListCmd.Flags().Int64Var(&webhookListCmdLimitVar, "limit", 20, "Query param limit")
 	webhookListCmd.Flags().StringVar(&webhookListCmdOrderVar, "order", "", "Query param order")
 	webhookListCmd.Flags().Int64Var(&webhookListCmdPageVar, "page", 0, "Query param page")
 	webhookListCmd.Flags().StringVar(&webhookListCmdQVar, "q", "", "Query param q")
-	webhookListCmd.Flags().Int64Var(&webhookListCmdLimitVar, "limit", 20, "Query param limit")
-	/* Path flag — Use: "organization_id" */
+	webhookCreateCmd.Flags().StringVar(&webhookCreateCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
+	webhookCreateCmd.MarkFlagRequired("organization-id")
+	webhookCreateCmd.Flags().StringVar(&webhookCreateCmdDataVar, "data", "", "Request body: literal, @file, or - for stdin")
 	webhookGetCmd.Flags().StringVar(&webhookGetCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
 	webhookGetCmd.MarkFlagRequired("organization-id")
-	/* Path flag — Use: "id" */
 	webhookGetCmd.Flags().StringVar(&webhookGetCmdIdVar, "id", "", "Path parameter id")
 	webhookGetCmd.MarkFlagRequired("id")
-	/* Path flag — Use: "organization_id" */
 	webhookUpdateCmd.Flags().StringVar(&webhookUpdateCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
 	webhookUpdateCmd.MarkFlagRequired("organization-id")
-	/* Path flag — Use: "id" */
 	webhookUpdateCmd.Flags().StringVar(&webhookUpdateCmdIdVar, "id", "", "Path parameter id")
 	webhookUpdateCmd.MarkFlagRequired("id")
-	webhookUpdateCmd.Flags().StringVar(&webhookUpdateCmdDataVar, "data", "", "Request body: JSON literal, @file, or - for stdin")
-	/* Path flag — Use: "organization_id" */
+	webhookUpdateCmd.Flags().StringVar(&webhookUpdateCmdDataVar, "data", "", "Request body: literal, @file, or - for stdin")
 	webhookDeleteCmd.Flags().StringVar(&webhookDeleteCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
 	webhookDeleteCmd.MarkFlagRequired("organization-id")
-	/* Path flag — Use: "id" */
 	webhookDeleteCmd.Flags().StringVar(&webhookDeleteCmdIdVar, "id", "", "Path parameter id")
 	webhookDeleteCmd.MarkFlagRequired("id")
-	/* Path flag — Use: "organization_id" */
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
 	webhookDeliveriesCmd.MarkFlagRequired("organization-id")
-	/* Path flag — Use: "id" */
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdIdVar, "id", "", "Path parameter id")
 	webhookDeliveriesCmd.MarkFlagRequired("id")
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdCursorVar, "cursor", "", "Query param cursor")
-	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdFilterVar, "filter", "", "Query param filter")
-	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdLangVar, "lang", "", "Query param lang")
+	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdEventVar, "event", "", "Query param event (one of: batch.complete, batch.failed, batch.partial, ping)")
+	webhookDeliveriesCmd.Flags().Int64Var(&webhookDeliveriesCmdLimitVar, "limit", 20, "Query param limit")
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdOrderVar, "order", "", "Query param order")
 	webhookDeliveriesCmd.Flags().Int64Var(&webhookDeliveriesCmdPageVar, "page", 0, "Query param page")
-	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdQVar, "q", "", "Query param q")
-	webhookDeliveriesCmd.Flags().Int64Var(&webhookDeliveriesCmdLimitVar, "limit", 20, "Query param limit")
-	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdEventVar, "event", "", "Query param event (one of: batch.complete, batch.failed, batch.partial, ping)")
 	webhookDeliveriesCmd.Flags().StringVar(&webhookDeliveriesCmdStatusVar, "status", "", "Query param status (one of: pending, success, failed)")
-	/* Path flag — Use: "organization_id" */
 	webhookRotateSecretCmd.Flags().StringVar(&webhookRotateSecretCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
 	webhookRotateSecretCmd.MarkFlagRequired("organization-id")
-	/* Path flag — Use: "id" */
 	webhookRotateSecretCmd.Flags().StringVar(&webhookRotateSecretCmdIdVar, "id", "", "Path parameter id")
 	webhookRotateSecretCmd.MarkFlagRequired("id")
-	/* Path flag — Use: "organization_id" */
 	webhookTestCmd.Flags().StringVar(&webhookTestCmdOrganizationIdVar, "organization-id", "", "Path parameter organization_id")
 	webhookTestCmd.MarkFlagRequired("organization-id")
-	/* Path flag — Use: "id" */
 	webhookTestCmd.Flags().StringVar(&webhookTestCmdIdVar, "id", "", "Path parameter id")
 	webhookTestCmd.MarkFlagRequired("id")
 }

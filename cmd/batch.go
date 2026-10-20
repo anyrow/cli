@@ -2,16 +2,13 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"slices"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -20,33 +17,18 @@ import (
 	sdk "github.com/anyrow/cli/internal/sdk"
 )
 
-var _ = bytes.NewReader
-var _ = context.TODO
-var _ = json.Marshal
-var _ = fmt.Sprintf
-var _ = io.Discard
-var _ = http.MethodGet
-var _ = url.PathEscape
-var _ = os.Stdout
-var _ = slices.Contains[[]string]
-var _ = strings.NewReader
-var _ = time.Second
-var _ = sdk.SSEEvent{}
-var _ = cli.Version
-
 var batchCmd = &cobra.Command{
 	Use:   "batch",
 	Short: "List batches",
+	Args:  cobra.ArbitraryArgs,
+	RunE:  groupRun,
 }
 
 var batchListCmdProjectIdVar string
 var batchListCmdCursorVar string
-var batchListCmdFilterVar string
-var batchListCmdLangVar string
+var batchListCmdLimitVar int64
 var batchListCmdOrderVar string
 var batchListCmdPageVar int64
-var batchListCmdQVar string
-var batchListCmdLimitVar int64
 var batchListCmdStatusVar string
 
 var batchListCmd = &cobra.Command{
@@ -54,7 +36,7 @@ var batchListCmd = &cobra.Command{
 	Short: "List batches",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if cmd.Flags().Changed("status") && !slices.Contains([]string{"uploading", "processing", "merging", "complete", "partial", "failed"}, batchListCmdStatusVar) {
-			return fmt.Errorf("--status must be one of: uploading, processing, merging, complete, partial, failed")
+			return cli.Usage(errors.New("--status must be one of: uploading, processing, merging, complete, partial, failed"))
 		}
 		return nil
 	},
@@ -62,41 +44,62 @@ var batchListCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := batchListCmdProjectIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/batches"
-		q := url.Values{}
-		if cmd.Flags().Changed("cursor") { q.Set("cursor", batchListCmdCursorVar) }
-		if cmd.Flags().Changed("filter") { q.Set("filter", batchListCmdFilterVar) }
-		if cmd.Flags().Changed("lang") { q.Set("lang", batchListCmdLangVar) }
-		if cmd.Flags().Changed("order") { q.Set("order", batchListCmdOrderVar) }
-		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", batchListCmdPageVar)) }
-		if cmd.Flags().Changed("q") { q.Set("q", batchListCmdQVar) }
-		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", batchListCmdLimitVar)) }
-		if cmd.Flags().Changed("status") { q.Set("status", batchListCmdStatusVar) }
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/batches", map[string]string{"project_id": batchListCmdProjectIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		if cmd.Flags().Changed("cursor") {
+			query = append(query, [2]string{"cursor", batchListCmdCursorVar})
+		}
+		if cmd.Flags().Changed("limit") {
+			query = append(query, [2]string{"limit", strconv.FormatInt(batchListCmdLimitVar, 10)})
+		}
+		if cmd.Flags().Changed("order") {
+			query = append(query, [2]string{"order", batchListCmdOrderVar})
+		}
+		if cmd.Flags().Changed("page") {
+			query = append(query, [2]string{"page", strconv.FormatInt(batchListCmdPageVar, 10)})
+		}
+		if cmd.Flags().Changed("status") {
+			query = append(query, [2]string{"status", batchListCmdStatusVar})
+		}
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -112,34 +115,47 @@ var batchGetCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := batchGetCmdProjectIdVar
-		batchID := batchGetCmdBatchIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/batches/" + url.PathEscape(batchID)
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/batches/{batch_id}", map[string]string{"project_id": batchGetCmdProjectIdVar, "batch_id": batchGetCmdBatchIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -155,32 +171,46 @@ var batchDownloadCsvCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := batchDownloadCsvCmdProjectIdVar
-		batchID := batchDownloadCsvCmdBatchIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/batches/" + url.PathEscape(batchID) + "/download/csv"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/batches/{batch_id}/download/csv", map[string]string{"project_id": batchDownloadCsvCmdProjectIdVar, "batch_id": batchDownloadCsvCmdBatchIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		return nil
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		_, err = os.Stdout.Write(body)
+		return err
 	},
 }
 
@@ -194,32 +224,49 @@ var batchDownloadJsonCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := batchDownloadJsonCmdProjectIdVar
-		batchID := batchDownloadJsonCmdBatchIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/batches/" + url.PathEscape(batchID) + "/download/json"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/batches/{batch_id}/download/json", map[string]string{"project_id": batchDownloadJsonCmdProjectIdVar, "batch_id": batchDownloadJsonCmdBatchIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		return nil
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
+		}
+		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
 }
 
@@ -233,32 +280,46 @@ var batchDownloadXlsxCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := batchDownloadXlsxCmdProjectIdVar
-		batchID := batchDownloadXlsxCmdBatchIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/batches/" + url.PathEscape(batchID) + "/download/xlsx"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/batches/{batch_id}/download/xlsx", map[string]string{"project_id": batchDownloadXlsxCmdProjectIdVar, "batch_id": batchDownloadXlsxCmdBatchIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		return nil
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		_, err = os.Stdout.Write(body)
+		return err
 	},
 }
 
@@ -268,39 +329,27 @@ func init() {
 	batchCmd.AddCommand(batchDownloadCsvCmd)
 	batchCmd.AddCommand(batchDownloadJsonCmd)
 	batchCmd.AddCommand(batchDownloadXlsxCmd)
-	/* Path flag — Use: "project_id" */
 	batchListCmd.Flags().StringVar(&batchListCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	batchListCmd.MarkFlagRequired("project-id")
 	batchListCmd.Flags().StringVar(&batchListCmdCursorVar, "cursor", "", "Query param cursor")
-	batchListCmd.Flags().StringVar(&batchListCmdFilterVar, "filter", "", "Query param filter")
-	batchListCmd.Flags().StringVar(&batchListCmdLangVar, "lang", "", "Query param lang")
+	batchListCmd.Flags().Int64Var(&batchListCmdLimitVar, "limit", 20, "Query param limit")
 	batchListCmd.Flags().StringVar(&batchListCmdOrderVar, "order", "", "Query param order")
 	batchListCmd.Flags().Int64Var(&batchListCmdPageVar, "page", 0, "Query param page")
-	batchListCmd.Flags().StringVar(&batchListCmdQVar, "q", "", "Query param q")
-	batchListCmd.Flags().Int64Var(&batchListCmdLimitVar, "limit", 20, "Query param limit")
 	batchListCmd.Flags().StringVar(&batchListCmdStatusVar, "status", "", "Query param status (one of: uploading, processing, merging, complete, partial, failed)")
-	/* Path flag — Use: "project_id" */
 	batchGetCmd.Flags().StringVar(&batchGetCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	batchGetCmd.MarkFlagRequired("project-id")
-	/* Path flag — Use: "batch_id" */
 	batchGetCmd.Flags().StringVar(&batchGetCmdBatchIdVar, "batch-id", "", "Path parameter batch_id")
 	batchGetCmd.MarkFlagRequired("batch-id")
-	/* Path flag — Use: "project_id" */
 	batchDownloadCsvCmd.Flags().StringVar(&batchDownloadCsvCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	batchDownloadCsvCmd.MarkFlagRequired("project-id")
-	/* Path flag — Use: "batch_id" */
 	batchDownloadCsvCmd.Flags().StringVar(&batchDownloadCsvCmdBatchIdVar, "batch-id", "", "Path parameter batch_id")
 	batchDownloadCsvCmd.MarkFlagRequired("batch-id")
-	/* Path flag — Use: "project_id" */
 	batchDownloadJsonCmd.Flags().StringVar(&batchDownloadJsonCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	batchDownloadJsonCmd.MarkFlagRequired("project-id")
-	/* Path flag — Use: "batch_id" */
 	batchDownloadJsonCmd.Flags().StringVar(&batchDownloadJsonCmdBatchIdVar, "batch-id", "", "Path parameter batch_id")
 	batchDownloadJsonCmd.MarkFlagRequired("batch-id")
-	/* Path flag — Use: "project_id" */
 	batchDownloadXlsxCmd.Flags().StringVar(&batchDownloadXlsxCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	batchDownloadXlsxCmd.MarkFlagRequired("project-id")
-	/* Path flag — Use: "batch_id" */
 	batchDownloadXlsxCmd.Flags().StringVar(&batchDownloadXlsxCmdBatchIdVar, "batch-id", "", "Path parameter batch_id")
 	batchDownloadXlsxCmd.MarkFlagRequired("batch-id")
 }

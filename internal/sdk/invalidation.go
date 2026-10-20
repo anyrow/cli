@@ -3,16 +3,17 @@
 package sdk
 
 import (
+	"container/list"
 	"fmt"
-	"net/url"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
 )
 
-/* placeholderRe matches `{name}` and `:name` placeholders. */
-var placeholderRe = regexp.MustCompile(`\{([a-zA-Z_][a-zA-Z0-9_]*)\}|:([a-zA-Z_][a-zA-Z0-9_]*)`)
+/* placeholderRe matches `{name}` (any name without braces or slashes) and a
+ * `:name` segment. A colon inside a segment (`/ops/1:cancel`) is literal. */
+var placeholderRe = regexp.MustCompile(`\{([^{}/]+)\}|(^|/):([a-zA-Z_][a-zA-Z0-9_]*)`)
 
 /* patternRegexCache caches compiled placeholder→`[^/]+` regexps per pattern key. */
 var patternRegexCache sync.Map /* map[string]*regexp.Regexp */
@@ -24,6 +25,8 @@ type staleEntry struct {
 	by    []string
 	seq   uint64
 	until time.Time
+	/* position in the tracker's LRU list */
+	elem *list.Element
 }
 
 // RequestMeta is the per-request invalidation snapshot consumers see on hook
@@ -44,7 +47,11 @@ func compilePattern(pattern string) *regexp.Regexp {
 	b.WriteByte('^')
 	last := 0
 	for _, m := range matches {
-		b.WriteString(regexp.QuoteMeta(pattern[last:m[0]]))
+		start := m[0]
+		if pattern[start] == '/' {
+			start++ /* keep the segment slash literal */
+		}
+		b.WriteString(regexp.QuoteMeta(pattern[last:start]))
 		b.WriteString(`[^/]+`)
 		last = m[1]
 	}
@@ -78,8 +85,10 @@ func interpolatePath(template string, params map[string]string) (string, error) 
 	out := placeholderRe.ReplaceAllStringFunc(template, func(match string) string {
 		groups := placeholderRe.FindStringSubmatch(match)
 		key := groups[1]
+		prefix := ""
 		if key == "" {
-			key = groups[2]
+			prefix = groups[2]
+			key = groups[3]
 		}
 		val, ok := params[key]
 		if !ok {
@@ -88,7 +97,7 @@ func interpolatePath(template string, params map[string]string) (string, error) 
 			}
 			return match
 		}
-		return url.PathEscape(val)
+		return prefix + escapePathSegment(val)
 	})
 	if missing != "" {
 		return "", fmt.Errorf("interpolatePath: missing path param %q", missing)
@@ -98,8 +107,8 @@ func interpolatePath(template string, params map[string]string) (string, error) 
 
 // resolveInvalidationTargetsForMutation expands templated `METHOD /path/{x}`
 // invalidation entries to concrete `METHOD /path/abc` selectors using params.
-// Pattern-only entries (no params provided) pass through; entries whose
-// placeholders cannot be resolved are dropped.
+// An entry whose placeholders cannot all be resolved stays a pattern, so it
+// marks every instance stale (TS parity).
 func resolveInvalidationTargetsForMutation(targets []string, params map[string]string) []string {
 	out := make([]string, 0, len(targets))
 	for _, entry := range targets {
@@ -116,6 +125,7 @@ func resolveInvalidationTargetsForMutation(targets []string, params map[string]s
 		}
 		concrete, err := interpolatePath(template, params)
 		if err != nil {
+			out = append(out, entry)
 			continue
 		}
 		out = append(out, method+" "+concrete)
@@ -126,11 +136,14 @@ func resolveInvalidationTargetsForMutation(targets []string, params map[string]s
 // StaleTracker tracks invalidation state per `METHOD /path` selector with TS-
 // parity semantics: exact-key + pattern-key two-tier lookup, TTL stale window,
 // LRU eviction at cap, monotonic seq for clear-after-mutate ordering.
-// All public methods are safe for concurrent use.
+// All public methods are safe for concurrent use. A lookup costs one map read plus a scan of
+// the pattern keys of its method; touch and eviction are O(1).
 type StaleTracker struct {
-	mu         sync.Mutex
-	entries    map[string]*staleEntry
-	order      []string /* insertion order; oldest at index 0 */
+	mu      sync.Mutex
+	entries map[string]*staleEntry
+	order   *list.List /* of string keys; oldest at the front */
+	/* method → keys whose path still holds placeholders */
+	patterns   map[string]map[string]struct{}
 	enabled    bool
 	staleTime  time.Duration
 	maxEntries int
@@ -141,7 +154,7 @@ type StaleTracker struct {
 // NewStaleTracker constructs a tracker from an InvalidationConfig.
 // Tracker is disabled (cheap no-op) when cfg is nil or StaleTime ≤ 0.
 func NewStaleTracker(cfg *InvalidationConfig) *StaleTracker {
-	t := &StaleTracker{entries: map[string]*staleEntry{}}
+	t := &StaleTracker{entries: map[string]*staleEntry{}, order: list.New(), patterns: map[string]map[string]struct{}{}}
 	if cfg == nil || cfg.StaleTime <= 0 {
 		return t
 	}
@@ -203,21 +216,11 @@ func (t *StaleTracker) ClearStale(concreteSelector, concretePath, method string,
 		t.deleteLocked(concreteSelector)
 	}
 	toDelete := make([]string, 0)
-	for key, entry := range t.entries {
-		if entry.seq > seqSnapshot {
+	for key := range t.patterns[method] {
+		if t.entries[key].seq > seqSnapshot {
 			continue
 		}
-		if !strings.Contains(key, "{") && !strings.Contains(key, ":") {
-			continue
-		}
-		spaceIdx := strings.IndexByte(key, ' ')
-		if spaceIdx == -1 {
-			continue
-		}
-		if key[:spaceIdx] != method {
-			continue
-		}
-		if pathMatchesPattern(concretePath, key[spaceIdx+1:]) {
+		if pathMatchesPattern(concretePath, key[strings.IndexByte(key, ' ')+1:]) {
 			toDelete = append(toDelete, key)
 		}
 	}
@@ -278,29 +281,34 @@ func (t *StaleTracker) upsertLocked(key string, until time.Time, seq uint64, mut
 	if mutationSelector != "" {
 		by = append(by, mutationSelector)
 	}
-	t.entries[key] = &staleEntry{by: by, seq: seq, until: until}
-	t.order = append(t.order, key)
+	t.entries[key] = &staleEntry{by: by, elem: t.order.PushBack(key), seq: seq, until: until}
+	if method, path, ok := strings.Cut(key, " "); ok && pathHasPlaceholders(path) {
+		if t.patterns[method] == nil {
+			t.patterns[method] = map[string]struct{}{}
+		}
+		t.patterns[method][key] = struct{}{}
+	}
 }
 
 func (t *StaleTracker) touchOrderLocked(key string) {
-	for i, k := range t.order {
-		if k == key {
-			t.order = append(t.order[:i], t.order[i+1:]...)
-			break
-		}
+	if entry, ok := t.entries[key]; ok {
+		t.order.MoveToBack(entry.elem)
 	}
-	t.order = append(t.order, key)
 }
 
 func (t *StaleTracker) deleteLocked(key string) {
-	if _, ok := t.entries[key]; !ok {
+	entry, ok := t.entries[key]
+	if !ok {
 		return
 	}
 	delete(t.entries, key)
-	for i, k := range t.order {
-		if k == key {
-			t.order = append(t.order[:i], t.order[i+1:]...)
-			return
+	t.order.Remove(entry.elem)
+	if method, _, ok := strings.Cut(key, " "); ok {
+		if bucket := t.patterns[method]; bucket != nil {
+			delete(bucket, key)
+			if len(bucket) == 0 {
+				delete(t.patterns, method)
+			}
 		}
 	}
 }
@@ -315,7 +323,8 @@ func (t *StaleTracker) lookupLocked(concreteSelector, concretePath, method strin
 		}
 	}
 	expired := make([]string, 0)
-	for key, entry := range t.entries {
+	for key := range t.patterns[method] {
+		entry := t.entries[key]
 		if !entry.until.After(now) {
 			expired = append(expired, key)
 			continue
@@ -323,17 +332,7 @@ func (t *StaleTracker) lookupLocked(concreteSelector, concretePath, method strin
 		if key == concreteSelector {
 			continue
 		}
-		if !strings.Contains(key, "{") && !strings.Contains(key, ":") {
-			continue
-		}
-		spaceIdx := strings.IndexByte(key, ' ')
-		if spaceIdx == -1 {
-			continue
-		}
-		if key[:spaceIdx] != method {
-			continue
-		}
-		if pathMatchesPattern(concretePath, key[spaceIdx+1:]) {
+		if pathMatchesPattern(concretePath, key[strings.IndexByte(key, ' ')+1:]) {
 			allBy = append(allBy, entry.by...)
 		}
 	}
@@ -366,8 +365,7 @@ func (t *StaleTracker) enforceCapacityLocked() {
 	if target < 1 {
 		target = 1
 	}
-	for len(t.entries) > target && len(t.order) > 0 {
-		oldest := t.order[0]
-		t.deleteLocked(oldest)
+	for len(t.entries) > target && t.order.Len() > 0 {
+		t.deleteLocked(t.order.Front().Value.(string))
 	}
 }

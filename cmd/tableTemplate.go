@@ -5,13 +5,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
-	"slices"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -20,33 +19,20 @@ import (
 	sdk "github.com/anyrow/cli/internal/sdk"
 )
 
-var _ = bytes.NewReader
-var _ = context.TODO
-var _ = json.Marshal
-var _ = fmt.Sprintf
-var _ = io.Discard
-var _ = http.MethodGet
-var _ = url.PathEscape
-var _ = os.Stdout
-var _ = slices.Contains[[]string]
-var _ = strings.NewReader
-var _ = time.Second
-var _ = sdk.SSEEvent{}
-var _ = cli.Version
-
 var tableTemplateCmd = &cobra.Command{
 	Use:   "table-template",
 	Short: "Browse table templates",
+	Args:  cobra.ArbitraryArgs,
+	RunE:  groupRun,
 }
 
 var tableTemplateProjectListCmdProjectIdVar string
 var tableTemplateProjectListCmdCursorVar string
 var tableTemplateProjectListCmdFilterVar string
-var tableTemplateProjectListCmdLangVar string
+var tableTemplateProjectListCmdLimitVar int64
 var tableTemplateProjectListCmdOrderVar string
 var tableTemplateProjectListCmdPageVar int64
 var tableTemplateProjectListCmdQVar string
-var tableTemplateProjectListCmdLimitVar int64
 
 var tableTemplateProjectListCmd = &cobra.Command{
 	Use:   "project-list",
@@ -55,40 +41,65 @@ var tableTemplateProjectListCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := tableTemplateProjectListCmdProjectIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/table-templates"
-		q := url.Values{}
-		if cmd.Flags().Changed("cursor") { q.Set("cursor", tableTemplateProjectListCmdCursorVar) }
-		if cmd.Flags().Changed("filter") { q.Set("filter", tableTemplateProjectListCmdFilterVar) }
-		if cmd.Flags().Changed("lang") { q.Set("lang", tableTemplateProjectListCmdLangVar) }
-		if cmd.Flags().Changed("order") { q.Set("order", tableTemplateProjectListCmdOrderVar) }
-		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", tableTemplateProjectListCmdPageVar)) }
-		if cmd.Flags().Changed("q") { q.Set("q", tableTemplateProjectListCmdQVar) }
-		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", tableTemplateProjectListCmdLimitVar)) }
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/table-templates", map[string]string{"project_id": tableTemplateProjectListCmdProjectIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		if cmd.Flags().Changed("cursor") {
+			query = append(query, [2]string{"cursor", tableTemplateProjectListCmdCursorVar})
+		}
+		if cmd.Flags().Changed("filter") {
+			query = append(query, [2]string{"filter", tableTemplateProjectListCmdFilterVar})
+		}
+		if cmd.Flags().Changed("limit") {
+			query = append(query, [2]string{"limit", strconv.FormatInt(tableTemplateProjectListCmdLimitVar, 10)})
+		}
+		if cmd.Flags().Changed("order") {
+			query = append(query, [2]string{"order", tableTemplateProjectListCmdOrderVar})
+		}
+		if cmd.Flags().Changed("page") {
+			query = append(query, [2]string{"page", strconv.FormatInt(tableTemplateProjectListCmdPageVar, 10)})
+		}
+		if cmd.Flags().Changed("q") {
+			query = append(query, [2]string{"q", tableTemplateProjectListCmdQVar})
+		}
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -104,34 +115,47 @@ var tableTemplateProjectGetCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := tableTemplateProjectGetCmdProjectIdVar
-		templateID := tableTemplateProjectGetCmdTemplateIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/table-templates/" + url.PathEscape(templateID)
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/table-templates/{template_id}", map[string]string{"project_id": tableTemplateProjectGetCmdProjectIdVar, "template_id": tableTemplateProjectGetCmdTemplateIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -139,16 +163,16 @@ var tableTemplateProjectGetCmd = &cobra.Command{
 
 var tableTemplateUseCmdProjectIdVar string
 var tableTemplateUseCmdTemplateIdVar string
-var tableTemplateUseCmdDataVar string
 var tableTemplateUseCmdNameVar string
 var tableTemplateUseCmdSlugVar string
+var tableTemplateUseCmdDataVar string
 
 var tableTemplateUseCmd = &cobra.Command{
 	Use:   "use",
 	Short: "Create table from template",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if tableTemplateUseCmdDataVar == "" && !(cmd.Flags().Changed("name") || cmd.Flags().Changed("slug")) {
-			return fmt.Errorf("body required: pass --data or per-field flags")
+			return cli.Usage(errors.New("body required: pass --data or per-field flags"))
 		}
 		return nil
 	},
@@ -156,48 +180,70 @@ var tableTemplateUseCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := tableTemplateUseCmdProjectIdVar
-		templateID := tableTemplateUseCmdTemplateIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/table-templates/" + url.PathEscape(templateID) + "/use"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		// merge --data + per-prop flags
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/table-templates/{template_id}/use", map[string]string{"project_id": tableTemplateUseCmdProjectIdVar, "template_id": tableTemplateUseCmdTemplateIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
 		merged := map[string]any{}
 		if tableTemplateUseCmdDataVar != "" {
 			dataBytes, derr := cli.ReadDataFlag(tableTemplateUseCmdDataVar)
-			if derr != nil { return derr }
+			if derr != nil {
+				return cli.Usage(derr)
+			}
 			if len(dataBytes) > 0 {
-				if jerr := json.Unmarshal(dataBytes, &merged); jerr != nil { return fmt.Errorf("parse --data: %w", jerr) }
+				if jerr := json.Unmarshal(dataBytes, &merged); jerr != nil {
+					return cli.Usage(fmt.Errorf("parse --data: %w", jerr))
+				}
 			}
 		}
-		if cmd.Flags().Changed("name") { merged["name"] = tableTemplateUseCmdNameVar }
-		if cmd.Flags().Changed("slug") { merged["slug"] = tableTemplateUseCmdSlugVar }
-		bodyBytes, merr := json.Marshal(merged)
-		if merr != nil { return merr }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
-		if rerr != nil { return rerr }
-		req.Header.Set("Content-Type", "application/json")
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
-		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		if cmd.Flags().Changed("name") {
+			merged["name"] = tableTemplateUseCmdNameVar
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if cmd.Flags().Changed("slug") {
+			merged["slug"] = tableTemplateUseCmdSlugVar
+		}
+		bodyBytes, err := json.Marshal(merged)
+		if err != nil {
+			return err
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
+		if err != nil {
+			return err
+		}
+		req.Header.Set("Content-Type", "application/json")
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -210,7 +256,7 @@ var tableTemplateCreateCmd = &cobra.Command{
 	Short: "Create table template",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if tableTemplateCreateCmdDataVar == "" && !(false) {
-			return fmt.Errorf("body required: pass --data or per-field flags")
+			return cli.Usage(errors.New("body required: pass --data or per-field flags"))
 		}
 		return nil
 	},
@@ -218,35 +264,49 @@ var tableTemplateCreateCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		reqURL := baseURL + "/v1/table-templates"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		bodyBytes, derr := cli.ReadDataFlag(tableTemplateCreateCmdDataVar)
-		if derr != nil { return derr }
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
-		if rerr != nil { return rerr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path := "/v1/table-templates"
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		bodyBytes, err := cli.ReadDataFlag(tableTemplateCreateCmdDataVar)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
+		if err != nil {
+			return err
+		}
 		req.Header.Set("Content-Type", "application/json")
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
-		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -254,12 +314,11 @@ var tableTemplateCreateCmd = &cobra.Command{
 
 var tableTemplateListMineCmdCursorVar string
 var tableTemplateListMineCmdFilterVar string
-var tableTemplateListMineCmdLangVar string
+var tableTemplateListMineCmdLimitVar int64
 var tableTemplateListMineCmdOrderVar string
 var tableTemplateListMineCmdPageVar int64
 var tableTemplateListMineCmdQVar string
 var tableTemplateListMineCmdSelectVar string
-var tableTemplateListMineCmdLimitVar int64
 
 var tableTemplateListMineCmd = &cobra.Command{
 	Use:   "list-mine",
@@ -268,40 +327,65 @@ var tableTemplateListMineCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		reqURL := baseURL + "/v1/table-templates/mine"
-		q := url.Values{}
-		if cmd.Flags().Changed("cursor") { q.Set("cursor", tableTemplateListMineCmdCursorVar) }
-		if cmd.Flags().Changed("filter") { q.Set("filter", tableTemplateListMineCmdFilterVar) }
-		if cmd.Flags().Changed("lang") { q.Set("lang", tableTemplateListMineCmdLangVar) }
-		if cmd.Flags().Changed("order") { q.Set("order", tableTemplateListMineCmdOrderVar) }
-		if cmd.Flags().Changed("page") { q.Set("page", fmt.Sprintf("%d", tableTemplateListMineCmdPageVar)) }
-		if cmd.Flags().Changed("q") { q.Set("q", tableTemplateListMineCmdQVar) }
-		if cmd.Flags().Changed("select") { q.Set("select", tableTemplateListMineCmdSelectVar) }
-		if cmd.Flags().Changed("limit") { q.Set("limit", fmt.Sprintf("%d", tableTemplateListMineCmdLimitVar)) }
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path := "/v1/table-templates/mine"
+		var query [][2]string
+		if cmd.Flags().Changed("cursor") {
+			query = append(query, [2]string{"cursor", tableTemplateListMineCmdCursorVar})
+		}
+		if cmd.Flags().Changed("filter") {
+			query = append(query, [2]string{"filter", tableTemplateListMineCmdFilterVar})
+		}
+		if cmd.Flags().Changed("limit") {
+			query = append(query, [2]string{"limit", strconv.FormatInt(tableTemplateListMineCmdLimitVar, 10)})
+		}
+		if cmd.Flags().Changed("order") {
+			query = append(query, [2]string{"order", tableTemplateListMineCmdOrderVar})
+		}
+		if cmd.Flags().Changed("page") {
+			query = append(query, [2]string{"page", strconv.FormatInt(tableTemplateListMineCmdPageVar, 10)})
+		}
+		if cmd.Flags().Changed("q") {
+			query = append(query, [2]string{"q", tableTemplateListMineCmdQVar})
+		}
+		if cmd.Flags().Changed("select") {
+			query = append(query, [2]string{"select", tableTemplateListMineCmdSelectVar})
+		}
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -315,7 +399,7 @@ var tableTemplateUpdateCmd = &cobra.Command{
 	Short: "Update table template",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if tableTemplateUpdateCmdDataVar == "" && !(false) {
-			return fmt.Errorf("body required: pass --data or per-field flags")
+			return cli.Usage(errors.New("body required: pass --data or per-field flags"))
 		}
 		return nil
 	},
@@ -323,36 +407,52 @@ var tableTemplateUpdateCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		templateID := tableTemplateUpdateCmdTemplateIdVar
-		reqURL := baseURL + "/v1/table-templates/" + url.PathEscape(templateID)
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		bodyBytes, derr := cli.ReadDataFlag(tableTemplateUpdateCmdDataVar)
-		if derr != nil { return derr }
-		req, rerr := http.NewRequestWithContext(ctx, "PATCH", reqURL, bytes.NewReader(bodyBytes))
-		if rerr != nil { return rerr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/table-templates/{template_id}", map[string]string{"template_id": tableTemplateUpdateCmdTemplateIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		bodyBytes, err := cli.ReadDataFlag(tableTemplateUpdateCmdDataVar)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "PATCH", reqURL, bytes.NewReader(bodyBytes))
+		if err != nil {
+			return err
+		}
 		req.Header.Set("Content-Type", "application/json")
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
-		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -367,33 +467,47 @@ var tableTemplateDeleteCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		templateID := tableTemplateDeleteCmdTemplateIdVar
-		reqURL := baseURL + "/v1/table-templates/" + url.PathEscape(templateID)
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		req, rerr := http.NewRequestWithContext(ctx, "DELETE", reqURL, nil)
-		if rerr != nil { return rerr }
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/table-templates/{template_id}", map[string]string{"template_id": tableTemplateDeleteCmdTemplateIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "DELETE", reqURL, nil)
+		if err != nil {
+			return err
+		}
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -407,45 +521,36 @@ func init() {
 	tableTemplateCmd.AddCommand(tableTemplateListMineCmd)
 	tableTemplateCmd.AddCommand(tableTemplateUpdateCmd)
 	tableTemplateCmd.AddCommand(tableTemplateDeleteCmd)
-	/* Path flag — Use: "project_id" */
 	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	tableTemplateProjectListCmd.MarkFlagRequired("project-id")
 	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdCursorVar, "cursor", "", "Query param cursor")
 	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdFilterVar, "filter", "", "Query param filter")
-	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdLangVar, "lang", "", "Query param lang")
+	tableTemplateProjectListCmd.Flags().Int64Var(&tableTemplateProjectListCmdLimitVar, "limit", 20, "Query param limit")
 	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdOrderVar, "order", "", "Query param order")
 	tableTemplateProjectListCmd.Flags().Int64Var(&tableTemplateProjectListCmdPageVar, "page", 0, "Query param page")
 	tableTemplateProjectListCmd.Flags().StringVar(&tableTemplateProjectListCmdQVar, "q", "", "Query param q")
-	tableTemplateProjectListCmd.Flags().Int64Var(&tableTemplateProjectListCmdLimitVar, "limit", 20, "Query param limit")
-	/* Path flag — Use: "project_id" */
 	tableTemplateProjectGetCmd.Flags().StringVar(&tableTemplateProjectGetCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	tableTemplateProjectGetCmd.MarkFlagRequired("project-id")
-	/* Path flag — Use: "template_id" */
 	tableTemplateProjectGetCmd.Flags().StringVar(&tableTemplateProjectGetCmdTemplateIdVar, "template-id", "", "Path parameter template_id")
 	tableTemplateProjectGetCmd.MarkFlagRequired("template-id")
-	/* Path flag — Use: "project_id" */
 	tableTemplateUseCmd.Flags().StringVar(&tableTemplateUseCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	tableTemplateUseCmd.MarkFlagRequired("project-id")
-	/* Path flag — Use: "template_id" */
 	tableTemplateUseCmd.Flags().StringVar(&tableTemplateUseCmdTemplateIdVar, "template-id", "", "Path parameter template_id")
 	tableTemplateUseCmd.MarkFlagRequired("template-id")
-	tableTemplateUseCmd.Flags().StringVar(&tableTemplateUseCmdDataVar, "data", "", "Request body: JSON literal, @file, or - for stdin")
 	tableTemplateUseCmd.Flags().StringVar(&tableTemplateUseCmdNameVar, "name", "", "Body field name")
 	tableTemplateUseCmd.Flags().StringVar(&tableTemplateUseCmdSlugVar, "slug", "", "Body field slug")
-	tableTemplateCreateCmd.Flags().StringVar(&tableTemplateCreateCmdDataVar, "data", "", "Request body: JSON literal, @file, or - for stdin")
+	tableTemplateUseCmd.Flags().StringVar(&tableTemplateUseCmdDataVar, "data", "", "Request body: literal, @file, or - for stdin")
+	tableTemplateCreateCmd.Flags().StringVar(&tableTemplateCreateCmdDataVar, "data", "", "Request body: literal, @file, or - for stdin")
 	tableTemplateListMineCmd.Flags().StringVar(&tableTemplateListMineCmdCursorVar, "cursor", "", "Query param cursor")
 	tableTemplateListMineCmd.Flags().StringVar(&tableTemplateListMineCmdFilterVar, "filter", "", "Query param filter")
-	tableTemplateListMineCmd.Flags().StringVar(&tableTemplateListMineCmdLangVar, "lang", "", "Query param lang")
+	tableTemplateListMineCmd.Flags().Int64Var(&tableTemplateListMineCmdLimitVar, "limit", 20, "Query param limit")
 	tableTemplateListMineCmd.Flags().StringVar(&tableTemplateListMineCmdOrderVar, "order", "", "Query param order")
 	tableTemplateListMineCmd.Flags().Int64Var(&tableTemplateListMineCmdPageVar, "page", 0, "Query param page")
 	tableTemplateListMineCmd.Flags().StringVar(&tableTemplateListMineCmdQVar, "q", "", "Query param q")
 	tableTemplateListMineCmd.Flags().StringVar(&tableTemplateListMineCmdSelectVar, "select", "", "Query param select")
-	tableTemplateListMineCmd.Flags().Int64Var(&tableTemplateListMineCmdLimitVar, "limit", 20, "Query param limit")
-	/* Path flag — Use: "template_id" */
 	tableTemplateUpdateCmd.Flags().StringVar(&tableTemplateUpdateCmdTemplateIdVar, "template-id", "", "Path parameter template_id")
 	tableTemplateUpdateCmd.MarkFlagRequired("template-id")
-	tableTemplateUpdateCmd.Flags().StringVar(&tableTemplateUpdateCmdDataVar, "data", "", "Request body: JSON literal, @file, or - for stdin")
-	/* Path flag — Use: "template_id" */
+	tableTemplateUpdateCmd.Flags().StringVar(&tableTemplateUpdateCmdDataVar, "data", "", "Request body: literal, @file, or - for stdin")
 	tableTemplateDeleteCmd.Flags().StringVar(&tableTemplateDeleteCmdTemplateIdVar, "template-id", "", "Path parameter template_id")
 	tableTemplateDeleteCmd.MarkFlagRequired("template-id")
 }

@@ -36,7 +36,8 @@
 	},
 	"scripts": {
 		"release": "goreleaser release --clean",
-		"release:snapshot": "goreleaser release --snapshot --clean --skip=publish"
+		"release:snapshot": "goreleaser release --snapshot --clean --skip=publish",
+		"turn": "repo-turn"
 	},
 	"type": "module",
 	"version": "1.0.0"

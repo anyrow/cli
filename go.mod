@@ -1,6 +1,6 @@
 module github.com/anyrow/cli
 
-go 1.23
+go 1.24
 
 require (
 	github.com/pelletier/go-toml/v2 v2.2.3

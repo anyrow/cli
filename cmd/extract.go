@@ -2,16 +2,12 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
-	"iter"
 	"net/http"
 	"net/url"
 	"os"
-	"slices"
 	"strings"
 	"time"
 
@@ -21,33 +17,14 @@ import (
 	sdk "github.com/anyrow/cli/internal/sdk"
 )
 
-var _ = bytes.NewReader
-var _ = context.TODO
-var _ = json.Marshal
-var _ = fmt.Sprintf
-var _ = io.Discard
-var _ = http.MethodGet
-var _ = url.PathEscape
-var _ = os.Stdout
-var _ = slices.Contains[[]string]
-var _ = strings.NewReader
-var _ = time.Second
-var _ = sdk.SSEEvent{}
-var _ = cli.Version
-var _ iter.Seq2[cli.SSEEvent, error]
-
 var extractCmd = &cobra.Command{
 	Use:   "extract",
 	Short: "Extract data from text or file (JSON response)",
+	Args:  cobra.ArbitraryArgs,
+	RunE:  groupRun,
 }
 
 var extractOnceCmdProjectIdVar string
-var extractOnceCmdColumnsVar string
-var extractOnceCmdInstructionVar string
-var extractOnceCmdSchemaVar string
-var extractOnceCmdStrictnessVar string
-var extractOnceCmdTextVar string
-var extractOnceCmdFileVar string
 
 var extractOnceCmd = &cobra.Command{
 	Use:   "once",
@@ -56,57 +33,56 @@ var extractOnceCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := extractOnceCmdProjectIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/extract"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		fields := map[string]string{}
-		if cmd.Flags().Changed("columns") { fields["columns"] = extractOnceCmdColumnsVar }
-		if cmd.Flags().Changed("instruction") { fields["instruction"] = extractOnceCmdInstructionVar }
-		if cmd.Flags().Changed("schema") { fields["schema"] = extractOnceCmdSchemaVar }
-		if cmd.Flags().Changed("strictness") { fields["strictness"] = extractOnceCmdStrictnessVar }
-		if cmd.Flags().Changed("text") { fields["text"] = extractOnceCmdTextVar }
-		files := map[string]string{}
-		if extractOnceCmdFileVar != "" { files["file"] = extractOnceCmdFileVar }
-		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
-		if mpErr != nil { return mpErr }
-		_ = mpCT
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, mpReader)
-		if rerr != nil { return rerr }
-		req.Header.Set("Content-Type", mpCT) // multipart/form-data; boundary=...
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/extract", map[string]string{"project_id": extractOnceCmdProjectIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		form := url.Values{}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, strings.NewReader(form.Encode()))
+		if err != nil {
+			return err
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
 }
 
 var extractStreamCmdProjectIdVar string
-var extractStreamCmdColumnsVar string
-var extractStreamCmdInstructionVar string
-var extractStreamCmdSchemaVar string
-var extractStreamCmdStrictnessVar string
-var extractStreamCmdTextVar string
-var extractStreamCmdFileVar string
+var extractStreamCmdLastEventIdVar string
 
 var extractStreamCmd = &cobra.Command{
 	Use:   "stream",
@@ -115,38 +91,37 @@ var extractStreamCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := extractStreamCmdProjectIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/extract-stream"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		fields := map[string]string{}
-		if cmd.Flags().Changed("columns") { fields["columns"] = extractStreamCmdColumnsVar }
-		if cmd.Flags().Changed("instruction") { fields["instruction"] = extractStreamCmdInstructionVar }
-		if cmd.Flags().Changed("schema") { fields["schema"] = extractStreamCmdSchemaVar }
-		if cmd.Flags().Changed("strictness") { fields["strictness"] = extractStreamCmdStrictnessVar }
-		if cmd.Flags().Changed("text") { fields["text"] = extractStreamCmdTextVar }
-		files := map[string]string{}
-		if extractStreamCmdFileVar != "" { files["file"] = extractStreamCmdFileVar }
-		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
-		if mpErr != nil { return mpErr }
-		_ = mpCT
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/extract-stream", map[string]string{"project_id": extractStreamCmdProjectIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		form := url.Values{}
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, strings.NewReader(form.Encode()))
+		if err != nil {
+			return err
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
 		req.Header.Set("Accept", "text/event-stream")
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
-		defer resp.Body.Close()
-		it := sdk.ParseSSEStreamExported(ctx, resp)
+		if extractStreamCmdLastEventIdVar != "" {
+			req.Header.Set("Last-Event-ID", extractStreamCmdLastEventIdVar)
+		}
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
+		it := sdk.HoneyParseSSEStream(ctx, resp)
 		wrapped := func(yield func(cli.SSEEvent, error) bool) {
 			for ev, iterErr := range it {
 				if !yield(cli.SSEEvent{Data: ev.Data, Event: ev.Event, ID: ev.ID, Retry: ev.Retry}, iterErr) {
@@ -160,8 +135,6 @@ var extractStreamCmd = &cobra.Command{
 
 var extractTableOnceCmdProjectIdVar string
 var extractTableOnceCmdTableIdVar string
-var extractTableOnceCmdTextVar string
-var extractTableOnceCmdFileVar string
 
 var extractTableOnceCmd = &cobra.Command{
 	Use:   "table-once",
@@ -170,42 +143,49 @@ var extractTableOnceCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := extractTableOnceCmdProjectIdVar
-		tableID := extractTableOnceCmdTableIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/tables/" + url.PathEscape(tableID) + "/extract"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		fields := map[string]string{}
-		if cmd.Flags().Changed("text") { fields["text"] = extractTableOnceCmdTextVar }
-		files := map[string]string{}
-		if extractTableOnceCmdFileVar != "" { files["file"] = extractTableOnceCmdFileVar }
-		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
-		if mpErr != nil { return mpErr }
-		_ = mpCT
-		req, rerr := http.NewRequestWithContext(ctx, "POST", reqURL, mpReader)
-		if rerr != nil { return rerr }
-		req.Header.Set("Content-Type", mpCT) // multipart/form-data; boundary=...
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/tables/{table_id}/extract", map[string]string{"project_id": extractTableOnceCmdProjectIdVar, "table_id": extractTableOnceCmdTableIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		form := url.Values{}
+		timeout, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, strings.NewReader(form.Encode()))
+		if err != nil {
+			return err
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
 		defer resp.Body.Close()
-		body, berr := io.ReadAll(resp.Body)
-		if berr != nil { return berr }
-		if resp.StatusCode >= 400 {
-			return &sdk.StatusError{StatusCode: resp.StatusCode, Body: body, Response: resp, Message: string(body)}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		var out any
-		if len(body) > 0 {
-			if jerr := json.Unmarshal(body, &out); jerr != nil { return jerr }
+		if err := sdk.HoneyRaiseForStatus(resp, body); err != nil {
+			return err
+		}
+		out, err := cli.DecodeJSON(body)
+		if err != nil {
+			return err
 		}
 		return cli.Emit(out, cfg.Output, os.Stdout)
 	},
@@ -213,8 +193,7 @@ var extractTableOnceCmd = &cobra.Command{
 
 var extractTableStreamCmdProjectIdVar string
 var extractTableStreamCmdTableIdVar string
-var extractTableStreamCmdTextVar string
-var extractTableStreamCmdFileVar string
+var extractTableStreamCmdLastEventIdVar string
 
 var extractTableStreamCmd = &cobra.Command{
 	Use:   "table-stream",
@@ -223,35 +202,37 @@ var extractTableStreamCmd = &cobra.Command{
 		ctx := cmd.Context()
 		cfg := configFromCtx(ctx)
 		apiKey, err := cli.ResolveAPIKey(cfg)
-		if err != nil { return err }
-		_ = apiKey
-		baseURL := cfg.BaseURL
-		if baseURL == "" { return fmt.Errorf("base URL required: set --base-url, env, or config") }
-		timeout := 30 * time.Second
-		if cfg.Timeout != "" {
-			if d, perr := time.ParseDuration(cfg.Timeout); perr == nil { timeout = d }
+		if err != nil {
+			return err
 		}
-		httpClient := &http.Client{Timeout: timeout}
-		projectID := extractTableStreamCmdProjectIdVar
-		tableID := extractTableStreamCmdTableIdVar
-		reqURL := baseURL + "/v1/projects/" + url.PathEscape(projectID) + "/tables/" + url.PathEscape(tableID) + "/extract-stream"
-		q := url.Values{}
-		if len(q) > 0 { reqURL += "?" + q.Encode() }
-		fields := map[string]string{}
-		if cmd.Flags().Changed("text") { fields["text"] = extractTableStreamCmdTextVar }
-		files := map[string]string{}
-		if extractTableStreamCmdFileVar != "" { files["file"] = extractTableStreamCmdFileVar }
-		mpReader, mpCT, mpErr := cli.BuildMultipart(fields, files)
-		if mpErr != nil { return mpErr }
-		_ = mpCT
-		req, rerr := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if rerr != nil { return rerr }
+		if cfg.BaseURL == "" {
+			return cli.Usage(errors.New("base URL required: set --base-url, env, or config"))
+		}
+		path, err := sdk.HoneyExpandPath("/v1/projects/{project_id}/tables/{table_id}/extract-stream", map[string]string{"project_id": extractTableStreamCmdProjectIdVar, "table_id": extractTableStreamCmdTableIdVar})
+		if err != nil {
+			return cli.Usage(err)
+		}
+		var query [][2]string
+		reqURL, err := sdk.HoneyBuildURL(cfg.BaseURL, path, query)
+		if err != nil {
+			return cli.Usage(err)
+		}
+		form := url.Values{}
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, strings.NewReader(form.Encode()))
+		if err != nil {
+			return err
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		cli.ApplyAuth(req.Header, AuthHeaderName, AuthHeaderPrefix, apiKey)
 		req.Header.Set("Accept", "text/event-stream")
-		if apiKey != "" { req.Header.Set("Authorization", "Bearer "+apiKey) }
-		resp, herr := httpClient.Do(req)
-		if herr != nil { return herr }
-		defer resp.Body.Close()
-		it := sdk.ParseSSEStreamExported(ctx, resp)
+		if extractTableStreamCmdLastEventIdVar != "" {
+			req.Header.Set("Last-Event-ID", extractTableStreamCmdLastEventIdVar)
+		}
+		resp, err := newHTTPClient().Do(req)
+		if err != nil {
+			return err
+		}
+		it := sdk.HoneyParseSSEStream(ctx, resp)
 		wrapped := func(yield func(cli.SSEEvent, error) bool) {
 			for ev, iterErr := range it {
 				if !yield(cli.SSEEvent{Data: ev.Data, Event: ev.Event, ID: ev.ID, Retry: ev.Retry}, iterErr) {
@@ -268,38 +249,18 @@ func init() {
 	extractCmd.AddCommand(extractStreamCmd)
 	extractCmd.AddCommand(extractTableOnceCmd)
 	extractCmd.AddCommand(extractTableStreamCmd)
-	/* Path flag — Use: "project_id" */
 	extractOnceCmd.Flags().StringVar(&extractOnceCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	extractOnceCmd.MarkFlagRequired("project-id")
-	extractOnceCmd.Flags().StringVar(&extractOnceCmdColumnsVar, "columns", "", "Body field columns")
-	extractOnceCmd.Flags().StringVar(&extractOnceCmdInstructionVar, "instruction", "", "Body field instruction")
-	extractOnceCmd.Flags().StringVar(&extractOnceCmdSchemaVar, "schema", "", "Body field schema")
-	extractOnceCmd.Flags().StringVar(&extractOnceCmdStrictnessVar, "strictness", "", "Body field strictness (one of: strict, balanced, flexible)")
-	extractOnceCmd.Flags().StringVar(&extractOnceCmdTextVar, "text", "", "Body field text")
-	extractOnceCmd.Flags().StringVar(&extractOnceCmdFileVar, "file", "", "Path to file to upload")
-	/* Path flag — Use: "project_id" */
 	extractStreamCmd.Flags().StringVar(&extractStreamCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	extractStreamCmd.MarkFlagRequired("project-id")
-	extractStreamCmd.Flags().StringVar(&extractStreamCmdColumnsVar, "columns", "", "Body field columns")
-	extractStreamCmd.Flags().StringVar(&extractStreamCmdInstructionVar, "instruction", "", "Body field instruction")
-	extractStreamCmd.Flags().StringVar(&extractStreamCmdSchemaVar, "schema", "", "Body field schema")
-	extractStreamCmd.Flags().StringVar(&extractStreamCmdStrictnessVar, "strictness", "", "Body field strictness (one of: strict, balanced, flexible)")
-	extractStreamCmd.Flags().StringVar(&extractStreamCmdTextVar, "text", "", "Body field text")
-	extractStreamCmd.Flags().StringVar(&extractStreamCmdFileVar, "file", "", "Path to file to upload")
-	/* Path flag — Use: "project_id" */
+	extractStreamCmd.Flags().StringVar(&extractStreamCmdLastEventIdVar, "last-event-id", "", "SSE Last-Event-ID resume token")
 	extractTableOnceCmd.Flags().StringVar(&extractTableOnceCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	extractTableOnceCmd.MarkFlagRequired("project-id")
-	/* Path flag — Use: "table_id" */
 	extractTableOnceCmd.Flags().StringVar(&extractTableOnceCmdTableIdVar, "table-id", "", "Path parameter table_id")
 	extractTableOnceCmd.MarkFlagRequired("table-id")
-	extractTableOnceCmd.Flags().StringVar(&extractTableOnceCmdTextVar, "text", "", "Body field text")
-	extractTableOnceCmd.Flags().StringVar(&extractTableOnceCmdFileVar, "file", "", "Path to file to upload")
-	/* Path flag — Use: "project_id" */
 	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdProjectIdVar, "project-id", "", "Path parameter project_id")
 	extractTableStreamCmd.MarkFlagRequired("project-id")
-	/* Path flag — Use: "table_id" */
 	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdTableIdVar, "table-id", "", "Path parameter table_id")
 	extractTableStreamCmd.MarkFlagRequired("table-id")
-	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdTextVar, "text", "", "Body field text")
-	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdFileVar, "file", "", "Path to file to upload")
+	extractTableStreamCmd.Flags().StringVar(&extractTableStreamCmdLastEventIdVar, "last-event-id", "", "SSE Last-Event-ID resume token")
 }

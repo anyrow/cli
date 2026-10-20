@@ -6,96 +6,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"iter"
-	"net/http"
 	"net/url"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
 )
-
-var _ = fmt.Sprintf
-var _ = io.Discard
-var _ = strings.NewReader
-var _ = sync.Mutex{}
-
-type serviceEntry struct {
-	Method     string
-	Path       string
-	Params     []string
-	SSE        bool
-	WS         bool
-	Invalidate []string
-}
-
-var invalidationMap = map[string]map[string]serviceEntry{
-	"batch": {
-		"download.csv": {Method: "GET", Path: "/v1/projects/{project_id}/batches/{batch_id}/download/csv", Params: []string{"project_id", "batch_id"}, SSE: false, WS: false, Invalidate: nil},
-		"download.json": {Method: "GET", Path: "/v1/projects/{project_id}/batches/{batch_id}/download/json", Params: []string{"project_id", "batch_id"}, SSE: false, WS: false, Invalidate: nil},
-		"download.xlsx": {Method: "GET", Path: "/v1/projects/{project_id}/batches/{batch_id}/download/xlsx", Params: []string{"project_id", "batch_id"}, SSE: false, WS: false, Invalidate: nil},
-		"get": {Method: "GET", Path: "/v1/projects/{project_id}/batches/{batch_id}", Params: []string{"project_id", "batch_id"}, SSE: false, WS: false, Invalidate: nil},
-		"list": {Method: "GET", Path: "/v1/projects/{project_id}/batches", Params: []string{"project_id"}, SSE: false, WS: false, Invalidate: nil},
-	},
-	"column": {
-		"add": {Method: "POST", Path: "/v1/projects/{project_id}/tables/{table_id}/columns", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"distinct": {Method: "GET", Path: "/v1/projects/{project_id}/tables/{table_id}/columns/{col_id}/distinct", Params: []string{"project_id", "table_id", "col_id"}, SSE: false, WS: false, Invalidate: nil},
-		"remove": {Method: "DELETE", Path: "/v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", Params: []string{"project_id", "table_id", "col_id"}, SSE: false, WS: false, Invalidate: nil},
-		"reorder": {Method: "PUT", Path: "/v1/projects/{project_id}/tables/{table_id}/columns/order", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"update": {Method: "PATCH", Path: "/v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", Params: []string{"project_id", "table_id", "col_id"}, SSE: false, WS: false, Invalidate: nil},
-	},
-	"export": {
-		"get": {Method: "GET", Path: "/v1/projects/{project_id}/exports/{export_id}", Params: []string{"project_id", "export_id"}, SSE: false, WS: false, Invalidate: nil},
-	},
-	"extract": {
-		"once": {Method: "POST", Path: "/v1/projects/{project_id}/extract", Params: []string{"project_id"}, SSE: false, WS: false, Invalidate: nil},
-		"stream": {Method: "POST", Path: "/v1/projects/{project_id}/extract-stream", Params: []string{"project_id"}, SSE: true, WS: false, Invalidate: nil},
-		"table.once": {Method: "POST", Path: "/v1/projects/{project_id}/tables/{table_id}/extract", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"table.stream": {Method: "POST", Path: "/v1/projects/{project_id}/tables/{table_id}/extract-stream", Params: []string{"project_id", "table_id"}, SSE: true, WS: false, Invalidate: nil},
-	},
-	"row": {
-		"aggregate": {Method: "GET", Path: "/v1/projects/{project_id}/tables/{table_id}/rows/aggregate", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"bulk": {Method: "POST", Path: "/v1/projects/{project_id}/tables/{table_id}/rows/bulk", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"create": {Method: "POST", Path: "/v1/projects/{project_id}/tables/{table_id}/rows", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"delete": {Method: "DELETE", Path: "/v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", Params: []string{"project_id", "table_id", "row_id"}, SSE: false, WS: false, Invalidate: nil},
-		"get": {Method: "GET", Path: "/v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", Params: []string{"project_id", "table_id", "row_id"}, SSE: false, WS: false, Invalidate: nil},
-		"list": {Method: "GET", Path: "/v1/projects/{project_id}/tables/{table_id}/rows", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"update": {Method: "PATCH", Path: "/v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", Params: []string{"project_id", "table_id", "row_id"}, SSE: false, WS: false, Invalidate: nil},
-	},
-	"suggest": {
-		"schema": {Method: "POST", Path: "/v1/projects/{project_id}/suggest-schema", Params: []string{"project_id"}, SSE: false, WS: false, Invalidate: nil},
-	},
-	"table": {
-		"create": {Method: "POST", Path: "/v1/projects/{project_id}/tables", Params: []string{"project_id"}, SSE: false, WS: false, Invalidate: nil},
-		"delete": {Method: "DELETE", Path: "/v1/projects/{project_id}/tables/{table_id}", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"duplicate": {Method: "POST", Path: "/v1/projects/{project_id}/tables/{table_id}/duplicate", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"export": {Method: "GET", Path: "/v1/projects/{project_id}/tables/{table_id}/export", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"get": {Method: "GET", Path: "/v1/projects/{project_id}/tables/{table_id}", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"list": {Method: "GET", Path: "/v1/projects/{project_id}/tables", Params: []string{"project_id"}, SSE: false, WS: false, Invalidate: nil},
-		"restore": {Method: "POST", Path: "/v1/projects/{project_id}/tables/{table_id}/restore", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-		"update": {Method: "PATCH", Path: "/v1/projects/{project_id}/tables/{table_id}", Params: []string{"project_id", "table_id"}, SSE: false, WS: false, Invalidate: nil},
-	},
-	"tableTemplate": {
-		"create": {Method: "POST", Path: "/v1/table-templates", Params: nil, SSE: false, WS: false, Invalidate: nil},
-		"delete": {Method: "DELETE", Path: "/v1/table-templates/{template_id}", Params: []string{"template_id"}, SSE: false, WS: false, Invalidate: nil},
-		"listMine": {Method: "GET", Path: "/v1/table-templates/mine", Params: nil, SSE: false, WS: false, Invalidate: nil},
-		"projectGet": {Method: "GET", Path: "/v1/projects/{project_id}/table-templates/{template_id}", Params: []string{"project_id", "template_id"}, SSE: false, WS: false, Invalidate: nil},
-		"projectList": {Method: "GET", Path: "/v1/projects/{project_id}/table-templates", Params: []string{"project_id"}, SSE: false, WS: false, Invalidate: nil},
-		"update": {Method: "PATCH", Path: "/v1/table-templates/{template_id}", Params: []string{"template_id"}, SSE: false, WS: false, Invalidate: nil},
-		"use": {Method: "POST", Path: "/v1/projects/{project_id}/table-templates/{template_id}/use", Params: []string{"project_id", "template_id"}, SSE: false, WS: false, Invalidate: nil},
-	},
-	"webhook": {
-		"create": {Method: "POST", Path: "/v1/organizations/{organization_id}/webhooks", Params: []string{"organization_id"}, SSE: false, WS: false, Invalidate: nil},
-		"delete": {Method: "DELETE", Path: "/v1/organizations/{organization_id}/webhooks/{id}", Params: []string{"organization_id", "id"}, SSE: false, WS: false, Invalidate: nil},
-		"deliveries": {Method: "GET", Path: "/v1/organizations/{organization_id}/webhooks/{id}/deliveries", Params: []string{"organization_id", "id"}, SSE: false, WS: false, Invalidate: nil},
-		"get": {Method: "GET", Path: "/v1/organizations/{organization_id}/webhooks/{id}", Params: []string{"organization_id", "id"}, SSE: false, WS: false, Invalidate: nil},
-		"list": {Method: "GET", Path: "/v1/organizations/{organization_id}/webhooks", Params: []string{"organization_id"}, SSE: false, WS: false, Invalidate: nil},
-		"rotateSecret": {Method: "POST", Path: "/v1/organizations/{organization_id}/webhooks/{id}/rotate-secret", Params: []string{"organization_id", "id"}, SSE: false, WS: false, Invalidate: nil},
-		"test": {Method: "POST", Path: "/v1/organizations/{organization_id}/webhooks/{id}/test", Params: []string{"organization_id", "id"}, SSE: false, WS: false, Invalidate: nil},
-		"update": {Method: "PATCH", Path: "/v1/organizations/{organization_id}/webhooks/{id}", Params: []string{"organization_id", "id"}, SSE: false, WS: false, Invalidate: nil},
-	},
-}
 
 // Client is the generated SDK client.
 type Client struct {
@@ -117,15 +30,13 @@ func NewClient(cfg Config) *Client {
 	if cfg.BaseURL == "" {
 		panic("honey sdk: Config.BaseURL must not be empty")
 	}
-	if cfg.HTTPClient == nil {
-		cfg.HTTPClient = &http.Client{Timeout: 30 * time.Second}
-	}
 	if cfg.AuthHeaderName == "" {
 		cfg.AuthHeaderName = "Authorization"
 	}
 	if cfg.AuthHeaderPrefix == "" {
 		cfg.AuthHeaderPrefix = "ApiKey "
 	}
+	cfg = prepareConfig(cfg)
 	c := &Client{cfg: cfg}
 	c.stale = NewStaleTracker(cfg.Invalidation)
 	c.Batch = newBatchResource(c)
@@ -142,10 +53,13 @@ func NewClient(cfg Config) *Client {
 
 // IsStale reports whether (method, path) currently sits inside an active stale window.
 func (c *Client) IsStale(method, path string) bool {
-	if c.stale == nil { return false }
+	if c.stale == nil {
+		return false
+	}
 	return c.stale.IsStale(method, path)
 }
 
+// BatchResource groups the "batch" operations.
 type BatchResource struct {
 	client *Client
 	Download *BatchDownloadResource
@@ -158,45 +72,89 @@ func newBatchResource(c *Client) *BatchResource {
 }
 
 // Get — Get batch
-func (b *BatchResource) Get(ctx context.Context, project_id string, batch_id string, opts *BatchGetOpts) (*GetProjectsBatcheResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, b.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/batches/" + url.PathEscape(batch_id), q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/batches/{batch_id}", nil)
+func (r *BatchResource) Get(ctx context.Context, projectId string, batchId string, opts *BatchGetOpts) (*GetProjectsBatcheResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/batches/{batch_id}", map[string]string{"project_id": projectId, "batch_id": batchId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "batch_id": batchId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/batches/{batch_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out GetProjectsBatcheResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // List — List batches
-func (b *BatchResource) List(ctx context.Context, project_id string, opts *BatchListOpts) (*ListProjectsBatchesResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Cursor != nil { q.Set("cursor", *opts.Cursor) }
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	if opts != nil && opts.Lang != nil { q.Set("lang", *opts.Lang) }
-	if opts != nil && opts.Limit != nil { q.Set("limit", strconv.FormatInt(*opts.Limit, 10)) }
-	if opts != nil && opts.Order != nil { q.Set("order", *opts.Order) }
-	if opts != nil && opts.Page != nil { q.Set("page", strconv.FormatInt(*opts.Page, 10)) }
-	if opts != nil && opts.Q != nil { q.Set("q", *opts.Q) }
-	if opts != nil && opts.Status != nil { q.Set("status", string(*opts.Status)) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, b.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/batches", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/batches", nil)
+func (r *BatchResource) List(ctx context.Context, projectId string, opts *BatchListOpts) (*ListProjectsBatchesResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/batches", map[string]string{"project_id": projectId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("cursor", opts.Cursor)
+		q.set("limit", opts.Limit)
+		q.set("order", opts.Order)
+		q.set("page", opts.Page)
+		q.set("status", opts.Status)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/batches", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListProjectsBatchesResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
+// BatchDownloadResource groups the "batch.download" operations.
 type BatchDownloadResource struct {
 	client *Client
 }
@@ -207,53 +165,115 @@ func newBatchDownloadResource(c *Client) *BatchDownloadResource {
 }
 
 // Csv — Download batch CSV
-func (d *BatchDownloadResource) Csv(ctx context.Context, project_id string, batch_id string, opts *BatchDownloadCsvOpts) (*json.RawMessage, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, d.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/batches/" + url.PathEscape(batch_id) + "/download/csv", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/batches/{batch_id}/download/csv", nil)
+func (r *BatchDownloadResource) Csv(ctx context.Context, projectId string, batchId string, opts *BatchDownloadCsvOpts) (*string, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/batches/{batch_id}/download/csv", map[string]string{"project_id": projectId, "batch_id": batchId})
 	if err != nil {
 		return nil, err
 	}
-	var out json.RawMessage
-	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
 	}
+	pathParams := map[string]string{"project_id": projectId, "batch_id": batchId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/batches/{batch_id}/download/csv", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
+	var out string
+	out = string(result.body)
 	return &out, nil
 }
 
 // Json — Download batch JSON
-func (d *BatchDownloadResource) Json(ctx context.Context, project_id string, batch_id string, opts *BatchDownloadJsonOpts) (*json.RawMessage, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, d.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/batches/" + url.PathEscape(batch_id) + "/download/json", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/batches/{batch_id}/download/json", nil)
+func (r *BatchDownloadResource) Json(ctx context.Context, projectId string, batchId string, opts *BatchDownloadJsonOpts) (*ListProjectsBatchesDownloadJsonResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/batches/{batch_id}/download/json", map[string]string{"project_id": projectId, "batch_id": batchId})
 	if err != nil {
 		return nil, err
 	}
-	var out json.RawMessage
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "batch_id": batchId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/batches/{batch_id}/download/json", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
+	var out ListProjectsBatchesDownloadJsonResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Xlsx — Download batch XLSX
-func (d *BatchDownloadResource) Xlsx(ctx context.Context, project_id string, batch_id string, opts *BatchDownloadXlsxOpts) (*json.RawMessage, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, d.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/batches/" + url.PathEscape(batch_id) + "/download/xlsx", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/batches/{batch_id}/download/xlsx", nil)
+func (r *BatchDownloadResource) Xlsx(ctx context.Context, projectId string, batchId string, opts *BatchDownloadXlsxOpts) (*[]byte, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/batches/{batch_id}/download/xlsx", map[string]string{"project_id": projectId, "batch_id": batchId})
 	if err != nil {
 		return nil, err
 	}
-	var out json.RawMessage
-	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
 	}
+	pathParams := map[string]string{"project_id": projectId, "batch_id": batchId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/batches/{batch_id}/download/xlsx", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
+	var out []byte
+	out = result.body
 	return &out, nil
 }
 
+// ColumnResource groups the "column" operations.
 type ColumnResource struct {
 	client *Client
 }
@@ -264,87 +284,203 @@ func newColumnResource(c *Client) *ColumnResource {
 }
 
 // Add — Add column
-func (c *ColumnResource) Add(ctx context.Context, project_id string, table_id string, body CreateProjectsTablesColumnRequest, opts *ColumnAddOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, c.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/columns", q, body, nil, "", callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/columns", nil)
+func (r *ColumnResource) Add(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesColumnRequest, opts *ColumnAddOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/columns", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Distinct — Get distinct column values
-func (c *ColumnResource) Distinct(ctx context.Context, project_id string, table_id string, col_id string, opts *ColumnDistinctOpts) (*ListProjectsTablesColumnsDistinctResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Limit != nil { q.Set("limit", strconv.FormatInt(*opts.Limit, 10)) }
-	if opts != nil && opts.Q != nil { q.Set("q", *opts.Q) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, c.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/columns/" + url.PathEscape(col_id) + "/distinct", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}/distinct", nil)
+func (r *ColumnResource) Distinct(ctx context.Context, projectId string, tableId string, colId string, opts *ColumnDistinctOpts) (*ListProjectsTablesColumnsDistinctResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns/{col_id}/distinct", map[string]string{"project_id": projectId, "table_id": tableId, "col_id": colId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("limit", opts.Limit)
+		q.set("q", opts.Q)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId, "col_id": colId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}/distinct", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListProjectsTablesColumnsDistinctResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Remove — Remove column
-func (c *ColumnResource) Remove(ctx context.Context, project_id string, table_id string, col_id string, opts *ColumnRemoveOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, c.client.cfg, "DELETE", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/columns/" + url.PathEscape(col_id), q, nil, nil, "", callHeaders, "DELETE /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", nil)
+func (r *ColumnResource) Remove(ctx context.Context, projectId string, tableId string, colId string, opts *ColumnRemoveOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", map[string]string{"project_id": projectId, "table_id": tableId, "col_id": colId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId, "col_id": colId}
+	selector := "DELETE " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "DELETE")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "DELETE", path, q, noBody(), callHeaders, "DELETE /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "DELETE", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Reorder — Reorder columns
-func (c *ColumnResource) Reorder(ctx context.Context, project_id string, table_id string, body ReplaceProjectsTablesColumnRequest, opts *ColumnReorderOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, c.client.cfg, "PUT", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/columns/order", q, body, nil, "", callHeaders, "PUT /v1/projects/{project_id}/tables/{table_id}/columns/order", nil)
+func (r *ColumnResource) Reorder(ctx context.Context, projectId string, tableId string, body ReplaceProjectsTablesColumnRequest, opts *ColumnReorderOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns/order", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "PUT " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "PUT")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "PUT", path, q, jsonBody(body), callHeaders, "PUT /v1/projects/{project_id}/tables/{table_id}/columns/order", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "PUT", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Update — Update column
-func (c *ColumnResource) Update(ctx context.Context, project_id string, table_id string, col_id string, body UpdateProjectsTablesColumnRequest, opts *ColumnUpdateOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, c.client.cfg, "PATCH", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/columns/" + url.PathEscape(col_id), q, body, nil, "", callHeaders, "PATCH /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", nil)
+func (r *ColumnResource) Update(ctx context.Context, projectId string, tableId string, colId string, body UpdateProjectsTablesColumnRequest, opts *ColumnUpdateOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", map[string]string{"project_id": projectId, "table_id": tableId, "col_id": colId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId, "col_id": colId}
+	selector := "PATCH " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "PATCH")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "PATCH", path, q, jsonBody(body), callHeaders, "PATCH /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "PATCH", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
+// ExportResource groups the "export" operations.
 type ExportResource struct {
 	client *Client
 }
@@ -355,21 +491,45 @@ func newExportResource(c *Client) *ExportResource {
 }
 
 // Get — Get export status
-func (e *ExportResource) Get(ctx context.Context, project_id string, export_id string, opts *ExportGetOpts) (*GetProjectsExportResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, e.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/exports/" + url.PathEscape(export_id), q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/exports/{export_id}", nil)
+func (r *ExportResource) Get(ctx context.Context, projectId string, exportId string, opts *ExportGetOpts) (*GetProjectsExportResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/exports/{export_id}", map[string]string{"project_id": projectId, "export_id": exportId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "export_id": exportId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/exports/{export_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out GetProjectsExportResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
+// ExtractResource groups the "extract" operations.
 type ExtractResource struct {
 	client *Client
 	Table *ExtractTableResource
@@ -382,44 +542,76 @@ func newExtractResource(c *Client) *ExtractResource {
 }
 
 // Once — Extract data from text or file (JSON response)
-func (e *ExtractResource) Once(ctx context.Context, project_id string, opts *ExtractOnceOpts) (*CreateProjectsExtractResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, e.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/extract", q, nil, nil, "", callHeaders, "POST /v1/projects/{project_id}/extract", nil)
+func (r *ExtractResource) Once(ctx context.Context, projectId string, form url.Values, opts *ExtractOnceOpts) (*CreateProjectsExtractResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/extract", map[string]string{"project_id": projectId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, formBody(form), callHeaders, "POST /v1/projects/{project_id}/extract", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsExtractResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Stream — Extract data from text or file (SSE stream)
-func (e *ExtractResource) Stream(ctx context.Context, project_id string, opts *ExtractStreamOpts) iter.Seq2[SSEEvent, error] {
+func (r *ExtractResource) Stream(ctx context.Context, projectId string, form url.Values, opts *ExtractStreamOpts) iter.Seq2[SSEEvent, error] {
 	return func(yield func(SSEEvent, error) bool) {
+		path, err := expandPath("/v1/projects/{project_id}/extract-stream", map[string]string{"project_id": projectId})
+		if err != nil {
+			yield(SSEEvent{}, err)
+			return
+		}
+		var q queryList
 		callHeaders := map[string]string{"Accept": "text/event-stream"}
+		if opts != nil {
+			for k, v := range opts.Headers {
+				callHeaders[k] = v
+			}
+		}
 		if opts != nil && opts.LastEventID != "" {
 			callHeaders["Last-Event-ID"] = opts.LastEventID
 		}
-		if opts != nil {
-			for k, v := range opts.Headers { callHeaders[k] = v }
+		resp, err := openStream(ctx, r.client.cfg, "POST", path, q, formBody(form), callHeaders)
+		if err != nil {
+			yield(SSEEvent{}, err)
+			return
 		}
-		req, err := http.NewRequestWithContext(ctx, "GET", e.client.cfg.BaseURL+"/v1/projects/" + url.PathEscape(project_id) + "/extract-stream", nil)
-		if err != nil { yield(SSEEvent{}, err); return }
-		for k, v := range e.client.cfg.Headers { req.Header.Set(k, v) }
-		for k, v := range callHeaders { req.Header.Set(k, v) }
-		if e.client.cfg.BearerToken != "" { req.Header.Set(e.client.cfg.AuthHeaderName, e.client.cfg.AuthHeaderPrefix+e.client.cfg.BearerToken) }
-		resp, err := e.client.cfg.HTTPClient.Do(req)
-		if err != nil { yield(SSEEvent{}, err); return }
 		for ev, err := range parseSSEStream(ctx, resp) {
-			if !yield(ev, err) { return }
+			if !yield(ev, err) {
+				return
+			}
 		}
 	}
 }
 
+// ExtractTableResource groups the "extract.table" operations.
 type ExtractTableResource struct {
 	client *Client
 }
@@ -430,44 +622,76 @@ func newExtractTableResource(c *Client) *ExtractTableResource {
 }
 
 // Once — Extract into table (JSON response)
-func (t *ExtractTableResource) Once(ctx context.Context, project_id string, table_id string, opts *ExtractTableOnceOpts) (*CreateProjectsExtractResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/extract", q, nil, nil, "", callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/extract", nil)
+func (r *ExtractTableResource) Once(ctx context.Context, projectId string, tableId string, form url.Values, opts *ExtractTableOnceOpts) (*CreateProjectsExtractResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/extract", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, formBody(form), callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/extract", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsExtractResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Stream — Extract into table (SSE stream)
-func (t *ExtractTableResource) Stream(ctx context.Context, project_id string, table_id string, opts *ExtractTableStreamOpts) iter.Seq2[SSEEvent, error] {
+func (r *ExtractTableResource) Stream(ctx context.Context, projectId string, tableId string, form url.Values, opts *ExtractTableStreamOpts) iter.Seq2[SSEEvent, error] {
 	return func(yield func(SSEEvent, error) bool) {
+		path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/extract-stream", map[string]string{"project_id": projectId, "table_id": tableId})
+		if err != nil {
+			yield(SSEEvent{}, err)
+			return
+		}
+		var q queryList
 		callHeaders := map[string]string{"Accept": "text/event-stream"}
+		if opts != nil {
+			for k, v := range opts.Headers {
+				callHeaders[k] = v
+			}
+		}
 		if opts != nil && opts.LastEventID != "" {
 			callHeaders["Last-Event-ID"] = opts.LastEventID
 		}
-		if opts != nil {
-			for k, v := range opts.Headers { callHeaders[k] = v }
+		resp, err := openStream(ctx, r.client.cfg, "POST", path, q, formBody(form), callHeaders)
+		if err != nil {
+			yield(SSEEvent{}, err)
+			return
 		}
-		req, err := http.NewRequestWithContext(ctx, "GET", t.client.cfg.BaseURL+"/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/extract-stream", nil)
-		if err != nil { yield(SSEEvent{}, err); return }
-		for k, v := range t.client.cfg.Headers { req.Header.Set(k, v) }
-		for k, v := range callHeaders { req.Header.Set(k, v) }
-		if t.client.cfg.BearerToken != "" { req.Header.Set(t.client.cfg.AuthHeaderName, t.client.cfg.AuthHeaderPrefix+t.client.cfg.BearerToken) }
-		resp, err := t.client.cfg.HTTPClient.Do(req)
-		if err != nil { yield(SSEEvent{}, err); return }
 		for ev, err := range parseSSEStream(ctx, resp) {
-			if !yield(ev, err) { return }
+			if !yield(ev, err) {
+				return
+			}
 		}
 	}
 }
 
+// RowResource groups the "row" operations.
 type RowResource struct {
 	client *Client
 }
@@ -478,125 +702,323 @@ func newRowResource(c *Client) *RowResource {
 }
 
 // Aggregate — Aggregate column values
-func (r *RowResource) Aggregate(ctx context.Context, project_id string, table_id string, opts *RowAggregateOpts) (*ListProjectsTablesRowsResponse200F7f633, error) {
-	q := url.Values{}
-	if opts != nil { q.Set("aggs", opts.Aggs) }
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, r.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/rows/aggregate", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/rows/aggregate", nil)
+func (r *RowResource) Aggregate(ctx context.Context, projectId string, tableId string, opts *RowAggregateOpts) (*ListProjectsTablesRowsResponse20021d74b, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows/aggregate", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
-	var out ListProjectsTablesRowsResponse200F7f633
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("aggs", opts.Aggs)
+		q.set("filter", opts.Filter)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/rows/aggregate", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
+	var out ListProjectsTablesRowsResponse20021d74b
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Bulk — Bulk create/update/delete rows
-func (r *RowResource) Bulk(ctx context.Context, project_id string, table_id string, body CreateProjectsTablesRowRequestDbbb57, opts *RowBulkOpts) (*CreateProjectsTablesRowResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, r.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/rows/bulk", q, body, nil, "", callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/rows/bulk", nil)
+func (r *RowResource) Bulk(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesRowRequestDbbb57, opts *RowBulkOpts) (*CreateProjectsTablesRowResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows/bulk", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/rows/bulk", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTablesRowResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Create — Create row
-func (r *RowResource) Create(ctx context.Context, project_id string, table_id string, body CreateProjectsTablesRowRequest, opts *RowCreateOpts) (*CreateProjectsTablesRowResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, r.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/rows", q, body, nil, "", callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/rows", nil)
+func (r *RowResource) Create(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesRowRequest, opts *RowCreateOpts) (*CreateProjectsTablesRowRequest, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
-	var out CreateProjectsTablesRowResponse201
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/rows", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
+	var out CreateProjectsTablesRowRequest
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Delete — Delete row
-func (r *RowResource) Delete(ctx context.Context, project_id string, table_id string, row_id string, opts *RowDeleteOpts) (*DeleteOrganizationsWebhookResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, r.client.cfg, "DELETE", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/rows/" + url.PathEscape(row_id), q, nil, nil, "", callHeaders, "DELETE /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", nil)
+func (r *RowResource) Delete(ctx context.Context, projectId string, tableId string, rowId string, opts *RowDeleteOpts) (*DeleteOrganizationsWebhookResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId}
+	selector := "DELETE " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "DELETE")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "DELETE", path, q, noBody(), callHeaders, "DELETE /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "DELETE", requestMeta.SeqSnapshot)
+		}
+	}
 	var out DeleteOrganizationsWebhookResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Get — Get row
-func (r *RowResource) Get(ctx context.Context, project_id string, table_id string, row_id string, opts *RowGetOpts) (*CreateProjectsTablesRowResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, r.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/rows/" + url.PathEscape(row_id), q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", nil)
+func (r *RowResource) Get(ctx context.Context, projectId string, tableId string, rowId string, opts *RowGetOpts) (*CreateProjectsTablesRowRequest, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId})
 	if err != nil {
 		return nil, err
 	}
-	var out CreateProjectsTablesRowResponse201
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
+	var out CreateProjectsTablesRowRequest
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // List — List rows
-func (r *RowResource) List(ctx context.Context, project_id string, table_id string, opts *RowListOpts) (*ListProjectsTablesRowsResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Cursor != nil { q.Set("cursor", *opts.Cursor) }
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	if opts != nil && opts.Limit != nil { q.Set("limit", strconv.FormatInt(*opts.Limit, 10)) }
-	if opts != nil && opts.Order != nil { q.Set("order", *opts.Order) }
-	if opts != nil && opts.Page != nil { q.Set("page", strconv.FormatInt(*opts.Page, 10)) }
-	if opts != nil && opts.Q != nil { q.Set("q", *opts.Q) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, r.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/rows", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/rows", nil)
+func (r *RowResource) List(ctx context.Context, projectId string, tableId string, opts *RowListOpts) (*ListProjectsTablesRowsResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("cursor", opts.Cursor)
+		q.set("filter", opts.Filter)
+		q.set("limit", opts.Limit)
+		q.set("order", opts.Order)
+		q.set("page", opts.Page)
+		q.set("q", opts.Q)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/rows", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListProjectsTablesRowsResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
+	return &out, nil
+}
+
+// Source — The source file behind a row: download it, or open a PDF or image inline
+func (r *RowResource) Source(ctx context.Context, projectId string, tableId string, rowId string, opts *RowSourceOpts) (*[]byte, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows/{row_id}/source", map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId})
+	if err != nil {
+		return nil, err
+	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("disposition", opts.Disposition)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}/source", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
+	var out []byte
+	out = result.body
 	return &out, nil
 }
 
 // Update — Update row
-func (r *RowResource) Update(ctx context.Context, project_id string, table_id string, row_id string, body CreateProjectsTablesRowRequest, opts *RowUpdateOpts) (*CreateProjectsTablesRowResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, r.client.cfg, "PATCH", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/rows/" + url.PathEscape(row_id), q, body, nil, "", callHeaders, "PATCH /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", nil)
+func (r *RowResource) Update(ctx context.Context, projectId string, tableId string, rowId string, body CreateProjectsTablesRowRequest, opts *RowUpdateOpts) (*CreateProjectsTablesRowRequest, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId})
 	if err != nil {
 		return nil, err
 	}
-	var out CreateProjectsTablesRowResponse201
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId}
+	selector := "PATCH " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "PATCH")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "PATCH", path, q, jsonBody(body), callHeaders, "PATCH /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "PATCH", requestMeta.SeqSnapshot)
+		}
+	}
+	var out CreateProjectsTablesRowRequest
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
+// SuggestResource groups the "suggest" operations.
 type SuggestResource struct {
 	client *Client
 }
@@ -607,21 +1029,45 @@ func newSuggestResource(c *Client) *SuggestResource {
 }
 
 // Schema — Suggest schema from text or file (multipart)
-func (s *SuggestResource) Schema(ctx context.Context, project_id string, opts *SuggestSchemaOpts) (*CreateProjectsSuggestSchemaResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, s.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/suggest-schema", q, nil, nil, "", callHeaders, "POST /v1/projects/{project_id}/suggest-schema", nil)
+func (r *SuggestResource) Schema(ctx context.Context, projectId string, form url.Values, opts *SuggestSchemaOpts) (*CreateProjectsSuggestSchemaResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/suggest-schema", map[string]string{"project_id": projectId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, formBody(form), callHeaders, "POST /v1/projects/{project_id}/suggest-schema", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsSuggestSchemaResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
+// TableResource groups the "table" operations.
 type TableResource struct {
 	client *Client
 }
@@ -632,146 +1078,330 @@ func newTableResource(c *Client) *TableResource {
 }
 
 // Create — Create table
-func (t *TableResource) Create(ctx context.Context, project_id string, body CreateProjectsTableRequest, opts *TableCreateOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/tables", q, body, nil, "", callHeaders, "POST /v1/projects/{project_id}/tables", nil)
+func (r *TableResource) Create(ctx context.Context, projectId string, body CreateProjectsTableRequest, opts *TableCreateOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables", map[string]string{"project_id": projectId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/projects/{project_id}/tables", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Delete — Delete table (soft, 72h grace)
-func (t *TableResource) Delete(ctx context.Context, project_id string, table_id string, opts *TableDeleteOpts) (*DeleteOrganizationsWebhookResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "DELETE", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id), q, nil, nil, "", callHeaders, "DELETE /v1/projects/{project_id}/tables/{table_id}", nil)
+func (r *TableResource) Delete(ctx context.Context, projectId string, tableId string, opts *TableDeleteOpts) (*DeleteOrganizationsWebhookResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "DELETE " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "DELETE")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "DELETE", path, q, noBody(), callHeaders, "DELETE /v1/projects/{project_id}/tables/{table_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "DELETE", requestMeta.SeqSnapshot)
+		}
+	}
 	var out DeleteOrganizationsWebhookResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Duplicate — Duplicate table structure
-func (t *TableResource) Duplicate(ctx context.Context, project_id string, table_id string, body CreateProjectsTablesDuplicateRequest, opts *TableDuplicateOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/duplicate", q, body, nil, "", callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/duplicate", nil)
+func (r *TableResource) Duplicate(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesDuplicateRequest, opts *TableDuplicateOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/duplicate", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/duplicate", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Export — Export table rows
-func (t *TableResource) Export(ctx context.Context, project_id string, table_id string, opts *TableExportOpts) (*ListProjectsTablesExportResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	if opts != nil { q.Set("format", string(opts.Format)) }
-	if opts != nil && opts.Order != nil { q.Set("order", *opts.Order) }
-	if opts != nil && opts.Schema != nil { q.Set("schema", string(*opts.Schema)) }
-	if opts != nil && opts.Search != nil { q.Set("search", *opts.Search) }
-	if opts != nil && opts.Since != nil { q.Set("since", *opts.Since) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/export", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/export", nil)
+func (r *TableResource) Export(ctx context.Context, projectId string, tableId string, opts *TableExportOpts) (*ListProjectsTablesExportResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/export", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("filter", opts.Filter)
+		q.set("format", opts.Format)
+		q.set("order", opts.Order)
+		q.set("schema", opts.Schema)
+		q.set("search", opts.Search)
+		q.set("since", opts.Since)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}/export", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListProjectsTablesExportResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Get — Get table
-func (t *TableResource) Get(ctx context.Context, project_id string, table_id string, opts *TableGetOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id), q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}", nil)
+func (r *TableResource) Get(ctx context.Context, projectId string, tableId string, opts *TableGetOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/tables/{table_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // List — List tables
-func (t *TableResource) List(ctx context.Context, project_id string, opts *TableListOpts) (*ListProjectsTablesResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Cursor != nil { q.Set("cursor", *opts.Cursor) }
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	if opts != nil && opts.Lang != nil { q.Set("lang", *opts.Lang) }
-	if opts != nil && opts.Limit != nil { q.Set("limit", strconv.FormatInt(*opts.Limit, 10)) }
-	if opts != nil && opts.Order != nil { q.Set("order", *opts.Order) }
-	if opts != nil && opts.Page != nil { q.Set("page", strconv.FormatInt(*opts.Page, 10)) }
-	if opts != nil && opts.Q != nil { q.Set("q", *opts.Q) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/tables", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/tables", nil)
+func (r *TableResource) List(ctx context.Context, projectId string, opts *TableListOpts) (*ListProjectsTablesResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables", map[string]string{"project_id": projectId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("cursor", opts.Cursor)
+		q.set("filter", opts.Filter)
+		q.set("limit", opts.Limit)
+		q.set("order", opts.Order)
+		q.set("page", opts.Page)
+		q.set("q", opts.Q)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/tables", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListProjectsTablesResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Restore — Restore deleted table
-func (t *TableResource) Restore(ctx context.Context, project_id string, table_id string, body CreateProjectsTablesRestoreRequest, opts *TableRestoreOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id) + "/restore", q, body, nil, "", callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/restore", nil)
+func (r *TableResource) Restore(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesRestoreRequest, opts *TableRestoreOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/restore", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/projects/{project_id}/tables/{table_id}/restore", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Update — Update table
-func (t *TableResource) Update(ctx context.Context, project_id string, table_id string, body UpdateProjectsTableRequest, opts *TableUpdateOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "PATCH", "/v1/projects/" + url.PathEscape(project_id) + "/tables/" + url.PathEscape(table_id), q, body, nil, "", callHeaders, "PATCH /v1/projects/{project_id}/tables/{table_id}", nil)
+func (r *TableResource) Update(ctx context.Context, projectId string, tableId string, body UpdateProjectsTableRequest, opts *TableUpdateOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}", map[string]string{"project_id": projectId, "table_id": tableId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "table_id": tableId}
+	selector := "PATCH " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "PATCH")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "PATCH", path, q, jsonBody(body), callHeaders, "PATCH /v1/projects/{project_id}/tables/{table_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "PATCH", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
+// TableTemplateResource groups the "tableTemplate" operations.
 type TableTemplateResource struct {
 	client *Client
 }
@@ -782,132 +1412,286 @@ func newTableTemplateResource(c *Client) *TableTemplateResource {
 }
 
 // Create — Create table template
-func (t *TableTemplateResource) Create(ctx context.Context, body CreateTableTemplateRequest, opts *TableTemplateCreateOpts) (*GetProjectsTableTemplateResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "POST", "/v1/table-templates", q, body, nil, "", callHeaders, "POST /v1/table-templates", nil)
+func (r *TableTemplateResource) Create(ctx context.Context, body CreateTableTemplateRequest, opts *TableTemplateCreateOpts) (*GetProjectsTableTemplateResponse200, error) {
+	var err error
+	path := "/v1/table-templates"
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string(nil)
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/table-templates", requestMeta)
 	if err != nil {
 		return nil, err
 	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out GetProjectsTableTemplateResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Delete — Delete table template
-func (t *TableTemplateResource) Delete(ctx context.Context, template_id string, opts *TableTemplateDeleteOpts) (*DeleteOrganizationsWebhookResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "DELETE", "/v1/table-templates/" + url.PathEscape(template_id), q, nil, nil, "", callHeaders, "DELETE /v1/table-templates/{template_id}", nil)
+func (r *TableTemplateResource) Delete(ctx context.Context, templateId string, opts *TableTemplateDeleteOpts) (*DeleteOrganizationsWebhookResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/table-templates/{template_id}", map[string]string{"template_id": templateId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"template_id": templateId}
+	selector := "DELETE " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "DELETE")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "DELETE", path, q, noBody(), callHeaders, "DELETE /v1/table-templates/{template_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "DELETE", requestMeta.SeqSnapshot)
+		}
+	}
 	var out DeleteOrganizationsWebhookResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // ListMine — List my table templates
-func (t *TableTemplateResource) ListMine(ctx context.Context, opts *TableTemplateListMineOpts) (*ListProjectsTableTemplatesResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Cursor != nil { q.Set("cursor", *opts.Cursor) }
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	if opts != nil && opts.Lang != nil { q.Set("lang", *opts.Lang) }
-	if opts != nil && opts.Limit != nil { q.Set("limit", strconv.FormatInt(*opts.Limit, 10)) }
-	if opts != nil && opts.Order != nil { q.Set("order", *opts.Order) }
-	if opts != nil && opts.Page != nil { q.Set("page", strconv.FormatInt(*opts.Page, 10)) }
-	if opts != nil && opts.Q != nil { q.Set("q", *opts.Q) }
-	if opts != nil && opts.Select != nil { q.Set("select", *opts.Select) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "GET", "/v1/table-templates/mine", q, nil, nil, "", callHeaders, "GET /v1/table-templates/mine", nil)
+func (r *TableTemplateResource) ListMine(ctx context.Context, opts *TableTemplateListMineOpts) (*ListProjectsTableTemplatesResponse200, error) {
+	var err error
+	path := "/v1/table-templates/mine"
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("cursor", opts.Cursor)
+		q.set("filter", opts.Filter)
+		q.set("limit", opts.Limit)
+		q.set("order", opts.Order)
+		q.set("page", opts.Page)
+		q.set("q", opts.Q)
+		q.set("select", opts.Select)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string(nil)
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/table-templates/mine", requestMeta)
 	if err != nil {
 		return nil, err
 	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListProjectsTableTemplatesResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // ProjectGet — Preview table template
-func (t *TableTemplateResource) ProjectGet(ctx context.Context, project_id string, template_id string, opts *TableTemplateProjectGetOpts) (*GetProjectsTableTemplateResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/table-templates/" + url.PathEscape(template_id), q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/table-templates/{template_id}", nil)
+func (r *TableTemplateResource) ProjectGet(ctx context.Context, projectId string, templateId string, opts *TableTemplateProjectGetOpts) (*GetProjectsTableTemplateResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/table-templates/{template_id}", map[string]string{"project_id": projectId, "template_id": templateId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "template_id": templateId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/table-templates/{template_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out GetProjectsTableTemplateResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // ProjectList — Browse table templates
-func (t *TableTemplateResource) ProjectList(ctx context.Context, project_id string, opts *TableTemplateProjectListOpts) (*ListProjectsTableTemplatesResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Cursor != nil { q.Set("cursor", *opts.Cursor) }
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	if opts != nil && opts.Lang != nil { q.Set("lang", *opts.Lang) }
-	if opts != nil && opts.Limit != nil { q.Set("limit", strconv.FormatInt(*opts.Limit, 10)) }
-	if opts != nil && opts.Order != nil { q.Set("order", *opts.Order) }
-	if opts != nil && opts.Page != nil { q.Set("page", strconv.FormatInt(*opts.Page, 10)) }
-	if opts != nil && opts.Q != nil { q.Set("q", *opts.Q) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "GET", "/v1/projects/" + url.PathEscape(project_id) + "/table-templates", q, nil, nil, "", callHeaders, "GET /v1/projects/{project_id}/table-templates", nil)
+func (r *TableTemplateResource) ProjectList(ctx context.Context, projectId string, opts *TableTemplateProjectListOpts) (*ListProjectsTableTemplatesResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/table-templates", map[string]string{"project_id": projectId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("cursor", opts.Cursor)
+		q.set("filter", opts.Filter)
+		q.set("limit", opts.Limit)
+		q.set("order", opts.Order)
+		q.set("page", opts.Page)
+		q.set("q", opts.Q)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/projects/{project_id}/table-templates", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListProjectsTableTemplatesResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Update — Update table template
-func (t *TableTemplateResource) Update(ctx context.Context, template_id string, body UpdateTableTemplateRequest, opts *TableTemplateUpdateOpts) (*GetProjectsTableTemplateResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "PATCH", "/v1/table-templates/" + url.PathEscape(template_id), q, body, nil, "", callHeaders, "PATCH /v1/table-templates/{template_id}", nil)
+func (r *TableTemplateResource) Update(ctx context.Context, templateId string, body UpdateTableTemplateRequest, opts *TableTemplateUpdateOpts) (*GetProjectsTableTemplateResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/table-templates/{template_id}", map[string]string{"template_id": templateId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"template_id": templateId}
+	selector := "PATCH " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "PATCH")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "PATCH", path, q, jsonBody(body), callHeaders, "PATCH /v1/table-templates/{template_id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "PATCH", requestMeta.SeqSnapshot)
+		}
+	}
 	var out GetProjectsTableTemplateResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Use — Create table from template
-func (t *TableTemplateResource) Use(ctx context.Context, project_id string, template_id string, body CreateProjectsTableTemplatesUseRequest, opts *TableTemplateUseOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, t.client.cfg, "POST", "/v1/projects/" + url.PathEscape(project_id) + "/table-templates/" + url.PathEscape(template_id) + "/use", q, body, nil, "", callHeaders, "POST /v1/projects/{project_id}/table-templates/{template_id}/use", nil)
+func (r *TableTemplateResource) Use(ctx context.Context, projectId string, templateId string, body CreateProjectsTableTemplatesUseRequest, opts *TableTemplateUseOpts) (*CreateProjectsTableTemplatesUseResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/projects/{project_id}/table-templates/{template_id}/use", map[string]string{"project_id": projectId, "template_id": templateId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"project_id": projectId, "template_id": templateId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/projects/{project_id}/table-templates/{template_id}/use", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateProjectsTableTemplatesUseResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
+// WebhookResource groups the "webhook" operations.
 type WebhookResource struct {
 	client *Client
 }
@@ -918,253 +1702,441 @@ func newWebhookResource(c *Client) *WebhookResource {
 }
 
 // Create — Create webhook
-func (w *WebhookResource) Create(ctx context.Context, organization_id string, body CreateOrganizationsWebhookRequest, opts *WebhookCreateOpts) (*CreateOrganizationsWebhookResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, w.client.cfg, "POST", "/v1/organizations/" + url.PathEscape(organization_id) + "/webhooks", q, body, nil, "", callHeaders, "POST /v1/organizations/{organization_id}/webhooks", nil)
+func (r *WebhookResource) Create(ctx context.Context, organizationId string, body CreateOrganizationsWebhookRequest, opts *WebhookCreateOpts) (*CreateOrganizationsWebhookResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/organizations/{organization_id}/webhooks", map[string]string{"organization_id": organizationId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"organization_id": organizationId}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, jsonBody(body), callHeaders, "POST /v1/organizations/{organization_id}/webhooks", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateOrganizationsWebhookResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Delete — Delete webhook
-func (w *WebhookResource) Delete(ctx context.Context, organization_id string, id string, opts *WebhookDeleteOpts) (*DeleteOrganizationsWebhookResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, w.client.cfg, "DELETE", "/v1/organizations/" + url.PathEscape(organization_id) + "/webhooks/" + url.PathEscape(id), q, nil, nil, "", callHeaders, "DELETE /v1/organizations/{organization_id}/webhooks/{id}", nil)
+func (r *WebhookResource) Delete(ctx context.Context, organizationId string, id string, opts *WebhookDeleteOpts) (*DeleteOrganizationsWebhookResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}", map[string]string{"organization_id": organizationId, "id": id})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"organization_id": organizationId, "id": id}
+	selector := "DELETE " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "DELETE")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "DELETE", path, q, noBody(), callHeaders, "DELETE /v1/organizations/{organization_id}/webhooks/{id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "DELETE", requestMeta.SeqSnapshot)
+		}
+	}
 	var out DeleteOrganizationsWebhookResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Deliveries — List webhook deliveries
-func (w *WebhookResource) Deliveries(ctx context.Context, organization_id string, id string, opts *WebhookDeliveriesOpts) (*ListOrganizationsWebhooksDeliveriesResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Cursor != nil { q.Set("cursor", *opts.Cursor) }
-	if opts != nil && opts.Event != nil { q.Set("event", string(*opts.Event)) }
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	if opts != nil && opts.Lang != nil { q.Set("lang", *opts.Lang) }
-	if opts != nil && opts.Limit != nil { q.Set("limit", strconv.FormatInt(*opts.Limit, 10)) }
-	if opts != nil && opts.Order != nil { q.Set("order", *opts.Order) }
-	if opts != nil && opts.Page != nil { q.Set("page", strconv.FormatInt(*opts.Page, 10)) }
-	if opts != nil && opts.Q != nil { q.Set("q", *opts.Q) }
-	if opts != nil && opts.Status != nil { q.Set("status", string(*opts.Status)) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, w.client.cfg, "GET", "/v1/organizations/" + url.PathEscape(organization_id) + "/webhooks/" + url.PathEscape(id) + "/deliveries", q, nil, nil, "", callHeaders, "GET /v1/organizations/{organization_id}/webhooks/{id}/deliveries", nil)
+func (r *WebhookResource) Deliveries(ctx context.Context, organizationId string, id string, opts *WebhookDeliveriesOpts) (*ListOrganizationsWebhooksDeliveriesResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}/deliveries", map[string]string{"organization_id": organizationId, "id": id})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("cursor", opts.Cursor)
+		q.set("event", opts.Event)
+		q.set("limit", opts.Limit)
+		q.set("order", opts.Order)
+		q.set("page", opts.Page)
+		q.set("status", opts.Status)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"organization_id": organizationId, "id": id}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/organizations/{organization_id}/webhooks/{id}/deliveries", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListOrganizationsWebhooksDeliveriesResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Get — Get webhook
-func (w *WebhookResource) Get(ctx context.Context, organization_id string, id string, opts *WebhookGetOpts) (*GetOrganizationsWebhookResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, w.client.cfg, "GET", "/v1/organizations/" + url.PathEscape(organization_id) + "/webhooks/" + url.PathEscape(id), q, nil, nil, "", callHeaders, "GET /v1/organizations/{organization_id}/webhooks/{id}", nil)
+func (r *WebhookResource) Get(ctx context.Context, organizationId string, id string, opts *WebhookGetOpts) (*GetOrganizationsWebhookResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}", map[string]string{"organization_id": organizationId, "id": id})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"organization_id": organizationId, "id": id}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/organizations/{organization_id}/webhooks/{id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out GetOrganizationsWebhookResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // List — List webhooks
-func (w *WebhookResource) List(ctx context.Context, organization_id string, opts *WebhookListOpts) (*ListOrganizationsWebhooksResponse200, error) {
-	q := url.Values{}
-	if opts != nil && opts.Cursor != nil { q.Set("cursor", *opts.Cursor) }
-	if opts != nil && opts.Filter != nil { q.Set("filter", *opts.Filter) }
-	if opts != nil && opts.Lang != nil { q.Set("lang", *opts.Lang) }
-	if opts != nil && opts.Limit != nil { q.Set("limit", strconv.FormatInt(*opts.Limit, 10)) }
-	if opts != nil && opts.Order != nil { q.Set("order", *opts.Order) }
-	if opts != nil && opts.Page != nil { q.Set("page", strconv.FormatInt(*opts.Page, 10)) }
-	if opts != nil && opts.Q != nil { q.Set("q", *opts.Q) }
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, w.client.cfg, "GET", "/v1/organizations/" + url.PathEscape(organization_id) + "/webhooks", q, nil, nil, "", callHeaders, "GET /v1/organizations/{organization_id}/webhooks", nil)
+func (r *WebhookResource) List(ctx context.Context, organizationId string, opts *WebhookListOpts) (*ListOrganizationsWebhooksResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/organizations/{organization_id}/webhooks", map[string]string{"organization_id": organizationId})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		q.set("cursor", opts.Cursor)
+		q.set("filter", opts.Filter)
+		q.set("limit", opts.Limit)
+		q.set("order", opts.Order)
+		q.set("page", opts.Page)
+		q.set("q", opts.Q)
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"organization_id": organizationId}
+	selector := "GET " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "GET")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "GET", path, q, noBody(), callHeaders, "GET /v1/organizations/{organization_id}/webhooks", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "GET", requestMeta.SeqSnapshot)
+		}
+	}
 	var out ListOrganizationsWebhooksResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // RotateSecret — Rotate webhook secret
-func (w *WebhookResource) RotateSecret(ctx context.Context, organization_id string, id string, opts *WebhookRotateSecretOpts) (*CreateOrganizationsWebhookResponse201, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, w.client.cfg, "POST", "/v1/organizations/" + url.PathEscape(organization_id) + "/webhooks/" + url.PathEscape(id) + "/rotate-secret", q, nil, nil, "", callHeaders, "POST /v1/organizations/{organization_id}/webhooks/{id}/rotate-secret", nil)
+func (r *WebhookResource) RotateSecret(ctx context.Context, organizationId string, id string, opts *WebhookRotateSecretOpts) (*CreateOrganizationsWebhookResponse201, error) {
+	var err error
+	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}/rotate-secret", map[string]string{"organization_id": organizationId, "id": id})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"organization_id": organizationId, "id": id}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, noBody(), callHeaders, "POST /v1/organizations/{organization_id}/webhooks/{id}/rotate-secret", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateOrganizationsWebhookResponse201
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Test — Send test webhook
-func (w *WebhookResource) Test(ctx context.Context, organization_id string, id string, opts *WebhookTestOpts) (*CreateOrganizationsWebhooksTestResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, w.client.cfg, "POST", "/v1/organizations/" + url.PathEscape(organization_id) + "/webhooks/" + url.PathEscape(id) + "/test", q, nil, nil, "", callHeaders, "POST /v1/organizations/{organization_id}/webhooks/{id}/test", nil)
+func (r *WebhookResource) Test(ctx context.Context, organizationId string, id string, opts *WebhookTestOpts) (*CreateOrganizationsWebhooksTestResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}/test", map[string]string{"organization_id": organizationId, "id": id})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"organization_id": organizationId, "id": id}
+	selector := "POST " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "POST")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "POST", path, q, noBody(), callHeaders, "POST /v1/organizations/{organization_id}/webhooks/{id}/test", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "POST", requestMeta.SeqSnapshot)
+		}
+	}
 	var out CreateOrganizationsWebhooksTestResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
 // Update — Update webhook
-func (w *WebhookResource) Update(ctx context.Context, organization_id string, id string, body UpdateOrganizationsWebhookRequest, opts *WebhookUpdateOpts) (*GetOrganizationsWebhookResponse200, error) {
-	q := url.Values{}
-	var callHeaders map[string]string
-	if opts != nil { callHeaders = opts.Headers }
-	result, err := doRequest(ctx, w.client.cfg, "PATCH", "/v1/organizations/" + url.PathEscape(organization_id) + "/webhooks/" + url.PathEscape(id), q, body, nil, "", callHeaders, "PATCH /v1/organizations/{organization_id}/webhooks/{id}", nil)
+func (r *WebhookResource) Update(ctx context.Context, organizationId string, id string, body UpdateOrganizationsWebhookRequest, opts *WebhookUpdateOpts) (*GetOrganizationsWebhookResponse200, error) {
+	var err error
+	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}", map[string]string{"organization_id": organizationId, "id": id})
 	if err != nil {
 		return nil, err
 	}
+	var q queryList
+	callHeaders := map[string]string{}
+	if opts != nil {
+		for k, v := range opts.Headers {
+			callHeaders[k] = v
+		}
+	}
+	pathParams := map[string]string{"organization_id": organizationId, "id": id}
+	selector := "PATCH " + path
+	var requestMeta *RequestMeta
+	if r.client.stale != nil {
+		requestMeta = r.client.stale.BuildRequestMeta(selector, path, "PATCH")
+	}
+	result, err := doRequest(ctx, r.client.cfg, "PATCH", path, q, jsonBody(body), callHeaders, "PATCH /v1/organizations/{organization_id}/webhooks/{id}", requestMeta)
+	if err != nil {
+		return nil, err
+	}
+	if r.client.stale != nil {
+		_ = pathParams
+		if requestMeta != nil && requestMeta.IsStale {
+			r.client.stale.ClearStale(selector, path, "PATCH", requestMeta.SeqSnapshot)
+		}
+	}
 	var out GetOrganizationsWebhookResponse200
 	if len(result.body) > 0 {
-		if err := json.Unmarshal(result.body, &out); err != nil { return nil, err }
+		if err := json.Unmarshal(result.body, &out); err != nil {
+			return nil, fmt.Errorf("honey: decode response: %w", err)
+		}
 	}
 	return &out, nil
 }
 
+// BatchDownloadCsvOpts holds the optional inputs of Csv.
 type BatchDownloadCsvOpts struct {
 	Headers map[string]string
 }
 
+// BatchDownloadJsonOpts holds the optional inputs of Json.
 type BatchDownloadJsonOpts struct {
 	Headers map[string]string
 }
 
+// BatchDownloadXlsxOpts holds the optional inputs of Xlsx.
 type BatchDownloadXlsxOpts struct {
 	Headers map[string]string
 }
 
+// BatchGetOpts holds the optional inputs of Get.
 type BatchGetOpts struct {
 	Headers map[string]string
 }
 
-type BatchListOptsStatus string
-const (
-	BatchListOptsStatusUploading BatchListOptsStatus = "uploading"
-	BatchListOptsStatusProcessing BatchListOptsStatus = "processing"
-	BatchListOptsStatusMerging BatchListOptsStatus = "merging"
-	BatchListOptsStatusComplete BatchListOptsStatus = "complete"
-	BatchListOptsStatusPartial BatchListOptsStatus = "partial"
-	BatchListOptsStatusFailed BatchListOptsStatus = "failed"
-)
-
+// BatchListOpts holds the optional inputs of List.
 type BatchListOpts struct {
 	Cursor *string
-	Filter *string
-	Lang *string
 	Limit *int64
 	Order *string
 	Page *int64
-	Q *string
 	Status *BatchListOptsStatus
 	Headers map[string]string
 }
 
+// ColumnAddOpts holds the optional inputs of Add.
 type ColumnAddOpts struct {
 	Headers map[string]string
 }
 
+// ColumnDistinctOpts holds the optional inputs of Distinct.
 type ColumnDistinctOpts struct {
 	Limit *int64
 	Q *string
 	Headers map[string]string
 }
 
+// ColumnRemoveOpts holds the optional inputs of Remove.
 type ColumnRemoveOpts struct {
 	Headers map[string]string
 }
 
+// ColumnReorderOpts holds the optional inputs of Reorder.
 type ColumnReorderOpts struct {
 	Headers map[string]string
 }
 
+// ColumnUpdateOpts holds the optional inputs of Update.
 type ColumnUpdateOpts struct {
 	Headers map[string]string
 }
 
+// ExportGetOpts holds the optional inputs of Get.
 type ExportGetOpts struct {
 	Headers map[string]string
 }
 
+// ExtractOnceOpts holds the optional inputs of Once.
 type ExtractOnceOpts struct {
 	Headers map[string]string
 }
 
+// ExtractStreamOpts holds the optional inputs of Stream.
 type ExtractStreamOpts struct {
 	LastEventID string
 	Headers map[string]string
 }
 
+// ExtractTableOnceOpts holds the optional inputs of Once.
 type ExtractTableOnceOpts struct {
 	Headers map[string]string
 }
 
+// ExtractTableStreamOpts holds the optional inputs of Stream.
 type ExtractTableStreamOpts struct {
 	LastEventID string
 	Headers map[string]string
 }
 
+// RowAggregateOpts holds the optional inputs of Aggregate.
 type RowAggregateOpts struct {
 	Aggs string
 	Filter *string
 	Headers map[string]string
 }
 
+// RowBulkOpts holds the optional inputs of Bulk.
 type RowBulkOpts struct {
 	Headers map[string]string
 }
 
+// RowCreateOpts holds the optional inputs of Create.
 type RowCreateOpts struct {
 	Headers map[string]string
 }
 
+// RowDeleteOpts holds the optional inputs of Delete.
 type RowDeleteOpts struct {
 	Headers map[string]string
 }
 
+// RowGetOpts holds the optional inputs of Get.
 type RowGetOpts struct {
 	Headers map[string]string
 }
 
+// RowListOpts holds the optional inputs of List.
 type RowListOpts struct {
 	Cursor *string
 	Filter *string
@@ -1175,39 +2147,38 @@ type RowListOpts struct {
 	Headers map[string]string
 }
 
+// RowSourceOpts holds the optional inputs of Source.
+type RowSourceOpts struct {
+	Disposition *RowSourceOptsDisposition
+	Headers map[string]string
+}
+
+// RowUpdateOpts holds the optional inputs of Update.
 type RowUpdateOpts struct {
 	Headers map[string]string
 }
 
+// SuggestSchemaOpts holds the optional inputs of Schema.
 type SuggestSchemaOpts struct {
 	Headers map[string]string
 }
 
+// TableCreateOpts holds the optional inputs of Create.
 type TableCreateOpts struct {
 	Headers map[string]string
 }
 
+// TableDeleteOpts holds the optional inputs of Delete.
 type TableDeleteOpts struct {
 	Headers map[string]string
 }
 
+// TableDuplicateOpts holds the optional inputs of Duplicate.
 type TableDuplicateOpts struct {
 	Headers map[string]string
 }
 
-type TableExportOptsFormat string
-const (
-	TableExportOptsFormatCsv TableExportOptsFormat = "csv"
-	TableExportOptsFormatJson TableExportOptsFormat = "json"
-	TableExportOptsFormatXlsx TableExportOptsFormat = "xlsx"
-)
-
-type TableExportOptsSchema string
-const (
-	TableExportOptsSchemaTrue TableExportOptsSchema = "true"
-	TableExportOptsSchemaFalse TableExportOptsSchema = "false"
-)
-
+// TableExportOpts holds the optional inputs of Export.
 type TableExportOpts struct {
 	Filter *string
 	Format TableExportOptsFormat
@@ -1218,14 +2189,15 @@ type TableExportOpts struct {
 	Headers map[string]string
 }
 
+// TableGetOpts holds the optional inputs of Get.
 type TableGetOpts struct {
 	Headers map[string]string
 }
 
+// TableListOpts holds the optional inputs of List.
 type TableListOpts struct {
 	Cursor *string
 	Filter *string
-	Lang *string
 	Limit *int64
 	Order *string
 	Page *int64
@@ -1233,26 +2205,25 @@ type TableListOpts struct {
 	Headers map[string]string
 }
 
+// TableRestoreOpts holds the optional inputs of Restore.
 type TableRestoreOpts struct {
 	Headers map[string]string
 }
 
-type TableUpdateOpts struct {
-	Headers map[string]string
-}
-
+// TableTemplateCreateOpts holds the optional inputs of Create.
 type TableTemplateCreateOpts struct {
 	Headers map[string]string
 }
 
+// TableTemplateDeleteOpts holds the optional inputs of Delete.
 type TableTemplateDeleteOpts struct {
 	Headers map[string]string
 }
 
+// TableTemplateListMineOpts holds the optional inputs of ListMine.
 type TableTemplateListMineOpts struct {
 	Cursor *string
 	Filter *string
-	Lang *string
 	Limit *int64
 	Order *string
 	Page *int64
@@ -1261,14 +2232,15 @@ type TableTemplateListMineOpts struct {
 	Headers map[string]string
 }
 
+// TableTemplateProjectGetOpts holds the optional inputs of ProjectGet.
 type TableTemplateProjectGetOpts struct {
 	Headers map[string]string
 }
 
+// TableTemplateProjectListOpts holds the optional inputs of ProjectList.
 type TableTemplateProjectListOpts struct {
 	Cursor *string
 	Filter *string
-	Lang *string
 	Limit *int64
 	Order *string
 	Page *int64
@@ -1276,58 +2248,51 @@ type TableTemplateProjectListOpts struct {
 	Headers map[string]string
 }
 
+// TableTemplateUpdateOpts holds the optional inputs of Update.
 type TableTemplateUpdateOpts struct {
 	Headers map[string]string
 }
 
+// TableTemplateUseOpts holds the optional inputs of Use.
 type TableTemplateUseOpts struct {
 	Headers map[string]string
 }
 
+// TableUpdateOpts holds the optional inputs of Update.
+type TableUpdateOpts struct {
+	Headers map[string]string
+}
+
+// WebhookCreateOpts holds the optional inputs of Create.
 type WebhookCreateOpts struct {
 	Headers map[string]string
 }
 
+// WebhookDeleteOpts holds the optional inputs of Delete.
 type WebhookDeleteOpts struct {
 	Headers map[string]string
 }
 
-type WebhookDeliveriesOptsEvent string
-const (
-	WebhookDeliveriesOptsEventBatchComplete WebhookDeliveriesOptsEvent = "batch.complete"
-	WebhookDeliveriesOptsEventBatchFailed WebhookDeliveriesOptsEvent = "batch.failed"
-	WebhookDeliveriesOptsEventBatchPartial WebhookDeliveriesOptsEvent = "batch.partial"
-	WebhookDeliveriesOptsEventPing WebhookDeliveriesOptsEvent = "ping"
-)
-
-type WebhookDeliveriesOptsStatus string
-const (
-	WebhookDeliveriesOptsStatusPending WebhookDeliveriesOptsStatus = "pending"
-	WebhookDeliveriesOptsStatusSuccess WebhookDeliveriesOptsStatus = "success"
-	WebhookDeliveriesOptsStatusFailed WebhookDeliveriesOptsStatus = "failed"
-)
-
+// WebhookDeliveriesOpts holds the optional inputs of Deliveries.
 type WebhookDeliveriesOpts struct {
 	Cursor *string
 	Event *WebhookDeliveriesOptsEvent
-	Filter *string
-	Lang *string
 	Limit *int64
 	Order *string
 	Page *int64
-	Q *string
 	Status *WebhookDeliveriesOptsStatus
 	Headers map[string]string
 }
 
+// WebhookGetOpts holds the optional inputs of Get.
 type WebhookGetOpts struct {
 	Headers map[string]string
 }
 
+// WebhookListOpts holds the optional inputs of List.
 type WebhookListOpts struct {
 	Cursor *string
 	Filter *string
-	Lang *string
 	Limit *int64
 	Order *string
 	Page *int64
@@ -1335,14 +2300,17 @@ type WebhookListOpts struct {
 	Headers map[string]string
 }
 
+// WebhookRotateSecretOpts holds the optional inputs of RotateSecret.
 type WebhookRotateSecretOpts struct {
 	Headers map[string]string
 }
 
+// WebhookTestOpts holds the optional inputs of Test.
 type WebhookTestOpts struct {
 	Headers map[string]string
 }
 
+// WebhookUpdateOpts holds the optional inputs of Update.
 type WebhookUpdateOpts struct {
 	Headers map[string]string
 }
