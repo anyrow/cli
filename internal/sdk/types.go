@@ -2,12 +2,14 @@
 
 package sdk
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type CreateOrganizationsWebhookRequest struct {
 	Events []CreateOrganizationsWebhookRequestEventsItem `json:"events"`
-	Name *string `json:"name,omitempty"`
-	Url string `json:"url"`
+	Name   *string                                       `json:"name,omitempty"`
+	Url    string                                        `json:"url"`
 }
 
 func (s CreateOrganizationsWebhookRequest) MarshalJSON() ([]byte, error) {
@@ -20,18 +22,18 @@ func (s CreateOrganizationsWebhookRequest) MarshalJSON() ([]byte, error) {
 }
 
 type CreateOrganizationsWebhookResponse201 struct {
-	Active bool `json:"active"`
-	CreatedAt int64 `json:"created_at"`
-	Events []CreateOrganizationsWebhookResponse201EventsItem `json:"events"`
-	FailureCount int64 `json:"failure_count"`
-	Id string `json:"id"`
-	LastTriggeredAt *int64 `json:"last_triggered_at"`
-	Name *string `json:"name"`
-	OrganizationId string `json:"organization_id"`
-	Secret string `json:"secret"`
-	SecretRotatedAt *int64 `json:"secret_rotated_at"`
-	UpdatedAt int64 `json:"updated_at"`
-	Url string `json:"url"`
+	Active          bool                                              `json:"active"`
+	CreatedAt       int64                                             `json:"created_at"`
+	Events          []CreateOrganizationsWebhookResponse201EventsItem `json:"events"`
+	FailureCount    int64                                             `json:"failure_count"`
+	Id              string                                            `json:"id"`
+	LastTriggeredAt *int64                                            `json:"last_triggered_at"`
+	Name            *string                                           `json:"name"`
+	OrganizationId  string                                            `json:"organization_id"`
+	Secret          string                                            `json:"secret"`
+	SecretRotatedAt *int64                                            `json:"secret_rotated_at"`
+	UpdatedAt       int64                                             `json:"updated_at"`
+	Url             string                                            `json:"url"`
 }
 
 func (s CreateOrganizationsWebhookResponse201) MarshalJSON() ([]byte, error) {
@@ -44,13 +46,13 @@ func (s CreateOrganizationsWebhookResponse201) MarshalJSON() ([]byte, error) {
 }
 
 type CreateOrganizationsWebhookResponse500 struct {
-	ErrorKey CreateOrganizationsWebhookResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]CreateOrganizationsWebhookResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateOrganizationsWebhookResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateOrganizationsWebhookResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateOrganizationsWebhookResponse500FieldsItem `json:"fields"`
+	Message   string                                                       `json:"message"`
+	Status    CreateOrganizationsWebhookResponse500Status                  `json:"status"`
+	StatusKey string                                                       `json:"status_key"`
+	Success   bool                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
 }
 
 func (s CreateOrganizationsWebhookResponse500) MarshalJSON() ([]byte, error) {
@@ -63,19 +65,19 @@ func (s CreateOrganizationsWebhookResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type CreateOrganizationsWebhooksTestResponse200 struct {
-	HttpStatus *float64 `json:"http_status"`
-	ResponseBody *string `json:"response_body"`
-	Status CreateOrganizationsWebhooksTestResponse200Status `json:"status"`
+	HttpStatus   *float64                                         `json:"http_status"`
+	ResponseBody *string                                          `json:"response_body"`
+	Status       CreateOrganizationsWebhooksTestResponse200Status `json:"status"`
 }
 
 type CreateOrganizationsWebhooksTestResponse500 struct {
-	ErrorKey CreateOrganizationsWebhooksTestResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]CreateOrganizationsWebhooksTestResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateOrganizationsWebhooksTestResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateOrganizationsWebhooksTestResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateOrganizationsWebhooksTestResponse500FieldsItem `json:"fields"`
+	Message   string                                                            `json:"message"`
+	Status    CreateOrganizationsWebhooksTestResponse500Status                  `json:"status"`
+	StatusKey string                                                            `json:"status_key"`
+	Success   bool                                                              `json:"success"`
+	Vars      map[string]json.RawMessage                                        `json:"vars,omitempty"`
 }
 
 func (s CreateOrganizationsWebhooksTestResponse500) MarshalJSON() ([]byte, error) {
@@ -88,27 +90,27 @@ func (s CreateOrganizationsWebhooksTestResponse500) MarshalJSON() ([]byte, error
 }
 
 type CreateProjectsExtractRequest struct {
-	Columns *string `json:"columns,omitempty"`
-	File *string `json:"file,omitempty"`
-	Instruction *string `json:"instruction,omitempty"`
-	Schema *string `json:"schema,omitempty"`
-	Strictness *CreateProjectsExtractRequestStrictness `json:"strictness,omitempty"`
-	Text *string `json:"text,omitempty"`
+	Columns     *string                                 `json:"columns,omitempty"`
+	File        *string                                 `json:"file,omitempty"`
+	Instruction *string                                 `json:"instruction,omitempty"`
+	Schema      *string                                 `json:"schema,omitempty"`
+	Strictness  *CreateProjectsExtractRequestStrictness `json:"strictness,omitempty"`
+	Text        *string                                 `json:"text,omitempty"`
 }
 
 type CreateProjectsExtractResponse200 struct {
-	BatchId *string `json:"batch_id,omitempty"`
-	Confidence *float64 `json:"confidence"`
-	Credits int64 `json:"credits"`
-	DurationMs *float64 `json:"duration_ms"`
-	FailCount float64 `json:"fail_count"`
-	FileType Nullable[CreateProjectsExtractResponse200FileType] `json:"file_type,omitzero"`
-	Files []CreateProjectsExtractResponse200FilesItem `json:"files"`
-	Result *CreateProjectsExtractResponse200Result `json:"result,omitempty"`
-	Status string `json:"status"`
-	SuccessCount float64 `json:"success_count"`
-	TableId string `json:"table_id"`
-	TotalRows float64 `json:"total_rows"`
+	BatchId      *string                                            `json:"batch_id,omitempty"`
+	Confidence   *float64                                           `json:"confidence"`
+	Credits      int64                                              `json:"credits"`
+	DurationMs   *float64                                           `json:"duration_ms"`
+	FailCount    float64                                            `json:"fail_count"`
+	FileType     Nullable[CreateProjectsExtractResponse200FileType] `json:"file_type,omitzero"`
+	Files        []CreateProjectsExtractResponse200FilesItem        `json:"files"`
+	Result       map[string]json.RawMessage                         `json:"result,omitempty"`
+	Status       string                                             `json:"status"`
+	SuccessCount float64                                            `json:"success_count"`
+	TableId      string                                             `json:"table_id"`
+	TotalRows    float64                                            `json:"total_rows"`
 }
 
 func (s CreateProjectsExtractResponse200) MarshalJSON() ([]byte, error) {
@@ -120,17 +122,15 @@ func (s CreateProjectsExtractResponse200) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p)
 }
 
-type CreateProjectsExtractResponse200Result map[string]json.RawMessage
-
 type CreateProjectsSuggestSchemaRequest struct {
 	File *string `json:"file,omitempty"`
 	Text *string `json:"text,omitempty"`
 }
 
 type CreateProjectsSuggestSchemaResponse200 struct {
-	Columns []CreateProjectsSuggestSchemaResponse200ColumnsItem `json:"columns"`
-	Confidence float64 `json:"confidence"`
-	Instruction *string `json:"instruction,omitempty"`
+	Columns     []CreateProjectsSuggestSchemaResponse200ColumnsItem `json:"columns"`
+	Confidence  float64                                             `json:"confidence"`
+	Instruction *string                                             `json:"instruction,omitempty"`
 }
 
 func (s CreateProjectsSuggestSchemaResponse200) MarshalJSON() ([]byte, error) {
@@ -143,31 +143,22 @@ func (s CreateProjectsSuggestSchemaResponse200) MarshalJSON() ([]byte, error) {
 }
 
 type CreateProjectsTableRequest struct {
-	ColumnsJson []CreateProjectsTableRequestColumnsJsonItem `json:"columns_json"`
-	InsertMode *CreateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[[]string] `json:"merge_columns_json,omitzero"`
-	Name string `json:"name"`
-	Strictness *CreateProjectsTableRequestStrictness `json:"strictness,omitempty"`
-}
-
-func (s CreateProjectsTableRequest) MarshalJSON() ([]byte, error) {
-	type plain CreateProjectsTableRequest
-	p := plain(s)
-	if p.ColumnsJson == nil {
-		p.ColumnsJson = []CreateProjectsTableRequestColumnsJsonItem{}
-	}
-	return json.Marshal(p)
+	ColumnsJson      json.RawMessage                       `json:"columns_json"`
+	InsertMode       *CreateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
+	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
+	MergeColumnsJson Nullable[json.RawMessage]             `json:"merge_columns_json,omitzero"`
+	Name             string                                `json:"name"`
+	Strictness       *CreateProjectsTableRequestStrictness `json:"strictness,omitempty"`
 }
 
 type CreateProjectsTableResponse402 struct {
-	ErrorKey CreateProjectsTableResponse402ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTableResponse402FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTableResponse402Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTableResponse402ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTableResponse402FieldsItem `json:"fields"`
+	Message   string                                                `json:"message"`
+	Status    CreateProjectsTableResponse402Status                  `json:"status"`
+	StatusKey string                                                `json:"status_key"`
+	Success   bool                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                            `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTableResponse402) MarshalJSON() ([]byte, error) {
@@ -180,29 +171,29 @@ func (s CreateProjectsTableResponse402) MarshalJSON() ([]byte, error) {
 }
 
 type CreateProjectsTableTemplatesUseRequest struct {
-	Name string `json:"name"`
+	Name string  `json:"name"`
 	Slug *string `json:"slug,omitempty"`
 }
 
 type CreateProjectsTableTemplatesUseResponse201 struct {
-	ColumnsJson []CreateProjectsTableTemplatesUseResponse201ColumnsJsonItem `json:"columns_json"`
-	CreatedAt int64 `json:"created_at"`
-	DataVersion int64 `json:"data_version"`
-	DefaultSort *string `json:"default_sort"`
-	DeletedAt *int64 `json:"deleted_at"`
-	FtsVersion int64 `json:"fts_version"`
-	Id string `json:"id"`
-	InsertMode CreateProjectsTableTemplatesUseResponse201InsertMode `json:"insert_mode"`
-	Instruction *string `json:"instruction"`
-	LastUsedAt *int64 `json:"last_used_at"`
-	MergeColumnsJson []string `json:"merge_columns_json"`
-	Name string `json:"name"`
-	ProjectId string `json:"project_id"`
-	RowCount int64 `json:"row_count"`
-	Slug string `json:"slug"`
-	Strictness CreateProjectsTableTemplatesUseResponse201Strictness `json:"strictness"`
-	UpdatedAt int64 `json:"updated_at"`
-	UsageCount int64 `json:"usage_count"`
+	ColumnsJson      []CreateProjectsTableTemplatesUseResponse201ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                                       `json:"created_at"`
+	DataVersion      int64                                                       `json:"data_version"`
+	DefaultSort      *string                                                     `json:"default_sort"`
+	DeletedAt        *int64                                                      `json:"deleted_at"`
+	FtsVersion       int64                                                       `json:"fts_version"`
+	Id               string                                                      `json:"id"`
+	InsertMode       CreateProjectsTableTemplatesUseResponse201InsertMode        `json:"insert_mode"`
+	Instruction      *string                                                     `json:"instruction"`
+	LastUsedAt       *int64                                                      `json:"last_used_at"`
+	MergeColumnsJson []string                                                    `json:"merge_columns_json"`
+	Name             string                                                      `json:"name"`
+	ProjectId        string                                                      `json:"project_id"`
+	RowCount         int64                                                       `json:"row_count"`
+	Slug             string                                                      `json:"slug"`
+	Strictness       CreateProjectsTableTemplatesUseResponse201Strictness        `json:"strictness"`
+	UpdatedAt        int64                                                       `json:"updated_at"`
+	UsageCount       int64                                                       `json:"usage_count"`
 }
 
 func (s CreateProjectsTableTemplatesUseResponse201) MarshalJSON() ([]byte, error) {
@@ -218,13 +209,13 @@ func (s CreateProjectsTableTemplatesUseResponse201) MarshalJSON() ([]byte, error
 }
 
 type CreateProjectsTableTemplatesUseResponse402 struct {
-	ErrorKey CreateProjectsTableTemplatesUseResponse402ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTableTemplatesUseResponse402FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTableTemplatesUseResponse402Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTableTemplatesUseResponse402ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTableTemplatesUseResponse402FieldsItem `json:"fields"`
+	Message   string                                                            `json:"message"`
+	Status    CreateProjectsTableTemplatesUseResponse402Status                  `json:"status"`
+	StatusKey string                                                            `json:"status_key"`
+	Success   bool                                                              `json:"success"`
+	Vars      map[string]json.RawMessage                                        `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTableTemplatesUseResponse402) MarshalJSON() ([]byte, error) {
@@ -237,23 +228,23 @@ func (s CreateProjectsTableTemplatesUseResponse402) MarshalJSON() ([]byte, error
 }
 
 type CreateProjectsTablesColumnRequest struct {
-	CurrencyCode *string `json:"currency_code,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Options []string `json:"options,omitempty"`
-	Required *bool `json:"required,omitempty"`
-	Type *CreateProjectsTablesColumnRequestType `json:"type,omitempty"`
+	CurrencyCode *string                                `json:"currency_code,omitempty"`
+	Description  Nullable[string]                       `json:"description,omitzero"`
+	Instruction  Nullable[string]                       `json:"instruction,omitzero"`
+	Name         string                                 `json:"name"`
+	Options      []string                               `json:"options,omitempty"`
+	Required     *bool                                  `json:"required,omitempty"`
+	Type         *CreateProjectsTablesColumnRequestType `json:"type,omitempty"`
 }
 
 type CreateProjectsTablesColumnResponse402 struct {
-	ErrorKey CreateProjectsTablesColumnResponse402ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTablesColumnResponse402FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTablesColumnResponse402Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTablesColumnResponse402ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTablesColumnResponse402FieldsItem `json:"fields"`
+	Message   string                                                       `json:"message"`
+	Status    CreateProjectsTablesColumnResponse402Status                  `json:"status"`
+	StatusKey string                                                       `json:"status_key"`
+	Success   bool                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTablesColumnResponse402) MarshalJSON() ([]byte, error) {
@@ -266,13 +257,13 @@ func (s CreateProjectsTablesColumnResponse402) MarshalJSON() ([]byte, error) {
 }
 
 type CreateProjectsTablesColumnResponse500 struct {
-	ErrorKey CreateProjectsTablesColumnResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTablesColumnResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTablesColumnResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTablesColumnResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTablesColumnResponse500FieldsItem `json:"fields"`
+	Message   string                                                       `json:"message"`
+	Status    CreateProjectsTablesColumnResponse500Status                  `json:"status"`
+	StatusKey string                                                       `json:"status_key"`
+	Success   bool                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTablesColumnResponse500) MarshalJSON() ([]byte, error) {
@@ -290,13 +281,13 @@ type CreateProjectsTablesDuplicateRequest struct {
 }
 
 type CreateProjectsTablesDuplicateResponse500 struct {
-	ErrorKey CreateProjectsTablesDuplicateResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTablesDuplicateResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTablesDuplicateResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTablesDuplicateResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTablesDuplicateResponse500FieldsItem `json:"fields"`
+	Message   string                                                          `json:"message"`
+	Status    CreateProjectsTablesDuplicateResponse500Status                  `json:"status"`
+	StatusKey string                                                          `json:"status_key"`
+	Success   bool                                                            `json:"success"`
+	Vars      map[string]json.RawMessage                                      `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTablesDuplicateResponse500) MarshalJSON() ([]byte, error) {
@@ -313,13 +304,13 @@ type CreateProjectsTablesRestoreRequest struct {
 }
 
 type CreateProjectsTablesRestoreResponse410 struct {
-	ErrorKey CreateProjectsTablesRestoreResponse410ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTablesRestoreResponse410FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTablesRestoreResponse410Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTablesRestoreResponse410ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTablesRestoreResponse410FieldsItem `json:"fields"`
+	Message   string                                                        `json:"message"`
+	Status    CreateProjectsTablesRestoreResponse410Status                  `json:"status"`
+	StatusKey string                                                        `json:"status_key"`
+	Success   bool                                                          `json:"success"`
+	Vars      map[string]json.RawMessage                                    `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTablesRestoreResponse410) MarshalJSON() ([]byte, error) {
@@ -332,13 +323,13 @@ func (s CreateProjectsTablesRestoreResponse410) MarshalJSON() ([]byte, error) {
 }
 
 type CreateProjectsTablesRestoreResponse500 struct {
-	ErrorKey CreateProjectsTablesRestoreResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTablesRestoreResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTablesRestoreResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTablesRestoreResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTablesRestoreResponse500FieldsItem `json:"fields"`
+	Message   string                                                        `json:"message"`
+	Status    CreateProjectsTablesRestoreResponse500Status                  `json:"status"`
+	StatusKey string                                                        `json:"status_key"`
+	Success   bool                                                          `json:"success"`
+	Vars      map[string]json.RawMessage                                    `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTablesRestoreResponse500) MarshalJSON() ([]byte, error) {
@@ -353,25 +344,25 @@ func (s CreateProjectsTablesRestoreResponse500) MarshalJSON() ([]byte, error) {
 type CreateProjectsTablesRowRequest map[string]json.RawMessage
 
 type CreateProjectsTablesRowRequestDbbb57 struct {
-	Creates []map[string]json.RawMessage `json:"creates,omitempty"`
-	Deletes []string `json:"deletes,omitempty"`
+	Creates []map[string]json.RawMessage                      `json:"creates,omitempty"`
+	Deletes []string                                          `json:"deletes,omitempty"`
 	Updates []CreateProjectsTablesRowRequestDbbb57UpdatesItem `json:"updates,omitempty"`
 }
 
 type CreateProjectsTablesRowResponse200 struct {
 	Created []map[string]json.RawMessage `json:"created,omitempty"`
-	Deleted []string `json:"deleted,omitempty"`
+	Deleted []string                     `json:"deleted,omitempty"`
 	Updated []map[string]json.RawMessage `json:"updated,omitempty"`
 }
 
 type CreateProjectsTablesRowResponse500 struct {
-	ErrorKey CreateProjectsTablesRowResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTablesRowResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTablesRowResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTablesRowResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTablesRowResponse500FieldsItem `json:"fields"`
+	Message   string                                                    `json:"message"`
+	Status    CreateProjectsTablesRowResponse500Status                  `json:"status"`
+	StatusKey string                                                    `json:"status_key"`
+	Success   bool                                                      `json:"success"`
+	Vars      map[string]json.RawMessage                                `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTablesRowResponse500) MarshalJSON() ([]byte, error) {
@@ -384,13 +375,13 @@ func (s CreateProjectsTablesRowResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type CreateProjectsTablesRowResponse500534f56 struct {
-	ErrorKey CreateProjectsTablesRowResponse500534f56ErrorKey `json:"error_key"`
-	Fields map[string][]CreateProjectsTablesRowResponse500534f56FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateProjectsTablesRowResponse500534f56Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateProjectsTablesRowResponse500534f56ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTablesRowResponse500534f56FieldsItem `json:"fields"`
+	Message   string                                                          `json:"message"`
+	Status    CreateProjectsTablesRowResponse500534f56Status                  `json:"status"`
+	StatusKey string                                                          `json:"status_key"`
+	Success   bool                                                            `json:"success"`
+	Vars      map[string]json.RawMessage                                      `json:"vars,omitempty"`
 }
 
 func (s CreateProjectsTablesRowResponse500534f56) MarshalJSON() ([]byte, error) {
@@ -403,33 +394,24 @@ func (s CreateProjectsTablesRowResponse500534f56) MarshalJSON() ([]byte, error) 
 }
 
 type CreateTableTemplateRequest struct {
-	Category string `json:"category"`
-	ColumnsJson []CreateTableTemplateRequestColumnsJsonItem `json:"columns_json"`
-	Description Nullable[string] `json:"description,omitzero"`
-	InsertMode *CreateTableTemplateRequestInsertMode `json:"insert_mode,omitempty"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[[]string] `json:"merge_columns_json,omitzero"`
-	Name string `json:"name"`
-	Strictness *CreateTableTemplateRequestStrictness `json:"strictness,omitempty"`
-}
-
-func (s CreateTableTemplateRequest) MarshalJSON() ([]byte, error) {
-	type plain CreateTableTemplateRequest
-	p := plain(s)
-	if p.ColumnsJson == nil {
-		p.ColumnsJson = []CreateTableTemplateRequestColumnsJsonItem{}
-	}
-	return json.Marshal(p)
+	Category         string                                `json:"category"`
+	ColumnsJson      json.RawMessage                       `json:"columns_json"`
+	Description      Nullable[string]                      `json:"description,omitzero"`
+	InsertMode       *CreateTableTemplateRequestInsertMode `json:"insert_mode,omitempty"`
+	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
+	MergeColumnsJson Nullable[json.RawMessage]             `json:"merge_columns_json,omitzero"`
+	Name             string                                `json:"name"`
+	Strictness       *CreateTableTemplateRequestStrictness `json:"strictness,omitempty"`
 }
 
 type CreateTableTemplateResponse500 struct {
-	ErrorKey CreateTableTemplateResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]CreateTableTemplateResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status CreateTableTemplateResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  CreateTableTemplateResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateTableTemplateResponse500FieldsItem `json:"fields"`
+	Message   string                                                `json:"message"`
+	Status    CreateTableTemplateResponse500Status                  `json:"status"`
+	StatusKey string                                                `json:"status_key"`
+	Success   bool                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                            `json:"vars,omitempty"`
 }
 
 func (s CreateTableTemplateResponse500) MarshalJSON() ([]byte, error) {
@@ -446,13 +428,13 @@ type DeleteOrganizationsWebhookResponse200 struct {
 }
 
 type DeleteProjectsTablesColumnResponse400 struct {
-	ErrorKey DeleteProjectsTablesColumnResponse400ErrorKey `json:"error_key"`
-	Fields map[string][]DeleteProjectsTablesColumnResponse400FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status DeleteProjectsTablesColumnResponse400Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  DeleteProjectsTablesColumnResponse400ErrorKey                `json:"error_key"`
+	Fields    map[string][]DeleteProjectsTablesColumnResponse400FieldsItem `json:"fields"`
+	Message   string                                                       `json:"message"`
+	Status    DeleteProjectsTablesColumnResponse400Status                  `json:"status"`
+	StatusKey string                                                       `json:"status_key"`
+	Success   bool                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
 }
 
 func (s DeleteProjectsTablesColumnResponse400) MarshalJSON() ([]byte, error) {
@@ -465,13 +447,13 @@ func (s DeleteProjectsTablesColumnResponse400) MarshalJSON() ([]byte, error) {
 }
 
 type DeleteProjectsTablesColumnResponse409 struct {
-	ErrorKey DeleteProjectsTablesColumnResponse409ErrorKey `json:"error_key"`
-	Fields map[string][]DeleteProjectsTablesColumnResponse409FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status DeleteProjectsTablesColumnResponse409Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  DeleteProjectsTablesColumnResponse409ErrorKey                `json:"error_key"`
+	Fields    map[string][]DeleteProjectsTablesColumnResponse409FieldsItem `json:"fields"`
+	Message   string                                                       `json:"message"`
+	Status    DeleteProjectsTablesColumnResponse409Status                  `json:"status"`
+	StatusKey string                                                       `json:"status_key"`
+	Success   bool                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
 }
 
 func (s DeleteProjectsTablesColumnResponse409) MarshalJSON() ([]byte, error) {
@@ -484,13 +466,13 @@ func (s DeleteProjectsTablesColumnResponse409) MarshalJSON() ([]byte, error) {
 }
 
 type DeleteProjectsTablesColumnResponse500 struct {
-	ErrorKey DeleteProjectsTablesColumnResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]DeleteProjectsTablesColumnResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status DeleteProjectsTablesColumnResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  DeleteProjectsTablesColumnResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]DeleteProjectsTablesColumnResponse500FieldsItem `json:"fields"`
+	Message   string                                                       `json:"message"`
+	Status    DeleteProjectsTablesColumnResponse500Status                  `json:"status"`
+	StatusKey string                                                       `json:"status_key"`
+	Success   bool                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
 }
 
 func (s DeleteProjectsTablesColumnResponse500) MarshalJSON() ([]byte, error) {
@@ -503,13 +485,13 @@ func (s DeleteProjectsTablesColumnResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type DeleteProjectsTablesRowResponse500 struct {
-	ErrorKey DeleteProjectsTablesRowResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]DeleteProjectsTablesRowResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status DeleteProjectsTablesRowResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  DeleteProjectsTablesRowResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]DeleteProjectsTablesRowResponse500FieldsItem `json:"fields"`
+	Message   string                                                    `json:"message"`
+	Status    DeleteProjectsTablesRowResponse500Status                  `json:"status"`
+	StatusKey string                                                    `json:"status_key"`
+	Success   bool                                                      `json:"success"`
+	Vars      map[string]json.RawMessage                                `json:"vars,omitempty"`
 }
 
 func (s DeleteProjectsTablesRowResponse500) MarshalJSON() ([]byte, error) {
@@ -522,13 +504,13 @@ func (s DeleteProjectsTablesRowResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type DeleteTableTemplateResponse500 struct {
-	ErrorKey DeleteTableTemplateResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]DeleteTableTemplateResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status DeleteTableTemplateResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  DeleteTableTemplateResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]DeleteTableTemplateResponse500FieldsItem `json:"fields"`
+	Message   string                                                `json:"message"`
+	Status    DeleteTableTemplateResponse500Status                  `json:"status"`
+	StatusKey string                                                `json:"status_key"`
+	Success   bool                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                            `json:"vars,omitempty"`
 }
 
 func (s DeleteTableTemplateResponse500) MarshalJSON() ([]byte, error) {
@@ -541,13 +523,13 @@ func (s DeleteTableTemplateResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInput struct {
-	ErrorKey Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey `json:"error_key"`
-	Fields map[string][]Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey                `json:"error_key"`
+	Fields    map[string][]Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputFieldsItem `json:"fields"`
+	Message   string                                                                                `json:"message"`
+	Status    Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputStatus                  `json:"status"`
+	StatusKey string                                                                                `json:"status_key"`
+	Success   bool                                                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                                                            `json:"vars,omitempty"`
 }
 
 func (s Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInput) MarshalJSON() ([]byte, error) {
@@ -560,13 +542,13 @@ func (s Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInput) MarshalJ
 }
 
 type Err400CaptchaFailedCaptchaRequiredInvalidInput struct {
-	ErrorKey Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKey `json:"error_key"`
-	Fields map[string][]Err400CaptchaFailedCaptchaRequiredInvalidInputFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err400CaptchaFailedCaptchaRequiredInvalidInputStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKey                `json:"error_key"`
+	Fields    map[string][]Err400CaptchaFailedCaptchaRequiredInvalidInputFieldsItem `json:"fields"`
+	Message   string                                                                `json:"message"`
+	Status    Err400CaptchaFailedCaptchaRequiredInvalidInputStatus                  `json:"status"`
+	StatusKey string                                                                `json:"status_key"`
+	Success   bool                                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                                            `json:"vars,omitempty"`
 }
 
 func (s Err400CaptchaFailedCaptchaRequiredInvalidInput) MarshalJSON() ([]byte, error) {
@@ -579,13 +561,13 @@ func (s Err400CaptchaFailedCaptchaRequiredInvalidInput) MarshalJSON() ([]byte, e
 }
 
 type Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailed struct {
-	ErrorKey Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey `json:"error_key"`
-	Fields map[string][]Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey                `json:"error_key"`
+	Fields    map[string][]Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedFieldsItem `json:"fields"`
+	Message   string                                                                                   `json:"message"`
+	Status    Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedStatus                  `json:"status"`
+	StatusKey string                                                                                   `json:"status_key"`
+	Success   bool                                                                                     `json:"success"`
+	Vars      map[string]json.RawMessage                                                               `json:"vars,omitempty"`
 }
 
 func (s Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailed) MarshalJSON() ([]byte, error) {
@@ -598,13 +580,13 @@ func (s Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailed) Marsh
 }
 
 type Err401ImpersonationEndedUnauthorized struct {
-	ErrorKey Err401ImpersonationEndedUnauthorizedErrorKey `json:"error_key"`
-	Fields map[string][]Err401ImpersonationEndedUnauthorizedFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err401ImpersonationEndedUnauthorizedStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err401ImpersonationEndedUnauthorizedErrorKey                `json:"error_key"`
+	Fields    map[string][]Err401ImpersonationEndedUnauthorizedFieldsItem `json:"fields"`
+	Message   string                                                      `json:"message"`
+	Status    Err401ImpersonationEndedUnauthorizedStatus                  `json:"status"`
+	StatusKey string                                                      `json:"status_key"`
+	Success   bool                                                        `json:"success"`
+	Vars      map[string]json.RawMessage                                  `json:"vars,omitempty"`
 }
 
 func (s Err401ImpersonationEndedUnauthorized) MarshalJSON() ([]byte, error) {
@@ -617,13 +599,13 @@ func (s Err401ImpersonationEndedUnauthorized) MarshalJSON() ([]byte, error) {
 }
 
 type Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimit struct {
-	ErrorKey Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey `json:"error_key"`
-	Fields map[string][]Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey                `json:"error_key"`
+	Fields    map[string][]Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitFieldsItem `json:"fields"`
+	Message   string                                                                                                                                    `json:"message"`
+	Status    Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitStatus                  `json:"status"`
+	StatusKey string                                                                                                                                    `json:"status_key"`
+	Success   bool                                                                                                                                      `json:"success"`
+	Vars      map[string]json.RawMessage                                                                                                                `json:"vars,omitempty"`
 }
 
 func (s Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimit) MarshalJSON() ([]byte, error) {
@@ -636,13 +618,13 @@ func (s Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileC
 }
 
 type Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimit struct {
-	ErrorKey Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey `json:"error_key"`
-	Fields map[string][]Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey                `json:"error_key"`
+	Fields    map[string][]Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitFieldsItem `json:"fields"`
+	Message   string                                                                                                                                      `json:"message"`
+	Status    Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitStatus                  `json:"status"`
+	StatusKey string                                                                                                                                      `json:"status_key"`
+	Success   bool                                                                                                                                        `json:"success"`
+	Vars      map[string]json.RawMessage                                                                                                                  `json:"vars,omitempty"`
 }
 
 func (s Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimit) MarshalJSON() ([]byte, error) {
@@ -655,13 +637,13 @@ func (s Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileC
 }
 
 type Err402ApiRequestLimitExceededFeatureNotAvailable struct {
-	ErrorKey Err402ApiRequestLimitExceededFeatureNotAvailableErrorKey `json:"error_key"`
-	Fields map[string][]Err402ApiRequestLimitExceededFeatureNotAvailableFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err402ApiRequestLimitExceededFeatureNotAvailableStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err402ApiRequestLimitExceededFeatureNotAvailableErrorKey                `json:"error_key"`
+	Fields    map[string][]Err402ApiRequestLimitExceededFeatureNotAvailableFieldsItem `json:"fields"`
+	Message   string                                                                  `json:"message"`
+	Status    Err402ApiRequestLimitExceededFeatureNotAvailableStatus                  `json:"status"`
+	StatusKey string                                                                  `json:"status_key"`
+	Success   bool                                                                    `json:"success"`
+	Vars      map[string]json.RawMessage                                              `json:"vars,omitempty"`
 }
 
 func (s Err402ApiRequestLimitExceededFeatureNotAvailable) MarshalJSON() ([]byte, error) {
@@ -674,13 +656,13 @@ func (s Err402ApiRequestLimitExceededFeatureNotAvailable) MarshalJSON() ([]byte,
 }
 
 type Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimit struct {
-	ErrorKey Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKey `json:"error_key"`
-	Fields map[string][]Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKey                `json:"error_key"`
+	Fields    map[string][]Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitFieldsItem `json:"fields"`
+	Message   string                                                                              `json:"message"`
+	Status    Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitStatus                  `json:"status"`
+	StatusKey string                                                                              `json:"status_key"`
+	Success   bool                                                                                `json:"success"`
+	Vars      map[string]json.RawMessage                                                          `json:"vars,omitempty"`
 }
 
 func (s Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimit) MarshalJSON() ([]byte, error) {
@@ -693,13 +675,13 @@ func (s Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimit) MarshalJSO
 }
 
 type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspended struct {
-	ErrorKey Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey `json:"error_key"`
-	Fields map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey                `json:"error_key"`
+	Fields    map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedFieldsItem `json:"fields"`
+	Message   string                                                                                   `json:"message"`
+	Status    Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus                  `json:"status"`
+	StatusKey string                                                                                   `json:"status_key"`
+	Success   bool                                                                                     `json:"success"`
+	Vars      map[string]json.RawMessage                                                               `json:"vars,omitempty"`
 }
 
 func (s Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspended) MarshalJSON() ([]byte, error) {
@@ -712,13 +694,13 @@ func (s Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspended) Marsh
 }
 
 type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbidden struct {
-	ErrorKey Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey `json:"error_key"`
-	Fields map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey                `json:"error_key"`
+	Fields    map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenFieldsItem `json:"fields"`
+	Message   string                                                                                                         `json:"message"`
+	Status    Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus                  `json:"status"`
+	StatusKey string                                                                                                         `json:"status_key"`
+	Success   bool                                                                                                           `json:"success"`
+	Vars      map[string]json.RawMessage                                                                                     `json:"vars,omitempty"`
 }
 
 func (s Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbidden) MarshalJSON() ([]byte, error) {
@@ -731,13 +713,13 @@ func (s Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTe
 }
 
 type Err404BatchNotFoundBatchResultEmptyNotFound struct {
-	ErrorKey Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey `json:"error_key"`
-	Fields map[string][]Err404BatchNotFoundBatchResultEmptyNotFoundFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err404BatchNotFoundBatchResultEmptyNotFoundStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey                `json:"error_key"`
+	Fields    map[string][]Err404BatchNotFoundBatchResultEmptyNotFoundFieldsItem `json:"fields"`
+	Message   string                                                             `json:"message"`
+	Status    Err404BatchNotFoundBatchResultEmptyNotFoundStatus                  `json:"status"`
+	StatusKey string                                                             `json:"status_key"`
+	Success   bool                                                               `json:"success"`
+	Vars      map[string]json.RawMessage                                         `json:"vars,omitempty"`
 }
 
 func (s Err404BatchNotFoundBatchResultEmptyNotFound) MarshalJSON() ([]byte, error) {
@@ -750,13 +732,13 @@ func (s Err404BatchNotFoundBatchResultEmptyNotFound) MarshalJSON() ([]byte, erro
 }
 
 type Err404ColumnNotFoundNotFoundTableNotFound struct {
-	ErrorKey Err404ColumnNotFoundNotFoundTableNotFoundErrorKey `json:"error_key"`
-	Fields map[string][]Err404ColumnNotFoundNotFoundTableNotFoundFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err404ColumnNotFoundNotFoundTableNotFoundStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err404ColumnNotFoundNotFoundTableNotFoundErrorKey                `json:"error_key"`
+	Fields    map[string][]Err404ColumnNotFoundNotFoundTableNotFoundFieldsItem `json:"fields"`
+	Message   string                                                           `json:"message"`
+	Status    Err404ColumnNotFoundNotFoundTableNotFoundStatus                  `json:"status"`
+	StatusKey string                                                           `json:"status_key"`
+	Success   bool                                                             `json:"success"`
+	Vars      map[string]json.RawMessage                                       `json:"vars,omitempty"`
 }
 
 func (s Err404ColumnNotFoundNotFoundTableNotFound) MarshalJSON() ([]byte, error) {
@@ -769,13 +751,13 @@ func (s Err404ColumnNotFoundNotFoundTableNotFound) MarshalJSON() ([]byte, error)
 }
 
 type Err404NotFound struct {
-	ErrorKey Err404NotFoundErrorKey `json:"error_key"`
-	Fields map[string][]Err404NotFoundFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err404NotFoundStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err404NotFoundErrorKey                `json:"error_key"`
+	Fields    map[string][]Err404NotFoundFieldsItem `json:"fields"`
+	Message   string                                `json:"message"`
+	Status    Err404NotFoundStatus                  `json:"status"`
+	StatusKey string                                `json:"status_key"`
+	Success   bool                                  `json:"success"`
+	Vars      map[string]json.RawMessage            `json:"vars,omitempty"`
 }
 
 func (s Err404NotFound) MarshalJSON() ([]byte, error) {
@@ -788,13 +770,13 @@ func (s Err404NotFound) MarshalJSON() ([]byte, error) {
 }
 
 type Err404NotFoundRowNotFoundTableNotFound struct {
-	ErrorKey Err404NotFoundRowNotFoundTableNotFoundErrorKey `json:"error_key"`
-	Fields map[string][]Err404NotFoundRowNotFoundTableNotFoundFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err404NotFoundRowNotFoundTableNotFoundStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err404NotFoundRowNotFoundTableNotFoundErrorKey                `json:"error_key"`
+	Fields    map[string][]Err404NotFoundRowNotFoundTableNotFoundFieldsItem `json:"fields"`
+	Message   string                                                        `json:"message"`
+	Status    Err404NotFoundRowNotFoundTableNotFoundStatus                  `json:"status"`
+	StatusKey string                                                        `json:"status_key"`
+	Success   bool                                                          `json:"success"`
+	Vars      map[string]json.RawMessage                                    `json:"vars,omitempty"`
 }
 
 func (s Err404NotFoundRowNotFoundTableNotFound) MarshalJSON() ([]byte, error) {
@@ -807,13 +789,13 @@ func (s Err404NotFoundRowNotFoundTableNotFound) MarshalJSON() ([]byte, error) {
 }
 
 type Err404NotFoundTableNotFound struct {
-	ErrorKey Err404NotFoundTableNotFoundErrorKey `json:"error_key"`
-	Fields map[string][]Err404NotFoundTableNotFoundFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err404NotFoundTableNotFoundStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err404NotFoundTableNotFoundErrorKey                `json:"error_key"`
+	Fields    map[string][]Err404NotFoundTableNotFoundFieldsItem `json:"fields"`
+	Message   string                                             `json:"message"`
+	Status    Err404NotFoundTableNotFoundStatus                  `json:"status"`
+	StatusKey string                                             `json:"status_key"`
+	Success   bool                                               `json:"success"`
+	Vars      map[string]json.RawMessage                         `json:"vars,omitempty"`
 }
 
 func (s Err404NotFoundTableNotFound) MarshalJSON() ([]byte, error) {
@@ -826,13 +808,13 @@ func (s Err404NotFoundTableNotFound) MarshalJSON() ([]byte, error) {
 }
 
 type Err404NotFoundTableTemplateNotFound struct {
-	ErrorKey Err404NotFoundTableTemplateNotFoundErrorKey `json:"error_key"`
-	Fields map[string][]Err404NotFoundTableTemplateNotFoundFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err404NotFoundTableTemplateNotFoundStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err404NotFoundTableTemplateNotFoundErrorKey                `json:"error_key"`
+	Fields    map[string][]Err404NotFoundTableTemplateNotFoundFieldsItem `json:"fields"`
+	Message   string                                                     `json:"message"`
+	Status    Err404NotFoundTableTemplateNotFoundStatus                  `json:"status"`
+	StatusKey string                                                     `json:"status_key"`
+	Success   bool                                                       `json:"success"`
+	Vars      map[string]json.RawMessage                                 `json:"vars,omitempty"`
 }
 
 func (s Err404NotFoundTableTemplateNotFound) MarshalJSON() ([]byte, error) {
@@ -845,13 +827,13 @@ func (s Err404NotFoundTableTemplateNotFound) MarshalJSON() ([]byte, error) {
 }
 
 type Err404NotFoundWebhookNotFound struct {
-	ErrorKey Err404NotFoundWebhookNotFoundErrorKey `json:"error_key"`
-	Fields map[string][]Err404NotFoundWebhookNotFoundFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err404NotFoundWebhookNotFoundStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err404NotFoundWebhookNotFoundErrorKey                `json:"error_key"`
+	Fields    map[string][]Err404NotFoundWebhookNotFoundFieldsItem `json:"fields"`
+	Message   string                                               `json:"message"`
+	Status    Err404NotFoundWebhookNotFoundStatus                  `json:"status"`
+	StatusKey string                                               `json:"status_key"`
+	Success   bool                                                 `json:"success"`
+	Vars      map[string]json.RawMessage                           `json:"vars,omitempty"`
 }
 
 func (s Err404NotFoundWebhookNotFound) MarshalJSON() ([]byte, error) {
@@ -864,13 +846,13 @@ func (s Err404NotFoundWebhookNotFound) MarshalJSON() ([]byte, error) {
 }
 
 type Err408RequestTimeout struct {
-	ErrorKey Err408RequestTimeoutErrorKey `json:"error_key"`
-	Fields map[string][]Err408RequestTimeoutFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err408RequestTimeoutStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err408RequestTimeoutErrorKey                `json:"error_key"`
+	Fields    map[string][]Err408RequestTimeoutFieldsItem `json:"fields"`
+	Message   string                                      `json:"message"`
+	Status    Err408RequestTimeoutStatus                  `json:"status"`
+	StatusKey string                                      `json:"status_key"`
+	Success   bool                                        `json:"success"`
+	Vars      map[string]json.RawMessage                  `json:"vars,omitempty"`
 }
 
 func (s Err408RequestTimeout) MarshalJSON() ([]byte, error) {
@@ -883,13 +865,13 @@ func (s Err408RequestTimeout) MarshalJSON() ([]byte, error) {
 }
 
 type Err409ColumnNameTakenOptimisticLockConflict struct {
-	ErrorKey Err409ColumnNameTakenOptimisticLockConflictErrorKey `json:"error_key"`
-	Fields map[string][]Err409ColumnNameTakenOptimisticLockConflictFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err409ColumnNameTakenOptimisticLockConflictStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err409ColumnNameTakenOptimisticLockConflictErrorKey                `json:"error_key"`
+	Fields    map[string][]Err409ColumnNameTakenOptimisticLockConflictFieldsItem `json:"fields"`
+	Message   string                                                             `json:"message"`
+	Status    Err409ColumnNameTakenOptimisticLockConflictStatus                  `json:"status"`
+	StatusKey string                                                             `json:"status_key"`
+	Success   bool                                                               `json:"success"`
+	Vars      map[string]json.RawMessage                                         `json:"vars,omitempty"`
 }
 
 func (s Err409ColumnNameTakenOptimisticLockConflict) MarshalJSON() ([]byte, error) {
@@ -901,33 +883,33 @@ func (s Err409ColumnNameTakenOptimisticLockConflict) MarshalJSON() ([]byte, erro
 	return json.Marshal(p)
 }
 
-type Err409TableProjectIdDuplicate struct {
-	ErrorKey Err409TableProjectIdDuplicateErrorKey `json:"error_key"`
-	Fields map[string][]Err409TableProjectIdDuplicateFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err409TableProjectIdDuplicateStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+type Err409TableProjectIdSlugDuplicate struct {
+	ErrorKey  Err409TableProjectIdSlugDuplicateErrorKey                `json:"error_key"`
+	Fields    map[string][]Err409TableProjectIdSlugDuplicateFieldsItem `json:"fields"`
+	Message   string                                                   `json:"message"`
+	Status    Err409TableProjectIdSlugDuplicateStatus                  `json:"status"`
+	StatusKey string                                                   `json:"status_key"`
+	Success   bool                                                     `json:"success"`
+	Vars      map[string]json.RawMessage                               `json:"vars,omitempty"`
 }
 
-func (s Err409TableProjectIdDuplicate) MarshalJSON() ([]byte, error) {
-	type plain Err409TableProjectIdDuplicate
+func (s Err409TableProjectIdSlugDuplicate) MarshalJSON() ([]byte, error) {
+	type plain Err409TableProjectIdSlugDuplicate
 	p := plain(s)
 	if p.Fields == nil {
-		p.Fields = map[string][]Err409TableProjectIdDuplicateFieldsItem{}
+		p.Fields = map[string][]Err409TableProjectIdSlugDuplicateFieldsItem{}
 	}
 	return json.Marshal(p)
 }
 
 type Err410TableSoftDeleted struct {
-	ErrorKey Err410TableSoftDeletedErrorKey `json:"error_key"`
-	Fields map[string][]Err410TableSoftDeletedFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err410TableSoftDeletedStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err410TableSoftDeletedErrorKey                `json:"error_key"`
+	Fields    map[string][]Err410TableSoftDeletedFieldsItem `json:"fields"`
+	Message   string                                        `json:"message"`
+	Status    Err410TableSoftDeletedStatus                  `json:"status"`
+	StatusKey string                                        `json:"status_key"`
+	Success   bool                                          `json:"success"`
+	Vars      map[string]json.RawMessage                    `json:"vars,omitempty"`
 }
 
 func (s Err410TableSoftDeleted) MarshalJSON() ([]byte, error) {
@@ -940,13 +922,13 @@ func (s Err410TableSoftDeleted) MarshalJSON() ([]byte, error) {
 }
 
 type Err413ContentTooLarge struct {
-	ErrorKey Err413ContentTooLargeErrorKey `json:"error_key"`
-	Fields map[string][]Err413ContentTooLargeFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err413ContentTooLargeStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err413ContentTooLargeErrorKey                `json:"error_key"`
+	Fields    map[string][]Err413ContentTooLargeFieldsItem `json:"fields"`
+	Message   string                                       `json:"message"`
+	Status    Err413ContentTooLargeStatus                  `json:"status"`
+	StatusKey string                                       `json:"status_key"`
+	Success   bool                                         `json:"success"`
+	Vars      map[string]json.RawMessage                   `json:"vars,omitempty"`
 }
 
 func (s Err413ContentTooLarge) MarshalJSON() ([]byte, error) {
@@ -959,13 +941,13 @@ func (s Err413ContentTooLarge) MarshalJSON() ([]byte, error) {
 }
 
 type Err415UnsupportedMediaType struct {
-	ErrorKey Err415UnsupportedMediaTypeErrorKey `json:"error_key"`
-	Fields map[string][]Err415UnsupportedMediaTypeFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err415UnsupportedMediaTypeStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err415UnsupportedMediaTypeErrorKey                `json:"error_key"`
+	Fields    map[string][]Err415UnsupportedMediaTypeFieldsItem `json:"fields"`
+	Message   string                                            `json:"message"`
+	Status    Err415UnsupportedMediaTypeStatus                  `json:"status"`
+	StatusKey string                                            `json:"status_key"`
+	Success   bool                                              `json:"success"`
+	Vars      map[string]json.RawMessage                        `json:"vars,omitempty"`
 }
 
 func (s Err415UnsupportedMediaType) MarshalJSON() ([]byte, error) {
@@ -978,13 +960,13 @@ func (s Err415UnsupportedMediaType) MarshalJSON() ([]byte, error) {
 }
 
 type Err422ExtractionUnprocessableUnprocessableEntity struct {
-	ErrorKey Err422ExtractionUnprocessableUnprocessableEntityErrorKey `json:"error_key"`
-	Fields map[string][]Err422ExtractionUnprocessableUnprocessableEntityFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err422ExtractionUnprocessableUnprocessableEntityStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err422ExtractionUnprocessableUnprocessableEntityErrorKey                `json:"error_key"`
+	Fields    map[string][]Err422ExtractionUnprocessableUnprocessableEntityFieldsItem `json:"fields"`
+	Message   string                                                                  `json:"message"`
+	Status    Err422ExtractionUnprocessableUnprocessableEntityStatus                  `json:"status"`
+	StatusKey string                                                                  `json:"status_key"`
+	Success   bool                                                                    `json:"success"`
+	Vars      map[string]json.RawMessage                                              `json:"vars,omitempty"`
 }
 
 func (s Err422ExtractionUnprocessableUnprocessableEntity) MarshalJSON() ([]byte, error) {
@@ -997,13 +979,13 @@ func (s Err422ExtractionUnprocessableUnprocessableEntity) MarshalJSON() ([]byte,
 }
 
 type Err422UnprocessableEntity struct {
-	ErrorKey Err422UnprocessableEntityErrorKey `json:"error_key"`
-	Fields map[string][]Err422UnprocessableEntityFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err422UnprocessableEntityStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err422UnprocessableEntityErrorKey                `json:"error_key"`
+	Fields    map[string][]Err422UnprocessableEntityFieldsItem `json:"fields"`
+	Message   string                                           `json:"message"`
+	Status    Err422UnprocessableEntityStatus                  `json:"status"`
+	StatusKey string                                           `json:"status_key"`
+	Success   bool                                             `json:"success"`
+	Vars      map[string]json.RawMessage                       `json:"vars,omitempty"`
 }
 
 func (s Err422UnprocessableEntity) MarshalJSON() ([]byte, error) {
@@ -1016,13 +998,13 @@ func (s Err422UnprocessableEntity) MarshalJSON() ([]byte, error) {
 }
 
 type Err429TooManyRequests struct {
-	ErrorKey Err429TooManyRequestsErrorKey `json:"error_key"`
-	Fields map[string][]Err429TooManyRequestsFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err429TooManyRequestsStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err429TooManyRequestsErrorKey                `json:"error_key"`
+	Fields    map[string][]Err429TooManyRequestsFieldsItem `json:"fields"`
+	Message   string                                       `json:"message"`
+	Status    Err429TooManyRequestsStatus                  `json:"status"`
+	StatusKey string                                       `json:"status_key"`
+	Success   bool                                         `json:"success"`
+	Vars      map[string]json.RawMessage                   `json:"vars,omitempty"`
 }
 
 func (s Err429TooManyRequests) MarshalJSON() ([]byte, error) {
@@ -1035,13 +1017,13 @@ func (s Err429TooManyRequests) MarshalJSON() ([]byte, error) {
 }
 
 type Err500BatchDownloadFailedCaptchaUnavailableInternalServerError struct {
-	ErrorKey Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKey `json:"error_key"`
-	Fields map[string][]Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKey                `json:"error_key"`
+	Fields    map[string][]Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorFieldsItem `json:"fields"`
+	Message   string                                                                                `json:"message"`
+	Status    Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorStatus                  `json:"status"`
+	StatusKey string                                                                                `json:"status_key"`
+	Success   bool                                                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                                                            `json:"vars,omitempty"`
 }
 
 func (s Err500BatchDownloadFailedCaptchaUnavailableInternalServerError) MarshalJSON() ([]byte, error) {
@@ -1054,13 +1036,13 @@ func (s Err500BatchDownloadFailedCaptchaUnavailableInternalServerError) MarshalJ
 }
 
 type Err500CaptchaUnavailableExtractionFailedInternalServerError struct {
-	ErrorKey Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKey `json:"error_key"`
-	Fields map[string][]Err500CaptchaUnavailableExtractionFailedInternalServerErrorFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err500CaptchaUnavailableExtractionFailedInternalServerErrorStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKey                `json:"error_key"`
+	Fields    map[string][]Err500CaptchaUnavailableExtractionFailedInternalServerErrorFieldsItem `json:"fields"`
+	Message   string                                                                             `json:"message"`
+	Status    Err500CaptchaUnavailableExtractionFailedInternalServerErrorStatus                  `json:"status"`
+	StatusKey string                                                                             `json:"status_key"`
+	Success   bool                                                                               `json:"success"`
+	Vars      map[string]json.RawMessage                                                         `json:"vars,omitempty"`
 }
 
 func (s Err500CaptchaUnavailableExtractionFailedInternalServerError) MarshalJSON() ([]byte, error) {
@@ -1073,13 +1055,13 @@ func (s Err500CaptchaUnavailableExtractionFailedInternalServerError) MarshalJSON
 }
 
 type Err500CaptchaUnavailableInternalServerError struct {
-	ErrorKey Err500CaptchaUnavailableInternalServerErrorErrorKey `json:"error_key"`
-	Fields map[string][]Err500CaptchaUnavailableInternalServerErrorFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err500CaptchaUnavailableInternalServerErrorStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err500CaptchaUnavailableInternalServerErrorErrorKey                `json:"error_key"`
+	Fields    map[string][]Err500CaptchaUnavailableInternalServerErrorFieldsItem `json:"fields"`
+	Message   string                                                             `json:"message"`
+	Status    Err500CaptchaUnavailableInternalServerErrorStatus                  `json:"status"`
+	StatusKey string                                                             `json:"status_key"`
+	Success   bool                                                               `json:"success"`
+	Vars      map[string]json.RawMessage                                         `json:"vars,omitempty"`
 }
 
 func (s Err500CaptchaUnavailableInternalServerError) MarshalJSON() ([]byte, error) {
@@ -1092,13 +1074,13 @@ func (s Err500CaptchaUnavailableInternalServerError) MarshalJSON() ([]byte, erro
 }
 
 type Err500CaptchaUnavailableInternalServerErrorTableCreateFailed struct {
-	ErrorKey Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKey `json:"error_key"`
-	Fields map[string][]Err500CaptchaUnavailableInternalServerErrorTableCreateFailedFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err500CaptchaUnavailableInternalServerErrorTableCreateFailedStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKey                `json:"error_key"`
+	Fields    map[string][]Err500CaptchaUnavailableInternalServerErrorTableCreateFailedFieldsItem `json:"fields"`
+	Message   string                                                                              `json:"message"`
+	Status    Err500CaptchaUnavailableInternalServerErrorTableCreateFailedStatus                  `json:"status"`
+	StatusKey string                                                                              `json:"status_key"`
+	Success   bool                                                                                `json:"success"`
+	Vars      map[string]json.RawMessage                                                          `json:"vars,omitempty"`
 }
 
 func (s Err500CaptchaUnavailableInternalServerErrorTableCreateFailed) MarshalJSON() ([]byte, error) {
@@ -1111,13 +1093,13 @@ func (s Err500CaptchaUnavailableInternalServerErrorTableCreateFailed) MarshalJSO
 }
 
 type Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailed struct {
-	ErrorKey Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey `json:"error_key"`
-	Fields map[string][]Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey                `json:"error_key"`
+	Fields    map[string][]Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedFieldsItem `json:"fields"`
+	Message   string                                                                                `json:"message"`
+	Status    Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus                  `json:"status"`
+	StatusKey string                                                                                `json:"status_key"`
+	Success   bool                                                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                                                            `json:"vars,omitempty"`
 }
 
 func (s Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailed) MarshalJSON() ([]byte, error) {
@@ -1130,13 +1112,13 @@ func (s Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailed) MarshalJ
 }
 
 type Err502BadGateway struct {
-	ErrorKey Err502BadGatewayErrorKey `json:"error_key"`
-	Fields map[string][]Err502BadGatewayFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err502BadGatewayStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err502BadGatewayErrorKey                `json:"error_key"`
+	Fields    map[string][]Err502BadGatewayFieldsItem `json:"fields"`
+	Message   string                                  `json:"message"`
+	Status    Err502BadGatewayStatus                  `json:"status"`
+	StatusKey string                                  `json:"status_key"`
+	Success   bool                                    `json:"success"`
+	Vars      map[string]json.RawMessage              `json:"vars,omitempty"`
 }
 
 func (s Err502BadGateway) MarshalJSON() ([]byte, error) {
@@ -1149,13 +1131,13 @@ func (s Err502BadGateway) MarshalJSON() ([]byte, error) {
 }
 
 type Err502BadGatewayEmailSendFailed struct {
-	ErrorKey Err502BadGatewayEmailSendFailedErrorKey `json:"error_key"`
-	Fields map[string][]Err502BadGatewayEmailSendFailedFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err502BadGatewayEmailSendFailedStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err502BadGatewayEmailSendFailedErrorKey                `json:"error_key"`
+	Fields    map[string][]Err502BadGatewayEmailSendFailedFieldsItem `json:"fields"`
+	Message   string                                                 `json:"message"`
+	Status    Err502BadGatewayEmailSendFailedStatus                  `json:"status"`
+	StatusKey string                                                 `json:"status_key"`
+	Success   bool                                                   `json:"success"`
+	Vars      map[string]json.RawMessage                             `json:"vars,omitempty"`
 }
 
 func (s Err502BadGatewayEmailSendFailed) MarshalJSON() ([]byte, error) {
@@ -1168,13 +1150,13 @@ func (s Err502BadGatewayEmailSendFailed) MarshalJSON() ([]byte, error) {
 }
 
 type Err503ExtractionUnavailableServiceUnavailable struct {
-	ErrorKey Err503ExtractionUnavailableServiceUnavailableErrorKey `json:"error_key"`
-	Fields map[string][]Err503ExtractionUnavailableServiceUnavailableFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err503ExtractionUnavailableServiceUnavailableStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err503ExtractionUnavailableServiceUnavailableErrorKey                `json:"error_key"`
+	Fields    map[string][]Err503ExtractionUnavailableServiceUnavailableFieldsItem `json:"fields"`
+	Message   string                                                               `json:"message"`
+	Status    Err503ExtractionUnavailableServiceUnavailableStatus                  `json:"status"`
+	StatusKey string                                                               `json:"status_key"`
+	Success   bool                                                                 `json:"success"`
+	Vars      map[string]json.RawMessage                                           `json:"vars,omitempty"`
 }
 
 func (s Err503ExtractionUnavailableServiceUnavailable) MarshalJSON() ([]byte, error) {
@@ -1187,13 +1169,13 @@ func (s Err503ExtractionUnavailableServiceUnavailable) MarshalJSON() ([]byte, er
 }
 
 type Err503ServiceUnavailable struct {
-	ErrorKey Err503ServiceUnavailableErrorKey `json:"error_key"`
-	Fields map[string][]Err503ServiceUnavailableFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err503ServiceUnavailableStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err503ServiceUnavailableErrorKey                `json:"error_key"`
+	Fields    map[string][]Err503ServiceUnavailableFieldsItem `json:"fields"`
+	Message   string                                          `json:"message"`
+	Status    Err503ServiceUnavailableStatus                  `json:"status"`
+	StatusKey string                                          `json:"status_key"`
+	Success   bool                                            `json:"success"`
+	Vars      map[string]json.RawMessage                      `json:"vars,omitempty"`
 }
 
 func (s Err503ServiceUnavailable) MarshalJSON() ([]byte, error) {
@@ -1206,13 +1188,13 @@ func (s Err503ServiceUnavailable) MarshalJSON() ([]byte, error) {
 }
 
 type Err504GatewayTimeout struct {
-	ErrorKey Err504GatewayTimeoutErrorKey `json:"error_key"`
-	Fields map[string][]Err504GatewayTimeoutFieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status Err504GatewayTimeoutStatus `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  Err504GatewayTimeoutErrorKey                `json:"error_key"`
+	Fields    map[string][]Err504GatewayTimeoutFieldsItem `json:"fields"`
+	Message   string                                      `json:"message"`
+	Status    Err504GatewayTimeoutStatus                  `json:"status"`
+	StatusKey string                                      `json:"status_key"`
+	Success   bool                                        `json:"success"`
+	Vars      map[string]json.RawMessage                  `json:"vars,omitempty"`
 }
 
 func (s Err504GatewayTimeout) MarshalJSON() ([]byte, error) {
@@ -1225,17 +1207,17 @@ func (s Err504GatewayTimeout) MarshalJSON() ([]byte, error) {
 }
 
 type GetOrganizationsWebhookResponse200 struct {
-	Active bool `json:"active"`
-	CreatedAt int64 `json:"created_at"`
-	Events []GetOrganizationsWebhookResponse200EventsItem `json:"events"`
-	FailureCount int64 `json:"failure_count"`
-	Id string `json:"id"`
-	LastTriggeredAt *int64 `json:"last_triggered_at"`
-	Name *string `json:"name"`
-	OrganizationId string `json:"organization_id"`
-	SecretRotatedAt *int64 `json:"secret_rotated_at"`
-	UpdatedAt int64 `json:"updated_at"`
-	Url string `json:"url"`
+	Active          bool                                           `json:"active"`
+	CreatedAt       int64                                          `json:"created_at"`
+	Events          []GetOrganizationsWebhookResponse200EventsItem `json:"events"`
+	FailureCount    int64                                          `json:"failure_count"`
+	Id              string                                         `json:"id"`
+	LastTriggeredAt *int64                                         `json:"last_triggered_at"`
+	Name            *string                                        `json:"name"`
+	OrganizationId  string                                         `json:"organization_id"`
+	SecretRotatedAt *int64                                         `json:"secret_rotated_at"`
+	UpdatedAt       int64                                          `json:"updated_at"`
+	Url             string                                         `json:"url"`
 }
 
 func (s GetOrganizationsWebhookResponse200) MarshalJSON() ([]byte, error) {
@@ -1248,37 +1230,37 @@ func (s GetOrganizationsWebhookResponse200) MarshalJSON() ([]byte, error) {
 }
 
 type GetProjectsBatcheResponse200 struct {
-	ActorId string `json:"actor_id"`
-	ActorType GetProjectsBatcheResponse200ActorType `json:"actor_type"`
-	Confidence *float64 `json:"confidence"`
-	CreatedAt int64 `json:"created_at"`
-	CsvKey *string `json:"csv_key"`
-	CurrentFile *string `json:"current_file"`
-	DurationMs *int64 `json:"duration_ms"`
-	Error *string `json:"error"`
+	ActorId     string                                        `json:"actor_id"`
+	ActorType   GetProjectsBatcheResponse200ActorType         `json:"actor_type"`
+	Confidence  *float64                                      `json:"confidence"`
+	CreatedAt   int64                                         `json:"created_at"`
+	CsvKey      *string                                       `json:"csv_key"`
+	CurrentFile *string                                       `json:"current_file"`
+	DurationMs  *int64                                        `json:"duration_ms"`
+	Error       *string                                       `json:"error"`
 	Extractions []GetProjectsBatcheResponse200ExtractionsItem `json:"extractions,omitempty"`
-	FileCount int64 `json:"file_count"`
-	FilesDone int64 `json:"files_done"`
-	Id string `json:"id"`
-	InsertMode *GetProjectsBatcheResponse200InsertMode `json:"insert_mode"`
-	JsonKey *string `json:"json_key"`
-	ProjectId string `json:"project_id"`
-	SchemaJson GetProjectsBatcheResponse200SchemaJson `json:"schema_json"`
-	Status GetProjectsBatcheResponse200Status `json:"status"`
-	TableId *string `json:"table_id"`
-	TotalRows *int64 `json:"total_rows"`
-	UpdatedAt int64 `json:"updated_at"`
-	XlsxKey *string `json:"xlsx_key"`
+	FileCount   int64                                         `json:"file_count"`
+	FilesDone   int64                                         `json:"files_done"`
+	Id          string                                        `json:"id"`
+	InsertMode  *GetProjectsBatcheResponse200InsertMode       `json:"insert_mode"`
+	JsonKey     *string                                       `json:"json_key"`
+	ProjectId   string                                        `json:"project_id"`
+	SchemaJson  GetProjectsBatcheResponse200SchemaJson        `json:"schema_json"`
+	Status      GetProjectsBatcheResponse200Status            `json:"status"`
+	TableId     *string                                       `json:"table_id"`
+	TotalRows   *int64                                        `json:"total_rows"`
+	UpdatedAt   int64                                         `json:"updated_at"`
+	XlsxKey     *string                                       `json:"xlsx_key"`
 }
 
 type GetProjectsBatcheResponse404 struct {
-	ErrorKey GetProjectsBatcheResponse404ErrorKey `json:"error_key"`
-	Fields map[string][]GetProjectsBatcheResponse404FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status GetProjectsBatcheResponse404Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  GetProjectsBatcheResponse404ErrorKey                `json:"error_key"`
+	Fields    map[string][]GetProjectsBatcheResponse404FieldsItem `json:"fields"`
+	Message   string                                              `json:"message"`
+	Status    GetProjectsBatcheResponse404Status                  `json:"status"`
+	StatusKey string                                              `json:"status_key"`
+	Success   bool                                                `json:"success"`
+	Vars      map[string]json.RawMessage                          `json:"vars,omitempty"`
 }
 
 func (s GetProjectsBatcheResponse404) MarshalJSON() ([]byte, error) {
@@ -1291,31 +1273,31 @@ func (s GetProjectsBatcheResponse404) MarshalJSON() ([]byte, error) {
 }
 
 type GetProjectsExportResponse200 struct {
-	ActorId string `json:"actor_id"`
-	Checksum string `json:"checksum"`
-	CreatedAt int64 `json:"created_at"`
-	CsvKey *string `json:"csv_key"`
-	Error *string `json:"error"`
-	ExpiresAt *int64 `json:"expires_at"`
-	FilterJson *string `json:"filter_json"`
-	Id string `json:"id"`
-	JsonKey *string `json:"json_key"`
-	ProjectId string `json:"project_id"`
-	RowCount *int64 `json:"row_count"`
-	Status GetProjectsExportResponse200Status `json:"status"`
-	TableId *string `json:"table_id"`
-	UpdatedAt int64 `json:"updated_at"`
-	XlsxKey *string `json:"xlsx_key"`
+	ActorId    string                             `json:"actor_id"`
+	Checksum   string                             `json:"checksum"`
+	CreatedAt  int64                              `json:"created_at"`
+	CsvKey     *string                            `json:"csv_key"`
+	Error      *string                            `json:"error"`
+	ExpiresAt  *int64                             `json:"expires_at"`
+	FilterJson *string                            `json:"filter_json"`
+	Id         string                             `json:"id"`
+	JsonKey    *string                            `json:"json_key"`
+	ProjectId  string                             `json:"project_id"`
+	RowCount   *int64                             `json:"row_count"`
+	Status     GetProjectsExportResponse200Status `json:"status"`
+	TableId    *string                            `json:"table_id"`
+	UpdatedAt  int64                              `json:"updated_at"`
+	XlsxKey    *string                            `json:"xlsx_key"`
 }
 
 type GetProjectsExportResponse404 struct {
-	ErrorKey GetProjectsExportResponse404ErrorKey `json:"error_key"`
-	Fields map[string][]GetProjectsExportResponse404FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status GetProjectsExportResponse404Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  GetProjectsExportResponse404ErrorKey                `json:"error_key"`
+	Fields    map[string][]GetProjectsExportResponse404FieldsItem `json:"fields"`
+	Message   string                                              `json:"message"`
+	Status    GetProjectsExportResponse404Status                  `json:"status"`
+	StatusKey string                                              `json:"status_key"`
+	Success   bool                                                `json:"success"`
+	Vars      map[string]json.RawMessage                          `json:"vars,omitempty"`
 }
 
 func (s GetProjectsExportResponse404) MarshalJSON() ([]byte, error) {
@@ -1328,20 +1310,20 @@ func (s GetProjectsExportResponse404) MarshalJSON() ([]byte, error) {
 }
 
 type GetProjectsTableTemplateResponse200 struct {
-	Category string `json:"category"`
-	ColumnsJson []GetProjectsTableTemplateResponse200ColumnsJsonItem `json:"columns_json"`
-	CreatedAt int64 `json:"created_at"`
-	CreatorDisplayName *string `json:"creator_display_name"`
-	CreatorUserId *string `json:"creator_user_id"`
-	Description *string `json:"description"`
-	Id string `json:"id"`
-	InsertMode GetProjectsTableTemplateResponse200InsertMode `json:"insert_mode"`
-	Instruction *string `json:"instruction"`
-	MergeColumnsJson []string `json:"merge_columns_json"`
-	Name string `json:"name"`
-	Strictness GetProjectsTableTemplateResponse200Strictness `json:"strictness"`
-	UpdatedAt int64 `json:"updated_at"`
-	UsageCount int64 `json:"usage_count"`
+	Category           string                                               `json:"category"`
+	ColumnsJson        []GetProjectsTableTemplateResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt          int64                                                `json:"created_at"`
+	CreatorDisplayName *string                                              `json:"creator_display_name"`
+	CreatorUserId      *string                                              `json:"creator_user_id"`
+	Description        *string                                              `json:"description"`
+	Id                 string                                               `json:"id"`
+	InsertMode         GetProjectsTableTemplateResponse200InsertMode        `json:"insert_mode"`
+	Instruction        *string                                              `json:"instruction"`
+	MergeColumnsJson   []string                                             `json:"merge_columns_json"`
+	Name               string                                               `json:"name"`
+	Strictness         GetProjectsTableTemplateResponse200Strictness        `json:"strictness"`
+	UpdatedAt          int64                                                `json:"updated_at"`
+	UsageCount         int64                                                `json:"usage_count"`
 }
 
 func (s GetProjectsTableTemplateResponse200) MarshalJSON() ([]byte, error) {
@@ -1357,12 +1339,12 @@ func (s GetProjectsTableTemplateResponse200) MarshalJSON() ([]byte, error) {
 }
 
 type ListOrganizationsWebhooksDeliveriesResponse200 struct {
-	Count *int64 `json:"count"`
+	Count      *int64                                                         `json:"count"`
 	Deliveries []ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItem `json:"deliveries"`
-	HasMore bool `json:"hasMore"`
-	Limit int64 `json:"limit"`
-	NextCursor *string `json:"nextCursor"`
-	Page *int64 `json:"page"`
+	HasMore    bool                                                           `json:"hasMore"`
+	Limit      int64                                                          `json:"limit"`
+	NextCursor *string                                                        `json:"nextCursor"`
+	Page       *int64                                                         `json:"page"`
 }
 
 func (s ListOrganizationsWebhooksDeliveriesResponse200) MarshalJSON() ([]byte, error) {
@@ -1375,12 +1357,12 @@ func (s ListOrganizationsWebhooksDeliveriesResponse200) MarshalJSON() ([]byte, e
 }
 
 type ListOrganizationsWebhooksResponse200 struct {
-	Count *int64 `json:"count"`
-	HasMore bool `json:"hasMore"`
-	Limit int64 `json:"limit"`
-	NextCursor *string `json:"nextCursor"`
-	Page *int64 `json:"page"`
-	Webhooks []ListOrganizationsWebhooksResponse200WebhooksItem `json:"webhooks"`
+	Count      *int64                                             `json:"count"`
+	HasMore    bool                                               `json:"hasMore"`
+	Limit      int64                                              `json:"limit"`
+	NextCursor *string                                            `json:"nextCursor"`
+	Page       *int64                                             `json:"page"`
+	Webhooks   []ListOrganizationsWebhooksResponse200WebhooksItem `json:"webhooks"`
 }
 
 func (s ListOrganizationsWebhooksResponse200) MarshalJSON() ([]byte, error) {
@@ -1395,9 +1377,9 @@ func (s ListOrganizationsWebhooksResponse200) MarshalJSON() ([]byte, error) {
 type ListProjectsBatchesDownloadCsvResponse200 = string
 
 type ListProjectsBatchesDownloadJsonResponse200 struct {
-	BatchId string `json:"batchId"`
-	Rows []map[string]json.RawMessage `json:"rows"`
-	TotalRows int64 `json:"totalRows"`
+	BatchId   string                       `json:"batchId"`
+	Rows      []map[string]json.RawMessage `json:"rows"`
+	TotalRows int64                        `json:"totalRows"`
 }
 
 func (s ListProjectsBatchesDownloadJsonResponse200) MarshalJSON() ([]byte, error) {
@@ -1412,12 +1394,12 @@ func (s ListProjectsBatchesDownloadJsonResponse200) MarshalJSON() ([]byte, error
 type ListProjectsBatchesDownloadXlsxResponse200 = json.RawMessage
 
 type ListProjectsBatchesResponse200 struct {
-	Batches []ListProjectsBatchesResponse200BatchesItem `json:"batches"`
-	Count *int64 `json:"count"`
-	HasMore bool `json:"hasMore"`
-	Limit int64 `json:"limit"`
-	NextCursor *string `json:"nextCursor"`
-	Page *int64 `json:"page"`
+	Batches    []ListProjectsBatchesResponse200BatchesItem `json:"batches"`
+	Count      *int64                                      `json:"count"`
+	HasMore    bool                                        `json:"hasMore"`
+	Limit      int64                                       `json:"limit"`
+	NextCursor *string                                     `json:"nextCursor"`
+	Page       *int64                                      `json:"page"`
 }
 
 func (s ListProjectsBatchesResponse200) MarshalJSON() ([]byte, error) {
@@ -1430,12 +1412,12 @@ func (s ListProjectsBatchesResponse200) MarshalJSON() ([]byte, error) {
 }
 
 type ListProjectsTableTemplatesResponse200 struct {
-	Count *int64 `json:"count"`
-	HasMore bool `json:"hasMore"`
-	Limit int64 `json:"limit"`
-	NextCursor *string `json:"nextCursor"`
-	Page *int64 `json:"page"`
-	Templates []ListProjectsTableTemplatesResponse200TemplatesItem `json:"templates"`
+	Count      *int64                                               `json:"count"`
+	HasMore    bool                                                 `json:"hasMore"`
+	Limit      int64                                                `json:"limit"`
+	NextCursor *string                                              `json:"nextCursor"`
+	Page       *int64                                               `json:"page"`
+	Templates  []ListProjectsTableTemplatesResponse200TemplatesItem `json:"templates"`
 }
 
 func (s ListProjectsTableTemplatesResponse200) MarshalJSON() ([]byte, error) {
@@ -1461,18 +1443,18 @@ func (s ListProjectsTablesColumnsDistinctResponse200) MarshalJSON() ([]byte, err
 }
 
 type ListProjectsTablesExportResponse200 struct {
-	Id string `json:"id"`
+	Id     string `json:"id"`
 	Status string `json:"status"`
 }
 
 type ListProjectsTablesExportResponse402 struct {
-	ErrorKey ListProjectsTablesExportResponse402ErrorKey `json:"error_key"`
-	Fields map[string][]ListProjectsTablesExportResponse402FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status ListProjectsTablesExportResponse402Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  ListProjectsTablesExportResponse402ErrorKey                `json:"error_key"`
+	Fields    map[string][]ListProjectsTablesExportResponse402FieldsItem `json:"fields"`
+	Message   string                                                     `json:"message"`
+	Status    ListProjectsTablesExportResponse402Status                  `json:"status"`
+	StatusKey string                                                     `json:"status_key"`
+	Success   bool                                                       `json:"success"`
+	Vars      map[string]json.RawMessage                                 `json:"vars,omitempty"`
 }
 
 func (s ListProjectsTablesExportResponse402) MarshalJSON() ([]byte, error) {
@@ -1485,13 +1467,13 @@ func (s ListProjectsTablesExportResponse402) MarshalJSON() ([]byte, error) {
 }
 
 type ListProjectsTablesExportResponse500 struct {
-	ErrorKey ListProjectsTablesExportResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]ListProjectsTablesExportResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status ListProjectsTablesExportResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  ListProjectsTablesExportResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]ListProjectsTablesExportResponse500FieldsItem `json:"fields"`
+	Message   string                                                     `json:"message"`
+	Status    ListProjectsTablesExportResponse500Status                  `json:"status"`
+	StatusKey string                                                     `json:"status_key"`
+	Success   bool                                                       `json:"success"`
+	Vars      map[string]json.RawMessage                                 `json:"vars,omitempty"`
 }
 
 func (s ListProjectsTablesExportResponse500) MarshalJSON() ([]byte, error) {
@@ -1504,12 +1486,12 @@ func (s ListProjectsTablesExportResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type ListProjectsTablesResponse200 struct {
-	Count *int64 `json:"count"`
-	HasMore bool `json:"hasMore"`
-	Limit int64 `json:"limit"`
-	NextCursor *string `json:"nextCursor"`
-	Page *int64 `json:"page"`
-	Tables []ListProjectsTablesResponse200TablesItem `json:"tables"`
+	Count      *int64                                    `json:"count"`
+	HasMore    bool                                      `json:"hasMore"`
+	Limit      int64                                     `json:"limit"`
+	NextCursor *string                                   `json:"nextCursor"`
+	Page       *int64                                    `json:"page"`
+	Tables     []ListProjectsTablesResponse200TablesItem `json:"tables"`
 }
 
 func (s ListProjectsTablesResponse200) MarshalJSON() ([]byte, error) {
@@ -1522,12 +1504,12 @@ func (s ListProjectsTablesResponse200) MarshalJSON() ([]byte, error) {
 }
 
 type ListProjectsTablesRowsResponse200 struct {
-	Count *int64 `json:"count"`
-	HasMore bool `json:"hasMore"`
-	Limit int64 `json:"limit"`
-	NextCursor *string `json:"nextCursor"`
-	Page *int64 `json:"page"`
-	Rows []map[string]json.RawMessage `json:"rows"`
+	Count      *int64                       `json:"count"`
+	HasMore    bool                         `json:"hasMore"`
+	Limit      int64                        `json:"limit"`
+	NextCursor *string                      `json:"nextCursor"`
+	Page       *int64                       `json:"page"`
+	Rows       []map[string]json.RawMessage `json:"rows"`
 }
 
 func (s ListProjectsTablesRowsResponse200) MarshalJSON() ([]byte, error) {
@@ -1542,13 +1524,13 @@ func (s ListProjectsTablesRowsResponse200) MarshalJSON() ([]byte, error) {
 type ListProjectsTablesRowsResponse20021d74b map[string]*float64
 
 type ListProjectsTablesRowsResponse400 struct {
-	ErrorKey ListProjectsTablesRowsResponse400ErrorKey `json:"error_key"`
-	Fields map[string][]ListProjectsTablesRowsResponse400FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status ListProjectsTablesRowsResponse400Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  ListProjectsTablesRowsResponse400ErrorKey                `json:"error_key"`
+	Fields    map[string][]ListProjectsTablesRowsResponse400FieldsItem `json:"fields"`
+	Message   string                                                   `json:"message"`
+	Status    ListProjectsTablesRowsResponse400Status                  `json:"status"`
+	StatusKey string                                                   `json:"status_key"`
+	Success   bool                                                     `json:"success"`
+	Vars      map[string]json.RawMessage                               `json:"vars,omitempty"`
 }
 
 func (s ListProjectsTablesRowsResponse400) MarshalJSON() ([]byte, error) {
@@ -1561,13 +1543,13 @@ func (s ListProjectsTablesRowsResponse400) MarshalJSON() ([]byte, error) {
 }
 
 type ListProjectsTablesRowsSourceResponse404 struct {
-	ErrorKey ListProjectsTablesRowsSourceResponse404ErrorKey `json:"error_key"`
-	Fields map[string][]ListProjectsTablesRowsSourceResponse404FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status ListProjectsTablesRowsSourceResponse404Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  ListProjectsTablesRowsSourceResponse404ErrorKey                `json:"error_key"`
+	Fields    map[string][]ListProjectsTablesRowsSourceResponse404FieldsItem `json:"fields"`
+	Message   string                                                         `json:"message"`
+	Status    ListProjectsTablesRowsSourceResponse404Status                  `json:"status"`
+	StatusKey string                                                         `json:"status_key"`
+	Success   bool                                                           `json:"success"`
+	Vars      map[string]json.RawMessage                                     `json:"vars,omitempty"`
 }
 
 func (s ListProjectsTablesRowsSourceResponse404) MarshalJSON() ([]byte, error) {
@@ -1593,13 +1575,13 @@ func (s ReplaceProjectsTablesColumnRequest) MarshalJSON() ([]byte, error) {
 }
 
 type ReplaceProjectsTablesColumnResponse400 struct {
-	ErrorKey ReplaceProjectsTablesColumnResponse400ErrorKey `json:"error_key"`
-	Fields map[string][]ReplaceProjectsTablesColumnResponse400FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status ReplaceProjectsTablesColumnResponse400Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  ReplaceProjectsTablesColumnResponse400ErrorKey                `json:"error_key"`
+	Fields    map[string][]ReplaceProjectsTablesColumnResponse400FieldsItem `json:"fields"`
+	Message   string                                                        `json:"message"`
+	Status    ReplaceProjectsTablesColumnResponse400Status                  `json:"status"`
+	StatusKey string                                                        `json:"status_key"`
+	Success   bool                                                          `json:"success"`
+	Vars      map[string]json.RawMessage                                    `json:"vars,omitempty"`
 }
 
 func (s ReplaceProjectsTablesColumnResponse400) MarshalJSON() ([]byte, error) {
@@ -1612,13 +1594,13 @@ func (s ReplaceProjectsTablesColumnResponse400) MarshalJSON() ([]byte, error) {
 }
 
 type ReplaceProjectsTablesColumnResponse409 struct {
-	ErrorKey ReplaceProjectsTablesColumnResponse409ErrorKey `json:"error_key"`
-	Fields map[string][]ReplaceProjectsTablesColumnResponse409FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status ReplaceProjectsTablesColumnResponse409Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  ReplaceProjectsTablesColumnResponse409ErrorKey                `json:"error_key"`
+	Fields    map[string][]ReplaceProjectsTablesColumnResponse409FieldsItem `json:"fields"`
+	Message   string                                                        `json:"message"`
+	Status    ReplaceProjectsTablesColumnResponse409Status                  `json:"status"`
+	StatusKey string                                                        `json:"status_key"`
+	Success   bool                                                          `json:"success"`
+	Vars      map[string]json.RawMessage                                    `json:"vars,omitempty"`
 }
 
 func (s ReplaceProjectsTablesColumnResponse409) MarshalJSON() ([]byte, error) {
@@ -1631,30 +1613,30 @@ func (s ReplaceProjectsTablesColumnResponse409) MarshalJSON() ([]byte, error) {
 }
 
 type UpdateOrganizationsWebhookRequest struct {
-	Active *bool `json:"active,omitempty"`
+	Active *bool                                         `json:"active,omitempty"`
 	Events []UpdateOrganizationsWebhookRequestEventsItem `json:"events,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Url *string `json:"url,omitempty"`
+	Name   *string                                       `json:"name,omitempty"`
+	Url    *string                                       `json:"url,omitempty"`
 }
 
 type UpdateProjectsTableRequest struct {
-	DefaultSort Nullable[string] `json:"default_sort,omitzero"`
-	InsertMode *UpdateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[[]string] `json:"merge_columns_json,omitzero"`
-	Name *string `json:"name,omitempty"`
-	Slug *string `json:"slug,omitempty"`
-	Strictness *UpdateProjectsTableRequestStrictness `json:"strictness,omitempty"`
+	DefaultSort      Nullable[string]                      `json:"default_sort,omitzero"`
+	InsertMode       *UpdateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
+	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
+	MergeColumnsJson Nullable[json.RawMessage]             `json:"merge_columns_json,omitzero"`
+	Name             *string                               `json:"name,omitempty"`
+	Slug             *string                               `json:"slug,omitempty"`
+	Strictness       *UpdateProjectsTableRequestStrictness `json:"strictness,omitempty"`
 }
 
 type UpdateProjectsTableResponse500 struct {
-	ErrorKey UpdateProjectsTableResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]UpdateProjectsTableResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status UpdateProjectsTableResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  UpdateProjectsTableResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]UpdateProjectsTableResponse500FieldsItem `json:"fields"`
+	Message   string                                                `json:"message"`
+	Status    UpdateProjectsTableResponse500Status                  `json:"status"`
+	StatusKey string                                                `json:"status_key"`
+	Success   bool                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                            `json:"vars,omitempty"`
 }
 
 func (s UpdateProjectsTableResponse500) MarshalJSON() ([]byte, error) {
@@ -1667,23 +1649,42 @@ func (s UpdateProjectsTableResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type UpdateProjectsTablesColumnRequest struct {
-	Description Nullable[string] `json:"description,omitzero"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name *string `json:"name,omitempty"`
-	Options []string `json:"options,omitempty"`
-	Required *bool `json:"required,omitempty"`
-	Searchable *bool `json:"searchable,omitempty"`
-	Type *UpdateProjectsTablesColumnRequestType `json:"type,omitempty"`
+	Description Nullable[string]                       `json:"description,omitzero"`
+	Instruction Nullable[string]                       `json:"instruction,omitzero"`
+	Name        *string                                `json:"name,omitempty"`
+	Options     []string                               `json:"options,omitempty"`
+	Required    *bool                                  `json:"required,omitempty"`
+	Searchable  *bool                                  `json:"searchable,omitempty"`
+	Type        *UpdateProjectsTablesColumnRequestType `json:"type,omitempty"`
+}
+
+type UpdateProjectsTablesColumnResponse422 struct {
+	ErrorKey  UpdateProjectsTablesColumnResponse422ErrorKey                `json:"error_key"`
+	Fields    map[string][]UpdateProjectsTablesColumnResponse422FieldsItem `json:"fields"`
+	Message   string                                                       `json:"message"`
+	Status    UpdateProjectsTablesColumnResponse422Status                  `json:"status"`
+	StatusKey string                                                       `json:"status_key"`
+	Success   bool                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
+}
+
+func (s UpdateProjectsTablesColumnResponse422) MarshalJSON() ([]byte, error) {
+	type plain UpdateProjectsTablesColumnResponse422
+	p := plain(s)
+	if p.Fields == nil {
+		p.Fields = map[string][]UpdateProjectsTablesColumnResponse422FieldsItem{}
+	}
+	return json.Marshal(p)
 }
 
 type UpdateProjectsTablesColumnResponse500 struct {
-	ErrorKey UpdateProjectsTablesColumnResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]UpdateProjectsTablesColumnResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status UpdateProjectsTablesColumnResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  UpdateProjectsTablesColumnResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]UpdateProjectsTablesColumnResponse500FieldsItem `json:"fields"`
+	Message   string                                                       `json:"message"`
+	Status    UpdateProjectsTablesColumnResponse500Status                  `json:"status"`
+	StatusKey string                                                       `json:"status_key"`
+	Success   bool                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
 }
 
 func (s UpdateProjectsTablesColumnResponse500) MarshalJSON() ([]byte, error) {
@@ -1696,13 +1697,13 @@ func (s UpdateProjectsTablesColumnResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type UpdateProjectsTablesRowResponse500 struct {
-	ErrorKey UpdateProjectsTablesRowResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]UpdateProjectsTablesRowResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status UpdateProjectsTablesRowResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  UpdateProjectsTablesRowResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]UpdateProjectsTablesRowResponse500FieldsItem `json:"fields"`
+	Message   string                                                    `json:"message"`
+	Status    UpdateProjectsTablesRowResponse500Status                  `json:"status"`
+	StatusKey string                                                    `json:"status_key"`
+	Success   bool                                                      `json:"success"`
+	Vars      map[string]json.RawMessage                                `json:"vars,omitempty"`
 }
 
 func (s UpdateProjectsTablesRowResponse500) MarshalJSON() ([]byte, error) {
@@ -1715,24 +1716,24 @@ func (s UpdateProjectsTablesRowResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type UpdateTableTemplateRequest struct {
-	Category *string `json:"category,omitempty"`
-	ColumnsJson []UpdateTableTemplateRequestColumnsJsonItem `json:"columns_json,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	InsertMode *UpdateTableTemplateRequestInsertMode `json:"insert_mode,omitempty"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[[]string] `json:"merge_columns_json,omitzero"`
-	Name *string `json:"name,omitempty"`
-	Strictness *UpdateTableTemplateRequestStrictness `json:"strictness,omitempty"`
+	Category         *string                               `json:"category,omitempty"`
+	ColumnsJson      json.RawMessage                       `json:"columns_json,omitempty"`
+	Description      Nullable[string]                      `json:"description,omitzero"`
+	InsertMode       *UpdateTableTemplateRequestInsertMode `json:"insert_mode,omitempty"`
+	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
+	MergeColumnsJson Nullable[json.RawMessage]             `json:"merge_columns_json,omitzero"`
+	Name             *string                               `json:"name,omitempty"`
+	Strictness       *UpdateTableTemplateRequestStrictness `json:"strictness,omitempty"`
 }
 
 type UpdateTableTemplateResponse500 struct {
-	ErrorKey UpdateTableTemplateResponse500ErrorKey `json:"error_key"`
-	Fields map[string][]UpdateTableTemplateResponse500FieldsItem `json:"fields"`
-	Message string `json:"message"`
-	Status UpdateTableTemplateResponse500Status `json:"status"`
-	StatusKey string `json:"status_key"`
-	Success bool `json:"success"`
-	Vars map[string]json.RawMessage `json:"vars,omitempty"`
+	ErrorKey  UpdateTableTemplateResponse500ErrorKey                `json:"error_key"`
+	Fields    map[string][]UpdateTableTemplateResponse500FieldsItem `json:"fields"`
+	Message   string                                                `json:"message"`
+	Status    UpdateTableTemplateResponse500Status                  `json:"status"`
+	StatusKey string                                                `json:"status_key"`
+	Success   bool                                                  `json:"success"`
+	Vars      map[string]json.RawMessage                            `json:"vars,omitempty"`
 }
 
 func (s UpdateTableTemplateResponse500) MarshalJSON() ([]byte, error) {
@@ -1745,335 +1746,337 @@ func (s UpdateTableTemplateResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type BatchListOptsStatus string
+
 const (
-	BatchListOptsStatusUploading BatchListOptsStatus = "uploading"
+	BatchListOptsStatusUploading  BatchListOptsStatus = "uploading"
 	BatchListOptsStatusProcessing BatchListOptsStatus = "processing"
-	BatchListOptsStatusMerging BatchListOptsStatus = "merging"
-	BatchListOptsStatusComplete BatchListOptsStatus = "complete"
-	BatchListOptsStatusPartial BatchListOptsStatus = "partial"
-	BatchListOptsStatusFailed BatchListOptsStatus = "failed"
+	BatchListOptsStatusMerging    BatchListOptsStatus = "merging"
+	BatchListOptsStatusComplete   BatchListOptsStatus = "complete"
+	BatchListOptsStatusPartial    BatchListOptsStatus = "partial"
+	BatchListOptsStatusFailed     BatchListOptsStatus = "failed"
 )
 
 type CreateOrganizationsWebhookRequestEventsItem string
+
 const (
 	CreateOrganizationsWebhookRequestEventsItemBatchComplete CreateOrganizationsWebhookRequestEventsItem = "batch.complete"
-	CreateOrganizationsWebhookRequestEventsItemBatchFailed CreateOrganizationsWebhookRequestEventsItem = "batch.failed"
-	CreateOrganizationsWebhookRequestEventsItemBatchPartial CreateOrganizationsWebhookRequestEventsItem = "batch.partial"
-	CreateOrganizationsWebhookRequestEventsItemPing CreateOrganizationsWebhookRequestEventsItem = "ping"
+	CreateOrganizationsWebhookRequestEventsItemBatchFailed   CreateOrganizationsWebhookRequestEventsItem = "batch.failed"
+	CreateOrganizationsWebhookRequestEventsItemBatchPartial  CreateOrganizationsWebhookRequestEventsItem = "batch.partial"
+	CreateOrganizationsWebhookRequestEventsItemPing          CreateOrganizationsWebhookRequestEventsItem = "ping"
 )
 
 type CreateOrganizationsWebhookResponse201EventsItem string
+
 const (
 	CreateOrganizationsWebhookResponse201EventsItemBatchComplete CreateOrganizationsWebhookResponse201EventsItem = "batch.complete"
-	CreateOrganizationsWebhookResponse201EventsItemBatchFailed CreateOrganizationsWebhookResponse201EventsItem = "batch.failed"
-	CreateOrganizationsWebhookResponse201EventsItemBatchPartial CreateOrganizationsWebhookResponse201EventsItem = "batch.partial"
-	CreateOrganizationsWebhookResponse201EventsItemPing CreateOrganizationsWebhookResponse201EventsItem = "ping"
+	CreateOrganizationsWebhookResponse201EventsItemBatchFailed   CreateOrganizationsWebhookResponse201EventsItem = "batch.failed"
+	CreateOrganizationsWebhookResponse201EventsItemBatchPartial  CreateOrganizationsWebhookResponse201EventsItem = "batch.partial"
+	CreateOrganizationsWebhookResponse201EventsItemPing          CreateOrganizationsWebhookResponse201EventsItem = "ping"
 )
 
 type CreateOrganizationsWebhookResponse500ErrorKey string
+
 const (
-	CreateOrganizationsWebhookResponse500ErrorKeyCaptchaUnavailable CreateOrganizationsWebhookResponse500ErrorKey = "captcha_unavailable"
+	CreateOrganizationsWebhookResponse500ErrorKeyCaptchaUnavailable  CreateOrganizationsWebhookResponse500ErrorKey = "captcha_unavailable"
 	CreateOrganizationsWebhookResponse500ErrorKeyInternalServerError CreateOrganizationsWebhookResponse500ErrorKey = "internal_server_error"
 	CreateOrganizationsWebhookResponse500ErrorKeyWebhookCreateFailed CreateOrganizationsWebhookResponse500ErrorKey = "webhook_create_failed"
 )
 
 type CreateOrganizationsWebhookResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateOrganizationsWebhookResponse500Status int
+
 const (
 	CreateOrganizationsWebhookResponse500Status500 CreateOrganizationsWebhookResponse500Status = 500
 )
 
 type CreateOrganizationsWebhooksTestResponse200Status string
+
 const (
-	CreateOrganizationsWebhooksTestResponse200StatusError CreateOrganizationsWebhooksTestResponse200Status = "error"
+	CreateOrganizationsWebhooksTestResponse200StatusError   CreateOrganizationsWebhooksTestResponse200Status = "error"
 	CreateOrganizationsWebhooksTestResponse200StatusSuccess CreateOrganizationsWebhooksTestResponse200Status = "success"
 	CreateOrganizationsWebhooksTestResponse200StatusTimeout CreateOrganizationsWebhooksTestResponse200Status = "timeout"
 )
 
 type CreateOrganizationsWebhooksTestResponse500ErrorKey string
+
 const (
-	CreateOrganizationsWebhooksTestResponse500ErrorKeyCaptchaUnavailable CreateOrganizationsWebhooksTestResponse500ErrorKey = "captcha_unavailable"
+	CreateOrganizationsWebhooksTestResponse500ErrorKeyCaptchaUnavailable  CreateOrganizationsWebhooksTestResponse500ErrorKey = "captcha_unavailable"
 	CreateOrganizationsWebhooksTestResponse500ErrorKeyInternalServerError CreateOrganizationsWebhooksTestResponse500ErrorKey = "internal_server_error"
-	CreateOrganizationsWebhooksTestResponse500ErrorKeyWebhookTestFailed CreateOrganizationsWebhooksTestResponse500ErrorKey = "webhook_test_failed"
+	CreateOrganizationsWebhooksTestResponse500ErrorKeyWebhookTestFailed   CreateOrganizationsWebhooksTestResponse500ErrorKey = "webhook_test_failed"
 )
 
 type CreateOrganizationsWebhooksTestResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateOrganizationsWebhooksTestResponse500Status int
+
 const (
 	CreateOrganizationsWebhooksTestResponse500Status500 CreateOrganizationsWebhooksTestResponse500Status = 500
 )
 
 type CreateProjectsExtractRequestStrictness string
+
 const (
-	CreateProjectsExtractRequestStrictnessStrict CreateProjectsExtractRequestStrictness = "strict"
+	CreateProjectsExtractRequestStrictnessStrict   CreateProjectsExtractRequestStrictness = "strict"
 	CreateProjectsExtractRequestStrictnessBalanced CreateProjectsExtractRequestStrictness = "balanced"
 	CreateProjectsExtractRequestStrictnessFlexible CreateProjectsExtractRequestStrictness = "flexible"
 )
 
 type CreateProjectsExtractResponse200FileType string
+
 const (
-	CreateProjectsExtractResponse200FileTypeTextPdf CreateProjectsExtractResponse200FileType = "text_pdf"
-	CreateProjectsExtractResponse200FileTypeScanned CreateProjectsExtractResponse200FileType = "scanned"
-	CreateProjectsExtractResponse200FileTypeImage CreateProjectsExtractResponse200FileType = "image"
-	CreateProjectsExtractResponse200FileTypeText CreateProjectsExtractResponse200FileType = "text"
+	CreateProjectsExtractResponse200FileTypeTextPdf  CreateProjectsExtractResponse200FileType = "text_pdf"
+	CreateProjectsExtractResponse200FileTypeScanned  CreateProjectsExtractResponse200FileType = "scanned"
+	CreateProjectsExtractResponse200FileTypeImage    CreateProjectsExtractResponse200FileType = "image"
+	CreateProjectsExtractResponse200FileTypeText     CreateProjectsExtractResponse200FileType = "text"
 	CreateProjectsExtractResponse200FileTypeDocument CreateProjectsExtractResponse200FileType = "document"
-	CreateProjectsExtractResponse200FileTypeUnknown CreateProjectsExtractResponse200FileType = "unknown"
+	CreateProjectsExtractResponse200FileTypeUnknown  CreateProjectsExtractResponse200FileType = "unknown"
 )
 
 type CreateProjectsExtractResponse200FilesItem struct {
-	Confidence Nullable[float64] `json:"confidence,omitzero"`
-	Error Nullable[json.RawMessage] `json:"error,omitzero"`
-	FileName Nullable[json.RawMessage] `json:"file_name,omitzero"`
-	Rows Nullable[float64] `json:"rows,omitzero"`
-	Status *string `json:"status,omitempty"`
+	Confidence Nullable[float64]         `json:"confidence,omitzero"`
+	Error      Nullable[json.RawMessage] `json:"error,omitzero"`
+	FileName   Nullable[json.RawMessage] `json:"file_name,omitzero"`
+	Rows       Nullable[float64]         `json:"rows,omitzero"`
+	Status     *string                   `json:"status,omitempty"`
 }
 
 type CreateProjectsSuggestSchemaResponse200ColumnsItem struct {
 	Description *string `json:"description,omitempty"`
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name        string  `json:"name"`
+	Type        string  `json:"type"`
 }
-
-type CreateProjectsTableRequestColumnsJsonItem struct {
-	CurrencyCode *string `json:"currency_code,omitempty"`
-	Default json.RawMessage `json:"default,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	Id string `json:"id"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Options []string `json:"options,omitempty"`
-	Required *bool `json:"required,omitempty"`
-	Searchable *bool `json:"searchable,omitempty"`
-	Type *CreateProjectsTableRequestColumnsJsonItemType `json:"type,omitempty"`
-}
-
-type CreateProjectsTableRequestColumnsJsonItemType string
-const (
-	CreateProjectsTableRequestColumnsJsonItemTypeArray CreateProjectsTableRequestColumnsJsonItemType = "array"
-	CreateProjectsTableRequestColumnsJsonItemTypeBoolean CreateProjectsTableRequestColumnsJsonItemType = "boolean"
-	CreateProjectsTableRequestColumnsJsonItemTypeCurrency CreateProjectsTableRequestColumnsJsonItemType = "currency"
-	CreateProjectsTableRequestColumnsJsonItemTypeDate CreateProjectsTableRequestColumnsJsonItemType = "date"
-	CreateProjectsTableRequestColumnsJsonItemTypeEmail CreateProjectsTableRequestColumnsJsonItemType = "email"
-	CreateProjectsTableRequestColumnsJsonItemTypeEnum CreateProjectsTableRequestColumnsJsonItemType = "enum"
-	CreateProjectsTableRequestColumnsJsonItemTypeMultiSelect CreateProjectsTableRequestColumnsJsonItemType = "multi_select"
-	CreateProjectsTableRequestColumnsJsonItemTypeNumber CreateProjectsTableRequestColumnsJsonItemType = "number"
-	CreateProjectsTableRequestColumnsJsonItemTypeString CreateProjectsTableRequestColumnsJsonItemType = "string"
-	CreateProjectsTableRequestColumnsJsonItemTypeText CreateProjectsTableRequestColumnsJsonItemType = "text"
-	CreateProjectsTableRequestColumnsJsonItemTypeUrl CreateProjectsTableRequestColumnsJsonItemType = "url"
-)
 
 type CreateProjectsTableRequestInsertMode string
+
 const (
-	CreateProjectsTableRequestInsertModeAppend CreateProjectsTableRequestInsertMode = "append"
-	CreateProjectsTableRequestInsertModeDedup CreateProjectsTableRequestInsertMode = "dedup"
-	CreateProjectsTableRequestInsertModeMerge CreateProjectsTableRequestInsertMode = "merge"
+	CreateProjectsTableRequestInsertModeAppend  CreateProjectsTableRequestInsertMode = "append"
+	CreateProjectsTableRequestInsertModeDedup   CreateProjectsTableRequestInsertMode = "dedup"
+	CreateProjectsTableRequestInsertModeMerge   CreateProjectsTableRequestInsertMode = "merge"
 	CreateProjectsTableRequestInsertModeReplace CreateProjectsTableRequestInsertMode = "replace"
 )
 
 type CreateProjectsTableRequestStrictness string
+
 const (
-	CreateProjectsTableRequestStrictnessStrict CreateProjectsTableRequestStrictness = "strict"
+	CreateProjectsTableRequestStrictnessStrict   CreateProjectsTableRequestStrictness = "strict"
 	CreateProjectsTableRequestStrictnessBalanced CreateProjectsTableRequestStrictness = "balanced"
 	CreateProjectsTableRequestStrictnessFlexible CreateProjectsTableRequestStrictness = "flexible"
 )
 
 type CreateProjectsTableResponse402ErrorKey string
+
 const (
 	CreateProjectsTableResponse402ErrorKeyApiRequestLimitExceeded CreateProjectsTableResponse402ErrorKey = "api_request_limit_exceeded"
-	CreateProjectsTableResponse402ErrorKeyColumnLimitReached CreateProjectsTableResponse402ErrorKey = "column_limit_reached"
-	CreateProjectsTableResponse402ErrorKeyFeatureNotAvailable CreateProjectsTableResponse402ErrorKey = "feature_not_available"
-	CreateProjectsTableResponse402ErrorKeyTablePlanLimit CreateProjectsTableResponse402ErrorKey = "table_plan_limit"
+	CreateProjectsTableResponse402ErrorKeyColumnLimitReached      CreateProjectsTableResponse402ErrorKey = "column_limit_reached"
+	CreateProjectsTableResponse402ErrorKeyFeatureNotAvailable     CreateProjectsTableResponse402ErrorKey = "feature_not_available"
+	CreateProjectsTableResponse402ErrorKeyTablePlanLimit          CreateProjectsTableResponse402ErrorKey = "table_plan_limit"
 )
 
 type CreateProjectsTableResponse402FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTableResponse402Status int
+
 const (
 	CreateProjectsTableResponse402Status402 CreateProjectsTableResponse402Status = 402
 )
 
 type CreateProjectsTableTemplatesUseResponse201ColumnsJsonItem struct {
-	CurrencyCode *string `json:"currency_code,omitempty"`
-	Default json.RawMessage `json:"default,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	Id string `json:"id"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Options []string `json:"options,omitempty"`
-	Required bool `json:"required"`
-	Searchable *bool `json:"searchable,omitempty"`
-	Type CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType `json:"type"`
+	CurrencyCode *string                                                       `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                               `json:"default,omitempty"`
+	Description  Nullable[string]                                              `json:"description,omitzero"`
+	Id           string                                                        `json:"id"`
+	Instruction  Nullable[string]                                              `json:"instruction,omitzero"`
+	Name         string                                                        `json:"name"`
+	Options      []string                                                      `json:"options,omitempty"`
+	Required     bool                                                          `json:"required"`
+	Searchable   *bool                                                         `json:"searchable,omitempty"`
+	Type         CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType `json:"type"`
 }
 
 type CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType string
+
 const (
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeArray CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "array"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeBoolean CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "boolean"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeCurrency CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "currency"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeDate CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "date"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeEmail CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "email"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeEnum CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "enum"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeArray       CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "array"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeBoolean     CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "boolean"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeCurrency    CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "currency"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeDate        CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "date"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeEmail       CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "email"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeEnum        CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "enum"
 	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeMultiSelect CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "multi_select"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeNumber CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "number"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeString CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "string"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeText CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "text"
-	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeUrl CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "url"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeNumber      CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "number"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeString      CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "string"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeText        CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "text"
+	CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemTypeUrl         CreateProjectsTableTemplatesUseResponse201ColumnsJsonItemType = "url"
 )
 
 type CreateProjectsTableTemplatesUseResponse201InsertMode string
+
 const (
-	CreateProjectsTableTemplatesUseResponse201InsertModeAppend CreateProjectsTableTemplatesUseResponse201InsertMode = "append"
-	CreateProjectsTableTemplatesUseResponse201InsertModeDedup CreateProjectsTableTemplatesUseResponse201InsertMode = "dedup"
-	CreateProjectsTableTemplatesUseResponse201InsertModeMerge CreateProjectsTableTemplatesUseResponse201InsertMode = "merge"
+	CreateProjectsTableTemplatesUseResponse201InsertModeAppend  CreateProjectsTableTemplatesUseResponse201InsertMode = "append"
+	CreateProjectsTableTemplatesUseResponse201InsertModeDedup   CreateProjectsTableTemplatesUseResponse201InsertMode = "dedup"
+	CreateProjectsTableTemplatesUseResponse201InsertModeMerge   CreateProjectsTableTemplatesUseResponse201InsertMode = "merge"
 	CreateProjectsTableTemplatesUseResponse201InsertModeReplace CreateProjectsTableTemplatesUseResponse201InsertMode = "replace"
 )
 
 type CreateProjectsTableTemplatesUseResponse201Strictness string
+
 const (
-	CreateProjectsTableTemplatesUseResponse201StrictnessStrict CreateProjectsTableTemplatesUseResponse201Strictness = "strict"
+	CreateProjectsTableTemplatesUseResponse201StrictnessStrict   CreateProjectsTableTemplatesUseResponse201Strictness = "strict"
 	CreateProjectsTableTemplatesUseResponse201StrictnessBalanced CreateProjectsTableTemplatesUseResponse201Strictness = "balanced"
 	CreateProjectsTableTemplatesUseResponse201StrictnessFlexible CreateProjectsTableTemplatesUseResponse201Strictness = "flexible"
 )
 
 type CreateProjectsTableTemplatesUseResponse402ErrorKey string
+
 const (
 	CreateProjectsTableTemplatesUseResponse402ErrorKeyApiRequestLimitExceeded CreateProjectsTableTemplatesUseResponse402ErrorKey = "api_request_limit_exceeded"
-	CreateProjectsTableTemplatesUseResponse402ErrorKeyFeatureNotAvailable CreateProjectsTableTemplatesUseResponse402ErrorKey = "feature_not_available"
-	CreateProjectsTableTemplatesUseResponse402ErrorKeyTablePlanLimit CreateProjectsTableTemplatesUseResponse402ErrorKey = "table_plan_limit"
+	CreateProjectsTableTemplatesUseResponse402ErrorKeyFeatureNotAvailable     CreateProjectsTableTemplatesUseResponse402ErrorKey = "feature_not_available"
+	CreateProjectsTableTemplatesUseResponse402ErrorKeyTablePlanLimit          CreateProjectsTableTemplatesUseResponse402ErrorKey = "table_plan_limit"
 )
 
 type CreateProjectsTableTemplatesUseResponse402FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTableTemplatesUseResponse402Status int
+
 const (
 	CreateProjectsTableTemplatesUseResponse402Status402 CreateProjectsTableTemplatesUseResponse402Status = 402
 )
 
 type CreateProjectsTablesColumnRequestType string
+
 const (
-	CreateProjectsTablesColumnRequestTypeArray CreateProjectsTablesColumnRequestType = "array"
-	CreateProjectsTablesColumnRequestTypeBoolean CreateProjectsTablesColumnRequestType = "boolean"
-	CreateProjectsTablesColumnRequestTypeCurrency CreateProjectsTablesColumnRequestType = "currency"
-	CreateProjectsTablesColumnRequestTypeDate CreateProjectsTablesColumnRequestType = "date"
-	CreateProjectsTablesColumnRequestTypeEmail CreateProjectsTablesColumnRequestType = "email"
-	CreateProjectsTablesColumnRequestTypeEnum CreateProjectsTablesColumnRequestType = "enum"
+	CreateProjectsTablesColumnRequestTypeArray       CreateProjectsTablesColumnRequestType = "array"
+	CreateProjectsTablesColumnRequestTypeBoolean     CreateProjectsTablesColumnRequestType = "boolean"
+	CreateProjectsTablesColumnRequestTypeCurrency    CreateProjectsTablesColumnRequestType = "currency"
+	CreateProjectsTablesColumnRequestTypeDate        CreateProjectsTablesColumnRequestType = "date"
+	CreateProjectsTablesColumnRequestTypeEmail       CreateProjectsTablesColumnRequestType = "email"
+	CreateProjectsTablesColumnRequestTypeEnum        CreateProjectsTablesColumnRequestType = "enum"
 	CreateProjectsTablesColumnRequestTypeMultiSelect CreateProjectsTablesColumnRequestType = "multi_select"
-	CreateProjectsTablesColumnRequestTypeNumber CreateProjectsTablesColumnRequestType = "number"
-	CreateProjectsTablesColumnRequestTypeString CreateProjectsTablesColumnRequestType = "string"
-	CreateProjectsTablesColumnRequestTypeText CreateProjectsTablesColumnRequestType = "text"
-	CreateProjectsTablesColumnRequestTypeUrl CreateProjectsTablesColumnRequestType = "url"
+	CreateProjectsTablesColumnRequestTypeNumber      CreateProjectsTablesColumnRequestType = "number"
+	CreateProjectsTablesColumnRequestTypeString      CreateProjectsTablesColumnRequestType = "string"
+	CreateProjectsTablesColumnRequestTypeText        CreateProjectsTablesColumnRequestType = "text"
+	CreateProjectsTablesColumnRequestTypeUrl         CreateProjectsTablesColumnRequestType = "url"
 )
 
 type CreateProjectsTablesColumnResponse402ErrorKey string
+
 const (
 	CreateProjectsTablesColumnResponse402ErrorKeyApiRequestLimitExceeded CreateProjectsTablesColumnResponse402ErrorKey = "api_request_limit_exceeded"
-	CreateProjectsTablesColumnResponse402ErrorKeyColumnLimitReached CreateProjectsTablesColumnResponse402ErrorKey = "column_limit_reached"
-	CreateProjectsTablesColumnResponse402ErrorKeyFeatureNotAvailable CreateProjectsTablesColumnResponse402ErrorKey = "feature_not_available"
+	CreateProjectsTablesColumnResponse402ErrorKeyColumnLimitReached      CreateProjectsTablesColumnResponse402ErrorKey = "column_limit_reached"
+	CreateProjectsTablesColumnResponse402ErrorKeyFeatureNotAvailable     CreateProjectsTablesColumnResponse402ErrorKey = "feature_not_available"
 )
 
 type CreateProjectsTablesColumnResponse402FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTablesColumnResponse402Status int
+
 const (
 	CreateProjectsTablesColumnResponse402Status402 CreateProjectsTablesColumnResponse402Status = 402
 )
 
 type CreateProjectsTablesColumnResponse500ErrorKey string
+
 const (
-	CreateProjectsTablesColumnResponse500ErrorKeyCaptchaUnavailable CreateProjectsTablesColumnResponse500ErrorKey = "captcha_unavailable"
-	CreateProjectsTablesColumnResponse500ErrorKeyColumnAddFailed CreateProjectsTablesColumnResponse500ErrorKey = "column_add_failed"
+	CreateProjectsTablesColumnResponse500ErrorKeyCaptchaUnavailable  CreateProjectsTablesColumnResponse500ErrorKey = "captcha_unavailable"
+	CreateProjectsTablesColumnResponse500ErrorKeyColumnAddFailed     CreateProjectsTablesColumnResponse500ErrorKey = "column_add_failed"
 	CreateProjectsTablesColumnResponse500ErrorKeyInternalServerError CreateProjectsTablesColumnResponse500ErrorKey = "internal_server_error"
 )
 
 type CreateProjectsTablesColumnResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTablesColumnResponse500Status int
+
 const (
 	CreateProjectsTablesColumnResponse500Status500 CreateProjectsTablesColumnResponse500Status = 500
 )
 
 type CreateProjectsTablesDuplicateResponse500ErrorKey string
+
 const (
-	CreateProjectsTablesDuplicateResponse500ErrorKeyCaptchaUnavailable CreateProjectsTablesDuplicateResponse500ErrorKey = "captcha_unavailable"
-	CreateProjectsTablesDuplicateResponse500ErrorKeyInternalServerError CreateProjectsTablesDuplicateResponse500ErrorKey = "internal_server_error"
+	CreateProjectsTablesDuplicateResponse500ErrorKeyCaptchaUnavailable   CreateProjectsTablesDuplicateResponse500ErrorKey = "captcha_unavailable"
+	CreateProjectsTablesDuplicateResponse500ErrorKeyInternalServerError  CreateProjectsTablesDuplicateResponse500ErrorKey = "internal_server_error"
 	CreateProjectsTablesDuplicateResponse500ErrorKeyTableDuplicateFailed CreateProjectsTablesDuplicateResponse500ErrorKey = "table_duplicate_failed"
 )
 
 type CreateProjectsTablesDuplicateResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTablesDuplicateResponse500Status int
+
 const (
 	CreateProjectsTablesDuplicateResponse500Status500 CreateProjectsTablesDuplicateResponse500Status = 500
 )
 
 type CreateProjectsTablesRestoreResponse410ErrorKey string
+
 const (
 	CreateProjectsTablesRestoreResponse410ErrorKeyTableDeleteExpired CreateProjectsTablesRestoreResponse410ErrorKey = "table_delete_expired"
-	CreateProjectsTablesRestoreResponse410ErrorKeyTableSoftDeleted CreateProjectsTablesRestoreResponse410ErrorKey = "table_soft_deleted"
+	CreateProjectsTablesRestoreResponse410ErrorKeyTableSoftDeleted   CreateProjectsTablesRestoreResponse410ErrorKey = "table_soft_deleted"
 )
 
 type CreateProjectsTablesRestoreResponse410FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTablesRestoreResponse410Status int
+
 const (
 	CreateProjectsTablesRestoreResponse410Status410 CreateProjectsTablesRestoreResponse410Status = 410
 )
 
 type CreateProjectsTablesRestoreResponse500ErrorKey string
+
 const (
-	CreateProjectsTablesRestoreResponse500ErrorKeyCaptchaUnavailable CreateProjectsTablesRestoreResponse500ErrorKey = "captcha_unavailable"
+	CreateProjectsTablesRestoreResponse500ErrorKeyCaptchaUnavailable  CreateProjectsTablesRestoreResponse500ErrorKey = "captcha_unavailable"
 	CreateProjectsTablesRestoreResponse500ErrorKeyInternalServerError CreateProjectsTablesRestoreResponse500ErrorKey = "internal_server_error"
-	CreateProjectsTablesRestoreResponse500ErrorKeyTableRestoreFailed CreateProjectsTablesRestoreResponse500ErrorKey = "table_restore_failed"
+	CreateProjectsTablesRestoreResponse500ErrorKeyTableRestoreFailed  CreateProjectsTablesRestoreResponse500ErrorKey = "table_restore_failed"
 )
 
 type CreateProjectsTablesRestoreResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTablesRestoreResponse500Status int
+
 const (
 	CreateProjectsTablesRestoreResponse500Status500 CreateProjectsTablesRestoreResponse500Status = 500
 )
 
 type CreateProjectsTablesRowRequestDbbb57UpdatesItem struct {
 	Data map[string]json.RawMessage `json:"data"`
-	Id string `json:"id"`
+	Id   string                     `json:"id"`
 }
 
 func (s CreateProjectsTablesRowRequestDbbb57UpdatesItem) MarshalJSON() ([]byte, error) {
@@ -2086,879 +2089,978 @@ func (s CreateProjectsTablesRowRequestDbbb57UpdatesItem) MarshalJSON() ([]byte, 
 }
 
 type CreateProjectsTablesRowResponse500534f56ErrorKey string
+
 const (
-	CreateProjectsTablesRowResponse500534f56ErrorKeyCaptchaUnavailable CreateProjectsTablesRowResponse500534f56ErrorKey = "captcha_unavailable"
+	CreateProjectsTablesRowResponse500534f56ErrorKeyCaptchaUnavailable  CreateProjectsTablesRowResponse500534f56ErrorKey = "captcha_unavailable"
 	CreateProjectsTablesRowResponse500534f56ErrorKeyInternalServerError CreateProjectsTablesRowResponse500534f56ErrorKey = "internal_server_error"
-	CreateProjectsTablesRowResponse500534f56ErrorKeyRowBulkFailed CreateProjectsTablesRowResponse500534f56ErrorKey = "row_bulk_failed"
+	CreateProjectsTablesRowResponse500534f56ErrorKeyRowBulkFailed       CreateProjectsTablesRowResponse500534f56ErrorKey = "row_bulk_failed"
 )
 
 type CreateProjectsTablesRowResponse500534f56FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTablesRowResponse500534f56Status int
+
 const (
 	CreateProjectsTablesRowResponse500534f56Status500 CreateProjectsTablesRowResponse500534f56Status = 500
 )
 
 type CreateProjectsTablesRowResponse500ErrorKey string
+
 const (
-	CreateProjectsTablesRowResponse500ErrorKeyCaptchaUnavailable CreateProjectsTablesRowResponse500ErrorKey = "captcha_unavailable"
+	CreateProjectsTablesRowResponse500ErrorKeyCaptchaUnavailable  CreateProjectsTablesRowResponse500ErrorKey = "captcha_unavailable"
 	CreateProjectsTablesRowResponse500ErrorKeyInternalServerError CreateProjectsTablesRowResponse500ErrorKey = "internal_server_error"
-	CreateProjectsTablesRowResponse500ErrorKeyRowCreateFailed CreateProjectsTablesRowResponse500ErrorKey = "row_create_failed"
+	CreateProjectsTablesRowResponse500ErrorKeyRowCreateFailed     CreateProjectsTablesRowResponse500ErrorKey = "row_create_failed"
 )
 
 type CreateProjectsTablesRowResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateProjectsTablesRowResponse500Status int
+
 const (
 	CreateProjectsTablesRowResponse500Status500 CreateProjectsTablesRowResponse500Status = 500
 )
 
-type CreateTableTemplateRequestColumnsJsonItem struct {
-	CurrencyCode *string `json:"currency_code,omitempty"`
-	Default json.RawMessage `json:"default,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	Id string `json:"id"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Options []string `json:"options,omitempty"`
-	Required *bool `json:"required,omitempty"`
-	Searchable *bool `json:"searchable,omitempty"`
-	Type *CreateTableTemplateRequestColumnsJsonItemType `json:"type,omitempty"`
-}
-
-type CreateTableTemplateRequestColumnsJsonItemType string
-const (
-	CreateTableTemplateRequestColumnsJsonItemTypeArray CreateTableTemplateRequestColumnsJsonItemType = "array"
-	CreateTableTemplateRequestColumnsJsonItemTypeBoolean CreateTableTemplateRequestColumnsJsonItemType = "boolean"
-	CreateTableTemplateRequestColumnsJsonItemTypeCurrency CreateTableTemplateRequestColumnsJsonItemType = "currency"
-	CreateTableTemplateRequestColumnsJsonItemTypeDate CreateTableTemplateRequestColumnsJsonItemType = "date"
-	CreateTableTemplateRequestColumnsJsonItemTypeEmail CreateTableTemplateRequestColumnsJsonItemType = "email"
-	CreateTableTemplateRequestColumnsJsonItemTypeEnum CreateTableTemplateRequestColumnsJsonItemType = "enum"
-	CreateTableTemplateRequestColumnsJsonItemTypeMultiSelect CreateTableTemplateRequestColumnsJsonItemType = "multi_select"
-	CreateTableTemplateRequestColumnsJsonItemTypeNumber CreateTableTemplateRequestColumnsJsonItemType = "number"
-	CreateTableTemplateRequestColumnsJsonItemTypeString CreateTableTemplateRequestColumnsJsonItemType = "string"
-	CreateTableTemplateRequestColumnsJsonItemTypeText CreateTableTemplateRequestColumnsJsonItemType = "text"
-	CreateTableTemplateRequestColumnsJsonItemTypeUrl CreateTableTemplateRequestColumnsJsonItemType = "url"
-)
-
 type CreateTableTemplateRequestInsertMode string
+
 const (
-	CreateTableTemplateRequestInsertModeAppend CreateTableTemplateRequestInsertMode = "append"
-	CreateTableTemplateRequestInsertModeDedup CreateTableTemplateRequestInsertMode = "dedup"
-	CreateTableTemplateRequestInsertModeMerge CreateTableTemplateRequestInsertMode = "merge"
+	CreateTableTemplateRequestInsertModeAppend  CreateTableTemplateRequestInsertMode = "append"
+	CreateTableTemplateRequestInsertModeDedup   CreateTableTemplateRequestInsertMode = "dedup"
+	CreateTableTemplateRequestInsertModeMerge   CreateTableTemplateRequestInsertMode = "merge"
 	CreateTableTemplateRequestInsertModeReplace CreateTableTemplateRequestInsertMode = "replace"
 )
 
 type CreateTableTemplateRequestStrictness string
+
 const (
-	CreateTableTemplateRequestStrictnessStrict CreateTableTemplateRequestStrictness = "strict"
+	CreateTableTemplateRequestStrictnessStrict   CreateTableTemplateRequestStrictness = "strict"
 	CreateTableTemplateRequestStrictnessBalanced CreateTableTemplateRequestStrictness = "balanced"
 	CreateTableTemplateRequestStrictnessFlexible CreateTableTemplateRequestStrictness = "flexible"
 )
 
 type CreateTableTemplateResponse500ErrorKey string
+
 const (
-	CreateTableTemplateResponse500ErrorKeyCaptchaUnavailable CreateTableTemplateResponse500ErrorKey = "captcha_unavailable"
-	CreateTableTemplateResponse500ErrorKeyInternalServerError CreateTableTemplateResponse500ErrorKey = "internal_server_error"
+	CreateTableTemplateResponse500ErrorKeyCaptchaUnavailable        CreateTableTemplateResponse500ErrorKey = "captcha_unavailable"
+	CreateTableTemplateResponse500ErrorKeyInternalServerError       CreateTableTemplateResponse500ErrorKey = "internal_server_error"
 	CreateTableTemplateResponse500ErrorKeyTableTemplateCreateFailed CreateTableTemplateResponse500ErrorKey = "table_template_create_failed"
 )
 
 type CreateTableTemplateResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type CreateTableTemplateResponse500Status int
+
 const (
 	CreateTableTemplateResponse500Status500 CreateTableTemplateResponse500Status = 500
 )
 
 type DeleteProjectsTablesColumnResponse400ErrorKey string
+
 const (
-	DeleteProjectsTablesColumnResponse400ErrorKeyCaptchaFailed DeleteProjectsTablesColumnResponse400ErrorKey = "captcha_failed"
-	DeleteProjectsTablesColumnResponse400ErrorKeyCaptchaRequired DeleteProjectsTablesColumnResponse400ErrorKey = "captcha_required"
+	DeleteProjectsTablesColumnResponse400ErrorKeyCaptchaFailed         DeleteProjectsTablesColumnResponse400ErrorKey = "captcha_failed"
+	DeleteProjectsTablesColumnResponse400ErrorKeyCaptchaRequired       DeleteProjectsTablesColumnResponse400ErrorKey = "captcha_required"
 	DeleteProjectsTablesColumnResponse400ErrorKeyColumnMinimumRequired DeleteProjectsTablesColumnResponse400ErrorKey = "column_minimum_required"
-	DeleteProjectsTablesColumnResponse400ErrorKeyInvalidInput DeleteProjectsTablesColumnResponse400ErrorKey = "invalid_input"
+	DeleteProjectsTablesColumnResponse400ErrorKeyInvalidInput          DeleteProjectsTablesColumnResponse400ErrorKey = "invalid_input"
 )
 
 type DeleteProjectsTablesColumnResponse400FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type DeleteProjectsTablesColumnResponse400Status int
+
 const (
 	DeleteProjectsTablesColumnResponse400Status400 DeleteProjectsTablesColumnResponse400Status = 400
 )
 
 type DeleteProjectsTablesColumnResponse409ErrorKey string
+
 const (
-	DeleteProjectsTablesColumnResponse409ErrorKeyColumnInMergeKey DeleteProjectsTablesColumnResponse409ErrorKey = "column_in_merge_key"
+	DeleteProjectsTablesColumnResponse409ErrorKeyColumnInMergeKey       DeleteProjectsTablesColumnResponse409ErrorKey = "column_in_merge_key"
 	DeleteProjectsTablesColumnResponse409ErrorKeyOptimisticLockConflict DeleteProjectsTablesColumnResponse409ErrorKey = "optimistic_lock_conflict"
 )
 
 type DeleteProjectsTablesColumnResponse409FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type DeleteProjectsTablesColumnResponse409Status int
+
 const (
 	DeleteProjectsTablesColumnResponse409Status409 DeleteProjectsTablesColumnResponse409Status = 409
 )
 
 type DeleteProjectsTablesColumnResponse500ErrorKey string
+
 const (
-	DeleteProjectsTablesColumnResponse500ErrorKeyCaptchaUnavailable DeleteProjectsTablesColumnResponse500ErrorKey = "captcha_unavailable"
-	DeleteProjectsTablesColumnResponse500ErrorKeyColumnRemoveFailed DeleteProjectsTablesColumnResponse500ErrorKey = "column_remove_failed"
+	DeleteProjectsTablesColumnResponse500ErrorKeyCaptchaUnavailable  DeleteProjectsTablesColumnResponse500ErrorKey = "captcha_unavailable"
+	DeleteProjectsTablesColumnResponse500ErrorKeyColumnRemoveFailed  DeleteProjectsTablesColumnResponse500ErrorKey = "column_remove_failed"
 	DeleteProjectsTablesColumnResponse500ErrorKeyInternalServerError DeleteProjectsTablesColumnResponse500ErrorKey = "internal_server_error"
 )
 
 type DeleteProjectsTablesColumnResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type DeleteProjectsTablesColumnResponse500Status int
+
 const (
 	DeleteProjectsTablesColumnResponse500Status500 DeleteProjectsTablesColumnResponse500Status = 500
 )
 
 type DeleteProjectsTablesRowResponse500ErrorKey string
+
 const (
-	DeleteProjectsTablesRowResponse500ErrorKeyCaptchaUnavailable DeleteProjectsTablesRowResponse500ErrorKey = "captcha_unavailable"
+	DeleteProjectsTablesRowResponse500ErrorKeyCaptchaUnavailable  DeleteProjectsTablesRowResponse500ErrorKey = "captcha_unavailable"
 	DeleteProjectsTablesRowResponse500ErrorKeyInternalServerError DeleteProjectsTablesRowResponse500ErrorKey = "internal_server_error"
-	DeleteProjectsTablesRowResponse500ErrorKeyRowDeleteFailed DeleteProjectsTablesRowResponse500ErrorKey = "row_delete_failed"
+	DeleteProjectsTablesRowResponse500ErrorKeyRowDeleteFailed     DeleteProjectsTablesRowResponse500ErrorKey = "row_delete_failed"
 )
 
 type DeleteProjectsTablesRowResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type DeleteProjectsTablesRowResponse500Status int
+
 const (
 	DeleteProjectsTablesRowResponse500Status500 DeleteProjectsTablesRowResponse500Status = 500
 )
 
 type DeleteTableTemplateResponse500ErrorKey string
+
 const (
-	DeleteTableTemplateResponse500ErrorKeyCaptchaUnavailable DeleteTableTemplateResponse500ErrorKey = "captcha_unavailable"
-	DeleteTableTemplateResponse500ErrorKeyInternalServerError DeleteTableTemplateResponse500ErrorKey = "internal_server_error"
+	DeleteTableTemplateResponse500ErrorKeyCaptchaUnavailable        DeleteTableTemplateResponse500ErrorKey = "captcha_unavailable"
+	DeleteTableTemplateResponse500ErrorKeyInternalServerError       DeleteTableTemplateResponse500ErrorKey = "internal_server_error"
 	DeleteTableTemplateResponse500ErrorKeyTableTemplateDeleteFailed DeleteTableTemplateResponse500ErrorKey = "table_template_delete_failed"
 )
 
 type DeleteTableTemplateResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type DeleteTableTemplateResponse500Status int
+
 const (
 	DeleteTableTemplateResponse500Status500 DeleteTableTemplateResponse500Status = 500
 )
 
 type Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey string
+
 const (
 	Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKeyBatchNotComplete Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey = "batch_not_complete"
-	Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKeyCaptchaFailed Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey = "captcha_failed"
-	Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKeyCaptchaRequired Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey = "captcha_required"
-	Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKeyInvalidInput Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey = "invalid_input"
+	Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKeyCaptchaFailed    Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey = "captcha_failed"
+	Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKeyCaptchaRequired  Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey = "captcha_required"
+	Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKeyInvalidInput     Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputErrorKey = "invalid_input"
 )
 
 type Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputStatus int
+
 const (
 	Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputStatus400 Err400BatchNotCompleteCaptchaFailedCaptchaRequiredInvalidInputStatus = 400
 )
 
 type Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKey string
+
 const (
-	Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKeyCaptchaFailed Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKey = "captcha_failed"
+	Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKeyCaptchaFailed   Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKey = "captcha_failed"
 	Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKeyCaptchaRequired Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKey = "captcha_required"
-	Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKeyInvalidInput Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKey = "invalid_input"
+	Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKeyInvalidInput    Err400CaptchaFailedCaptchaRequiredInvalidInputErrorKey = "invalid_input"
 )
 
 type Err400CaptchaFailedCaptchaRequiredInvalidInputFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey string
+
 const (
-	Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKeyCaptchaFailed Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey = "captcha_failed"
-	Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKeyCaptchaRequired Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey = "captcha_required"
-	Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKeyInvalidInput Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey = "invalid_input"
+	Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKeyCaptchaFailed       Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey = "captcha_failed"
+	Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKeyCaptchaRequired     Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey = "captcha_required"
+	Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKeyInvalidInput        Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey = "invalid_input"
 	Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKeyRowValidationFailed Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedErrorKey = "row_validation_failed"
 )
 
 type Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedStatus int
+
 const (
 	Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedStatus400 Err400CaptchaFailedCaptchaRequiredInvalidInputRowValidationFailedStatus = 400
 )
 
 type Err400CaptchaFailedCaptchaRequiredInvalidInputStatus int
+
 const (
 	Err400CaptchaFailedCaptchaRequiredInvalidInputStatus400 Err400CaptchaFailedCaptchaRequiredInvalidInputStatus = 400
 )
 
 type Err401ImpersonationEndedUnauthorizedErrorKey string
+
 const (
 	Err401ImpersonationEndedUnauthorizedErrorKeyImpersonationEnded Err401ImpersonationEndedUnauthorizedErrorKey = "impersonation_ended"
-	Err401ImpersonationEndedUnauthorizedErrorKeyUnauthorized Err401ImpersonationEndedUnauthorizedErrorKey = "unauthorized"
+	Err401ImpersonationEndedUnauthorizedErrorKeyUnauthorized       Err401ImpersonationEndedUnauthorizedErrorKey = "unauthorized"
 )
 
 type Err401ImpersonationEndedUnauthorizedFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err401ImpersonationEndedUnauthorizedStatus int
+
 const (
 	Err401ImpersonationEndedUnauthorizedStatus401 Err401ImpersonationEndedUnauthorizedStatus = 401
 )
 
 type Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey string
+
 const (
 	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyApiRequestLimitExceeded Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "api_request_limit_exceeded"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyCreditLimitExceeded Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "credit_limit_exceeded"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyFeatureNotAvailable Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "feature_not_available"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyFileCountPlanLimit Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "file_count_plan_limit"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyFileSizePlanLimit Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "file_size_plan_limit"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyRowPlanLimit Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "row_plan_limit"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyCreditLimitExceeded     Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "credit_limit_exceeded"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyFeatureNotAvailable     Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "feature_not_available"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyFileCountPlanLimit      Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "file_count_plan_limit"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyFileSizePlanLimit       Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "file_size_plan_limit"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKeyRowPlanLimit            Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitErrorKey = "row_plan_limit"
 )
 
 type Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitStatus int
+
 const (
 	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitStatus402 Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitRowPlanLimitStatus = 402
 )
 
 type Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey string
+
 const (
 	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyApiRequestLimitExceeded Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "api_request_limit_exceeded"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyCreditLimitExceeded Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "credit_limit_exceeded"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyFeatureNotAvailable Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "feature_not_available"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyFileCountPlanLimit Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "file_count_plan_limit"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyFileSizePlanLimit Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "file_size_plan_limit"
-	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyTablePlanLimit Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "table_plan_limit"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyCreditLimitExceeded     Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "credit_limit_exceeded"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyFeatureNotAvailable     Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "feature_not_available"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyFileCountPlanLimit      Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "file_count_plan_limit"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyFileSizePlanLimit       Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "file_size_plan_limit"
+	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKeyTablePlanLimit          Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitErrorKey = "table_plan_limit"
 )
 
 type Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitStatus int
+
 const (
 	Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitStatus402 Err402ApiRequestLimitExceededCreditLimitExceededFeatureNotAvailableFileCountPlanLimitFileSizePlanLimitTablePlanLimitStatus = 402
 )
 
 type Err402ApiRequestLimitExceededFeatureNotAvailableErrorKey string
+
 const (
 	Err402ApiRequestLimitExceededFeatureNotAvailableErrorKeyApiRequestLimitExceeded Err402ApiRequestLimitExceededFeatureNotAvailableErrorKey = "api_request_limit_exceeded"
-	Err402ApiRequestLimitExceededFeatureNotAvailableErrorKeyFeatureNotAvailable Err402ApiRequestLimitExceededFeatureNotAvailableErrorKey = "feature_not_available"
+	Err402ApiRequestLimitExceededFeatureNotAvailableErrorKeyFeatureNotAvailable     Err402ApiRequestLimitExceededFeatureNotAvailableErrorKey = "feature_not_available"
 )
 
 type Err402ApiRequestLimitExceededFeatureNotAvailableFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKey string
+
 const (
 	Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKeyApiRequestLimitExceeded Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKey = "api_request_limit_exceeded"
-	Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKeyFeatureNotAvailable Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKey = "feature_not_available"
-	Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKeyRowPlanLimit Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKey = "row_plan_limit"
+	Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKeyFeatureNotAvailable     Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKey = "feature_not_available"
+	Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKeyRowPlanLimit            Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitErrorKey = "row_plan_limit"
 )
 
 type Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitStatus int
+
 const (
 	Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitStatus402 Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimitStatus = 402
 )
 
 type Err402ApiRequestLimitExceededFeatureNotAvailableStatus int
+
 const (
 	Err402ApiRequestLimitExceededFeatureNotAvailableStatus402 Err402ApiRequestLimitExceededFeatureNotAvailableStatus = 402
 )
 
 type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey string
+
 const (
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyEmailNotVerified Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "email_not_verified"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "forbidden"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyEmailNotVerified       Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "email_not_verified"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyForbidden              Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "forbidden"
 	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyImpersonationForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "impersonation_forbidden"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyOrgSuspended Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "org_suspended"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyOrgSuspended           Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "org_suspended"
 )
 
 type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus int
+
 const (
 	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus403 Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus = 403
 )
 
 type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey string
+
 const (
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyEmailNotVerified Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "email_not_verified"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "forbidden"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyEmailNotVerified       Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "email_not_verified"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyForbidden              Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "forbidden"
 	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyImpersonationForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "impersonation_forbidden"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyOrgSuspended Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "org_suspended"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyOrgSuspended           Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "org_suspended"
 	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyTableTemplateForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "table_template_forbidden"
 )
 
 type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus int
+
 const (
 	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus403 Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus = 403
 )
 
 type Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey string
+
 const (
-	Err404BatchNotFoundBatchResultEmptyNotFoundErrorKeyBatchNotFound Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey = "batch_not_found"
+	Err404BatchNotFoundBatchResultEmptyNotFoundErrorKeyBatchNotFound    Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey = "batch_not_found"
 	Err404BatchNotFoundBatchResultEmptyNotFoundErrorKeyBatchResultEmpty Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey = "batch_result_empty"
-	Err404BatchNotFoundBatchResultEmptyNotFoundErrorKeyNotFound Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey = "not_found"
+	Err404BatchNotFoundBatchResultEmptyNotFoundErrorKeyNotFound         Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey = "not_found"
 )
 
 type Err404BatchNotFoundBatchResultEmptyNotFoundFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err404BatchNotFoundBatchResultEmptyNotFoundStatus int
+
 const (
 	Err404BatchNotFoundBatchResultEmptyNotFoundStatus404 Err404BatchNotFoundBatchResultEmptyNotFoundStatus = 404
 )
 
 type Err404ColumnNotFoundNotFoundTableNotFoundErrorKey string
+
 const (
 	Err404ColumnNotFoundNotFoundTableNotFoundErrorKeyColumnNotFound Err404ColumnNotFoundNotFoundTableNotFoundErrorKey = "column_not_found"
-	Err404ColumnNotFoundNotFoundTableNotFoundErrorKeyNotFound Err404ColumnNotFoundNotFoundTableNotFoundErrorKey = "not_found"
-	Err404ColumnNotFoundNotFoundTableNotFoundErrorKeyTableNotFound Err404ColumnNotFoundNotFoundTableNotFoundErrorKey = "table_not_found"
+	Err404ColumnNotFoundNotFoundTableNotFoundErrorKeyNotFound       Err404ColumnNotFoundNotFoundTableNotFoundErrorKey = "not_found"
+	Err404ColumnNotFoundNotFoundTableNotFoundErrorKeyTableNotFound  Err404ColumnNotFoundNotFoundTableNotFoundErrorKey = "table_not_found"
 )
 
 type Err404ColumnNotFoundNotFoundTableNotFoundFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err404ColumnNotFoundNotFoundTableNotFoundStatus int
+
 const (
 	Err404ColumnNotFoundNotFoundTableNotFoundStatus404 Err404ColumnNotFoundNotFoundTableNotFoundStatus = 404
 )
 
 type Err404NotFoundErrorKey string
+
 const (
 	Err404NotFoundErrorKeyNotFound Err404NotFoundErrorKey = "not_found"
 )
 
 type Err404NotFoundFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err404NotFoundRowNotFoundTableNotFoundErrorKey string
+
 const (
-	Err404NotFoundRowNotFoundTableNotFoundErrorKeyNotFound Err404NotFoundRowNotFoundTableNotFoundErrorKey = "not_found"
-	Err404NotFoundRowNotFoundTableNotFoundErrorKeyRowNotFound Err404NotFoundRowNotFoundTableNotFoundErrorKey = "row_not_found"
+	Err404NotFoundRowNotFoundTableNotFoundErrorKeyNotFound      Err404NotFoundRowNotFoundTableNotFoundErrorKey = "not_found"
+	Err404NotFoundRowNotFoundTableNotFoundErrorKeyRowNotFound   Err404NotFoundRowNotFoundTableNotFoundErrorKey = "row_not_found"
 	Err404NotFoundRowNotFoundTableNotFoundErrorKeyTableNotFound Err404NotFoundRowNotFoundTableNotFoundErrorKey = "table_not_found"
 )
 
 type Err404NotFoundRowNotFoundTableNotFoundFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err404NotFoundRowNotFoundTableNotFoundStatus int
+
 const (
 	Err404NotFoundRowNotFoundTableNotFoundStatus404 Err404NotFoundRowNotFoundTableNotFoundStatus = 404
 )
 
 type Err404NotFoundStatus int
+
 const (
 	Err404NotFoundStatus404 Err404NotFoundStatus = 404
 )
 
 type Err404NotFoundTableNotFoundErrorKey string
+
 const (
-	Err404NotFoundTableNotFoundErrorKeyNotFound Err404NotFoundTableNotFoundErrorKey = "not_found"
+	Err404NotFoundTableNotFoundErrorKeyNotFound      Err404NotFoundTableNotFoundErrorKey = "not_found"
 	Err404NotFoundTableNotFoundErrorKeyTableNotFound Err404NotFoundTableNotFoundErrorKey = "table_not_found"
 )
 
 type Err404NotFoundTableNotFoundFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err404NotFoundTableNotFoundStatus int
+
 const (
 	Err404NotFoundTableNotFoundStatus404 Err404NotFoundTableNotFoundStatus = 404
 )
 
 type Err404NotFoundTableTemplateNotFoundErrorKey string
+
 const (
-	Err404NotFoundTableTemplateNotFoundErrorKeyNotFound Err404NotFoundTableTemplateNotFoundErrorKey = "not_found"
+	Err404NotFoundTableTemplateNotFoundErrorKeyNotFound              Err404NotFoundTableTemplateNotFoundErrorKey = "not_found"
 	Err404NotFoundTableTemplateNotFoundErrorKeyTableTemplateNotFound Err404NotFoundTableTemplateNotFoundErrorKey = "table_template_not_found"
 )
 
 type Err404NotFoundTableTemplateNotFoundFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err404NotFoundTableTemplateNotFoundStatus int
+
 const (
 	Err404NotFoundTableTemplateNotFoundStatus404 Err404NotFoundTableTemplateNotFoundStatus = 404
 )
 
 type Err404NotFoundWebhookNotFoundErrorKey string
+
 const (
-	Err404NotFoundWebhookNotFoundErrorKeyNotFound Err404NotFoundWebhookNotFoundErrorKey = "not_found"
+	Err404NotFoundWebhookNotFoundErrorKeyNotFound        Err404NotFoundWebhookNotFoundErrorKey = "not_found"
 	Err404NotFoundWebhookNotFoundErrorKeyWebhookNotFound Err404NotFoundWebhookNotFoundErrorKey = "webhook_not_found"
 )
 
 type Err404NotFoundWebhookNotFoundFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err404NotFoundWebhookNotFoundStatus int
+
 const (
 	Err404NotFoundWebhookNotFoundStatus404 Err404NotFoundWebhookNotFoundStatus = 404
 )
 
 type Err408RequestTimeoutErrorKey string
+
 const (
 	Err408RequestTimeoutErrorKeyRequestTimeout Err408RequestTimeoutErrorKey = "request_timeout"
 )
 
 type Err408RequestTimeoutFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err408RequestTimeoutStatus int
+
 const (
 	Err408RequestTimeoutStatus408 Err408RequestTimeoutStatus = 408
 )
 
 type Err409ColumnNameTakenOptimisticLockConflictErrorKey string
+
 const (
-	Err409ColumnNameTakenOptimisticLockConflictErrorKeyColumnNameTaken Err409ColumnNameTakenOptimisticLockConflictErrorKey = "column_name_taken"
+	Err409ColumnNameTakenOptimisticLockConflictErrorKeyColumnNameTaken        Err409ColumnNameTakenOptimisticLockConflictErrorKey = "column_name_taken"
 	Err409ColumnNameTakenOptimisticLockConflictErrorKeyOptimisticLockConflict Err409ColumnNameTakenOptimisticLockConflictErrorKey = "optimistic_lock_conflict"
 )
 
 type Err409ColumnNameTakenOptimisticLockConflictFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err409ColumnNameTakenOptimisticLockConflictStatus int
+
 const (
 	Err409ColumnNameTakenOptimisticLockConflictStatus409 Err409ColumnNameTakenOptimisticLockConflictStatus = 409
 )
 
-type Err409TableProjectIdDuplicateErrorKey string
+type Err409TableProjectIdSlugDuplicateErrorKey string
+
 const (
-	Err409TableProjectIdDuplicateErrorKeyTableProjectIdDuplicate Err409TableProjectIdDuplicateErrorKey = "table_project_id_duplicate"
+	Err409TableProjectIdSlugDuplicateErrorKeyTableProjectIdSlugDuplicate Err409TableProjectIdSlugDuplicateErrorKey = "table_project_id_slug_duplicate"
 )
 
-type Err409TableProjectIdDuplicateFieldsItem struct {
+type Err409TableProjectIdSlugDuplicateFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
-type Err409TableProjectIdDuplicateStatus int
+type Err409TableProjectIdSlugDuplicateStatus int
+
 const (
-	Err409TableProjectIdDuplicateStatus409 Err409TableProjectIdDuplicateStatus = 409
+	Err409TableProjectIdSlugDuplicateStatus409 Err409TableProjectIdSlugDuplicateStatus = 409
 )
 
 type Err410TableSoftDeletedErrorKey string
+
 const (
 	Err410TableSoftDeletedErrorKeyTableSoftDeleted Err410TableSoftDeletedErrorKey = "table_soft_deleted"
 )
 
 type Err410TableSoftDeletedFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err410TableSoftDeletedStatus int
+
 const (
 	Err410TableSoftDeletedStatus410 Err410TableSoftDeletedStatus = 410
 )
 
 type Err413ContentTooLargeErrorKey string
+
 const (
 	Err413ContentTooLargeErrorKeyContentTooLarge Err413ContentTooLargeErrorKey = "content_too_large"
 )
 
 type Err413ContentTooLargeFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err413ContentTooLargeStatus int
+
 const (
 	Err413ContentTooLargeStatus413 Err413ContentTooLargeStatus = 413
 )
 
 type Err415UnsupportedMediaTypeErrorKey string
+
 const (
 	Err415UnsupportedMediaTypeErrorKeyUnsupportedMediaType Err415UnsupportedMediaTypeErrorKey = "unsupported_media_type"
 )
 
 type Err415UnsupportedMediaTypeFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err415UnsupportedMediaTypeStatus int
+
 const (
 	Err415UnsupportedMediaTypeStatus415 Err415UnsupportedMediaTypeStatus = 415
 )
 
 type Err422ExtractionUnprocessableUnprocessableEntityErrorKey string
+
 const (
 	Err422ExtractionUnprocessableUnprocessableEntityErrorKeyExtractionUnprocessable Err422ExtractionUnprocessableUnprocessableEntityErrorKey = "extraction_unprocessable"
-	Err422ExtractionUnprocessableUnprocessableEntityErrorKeyUnprocessableEntity Err422ExtractionUnprocessableUnprocessableEntityErrorKey = "unprocessable_entity"
+	Err422ExtractionUnprocessableUnprocessableEntityErrorKeyUnprocessableEntity     Err422ExtractionUnprocessableUnprocessableEntityErrorKey = "unprocessable_entity"
 )
 
 type Err422ExtractionUnprocessableUnprocessableEntityFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err422ExtractionUnprocessableUnprocessableEntityStatus int
+
 const (
 	Err422ExtractionUnprocessableUnprocessableEntityStatus422 Err422ExtractionUnprocessableUnprocessableEntityStatus = 422
 )
 
 type Err422UnprocessableEntityErrorKey string
+
 const (
 	Err422UnprocessableEntityErrorKeyUnprocessableEntity Err422UnprocessableEntityErrorKey = "unprocessable_entity"
 )
 
 type Err422UnprocessableEntityFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err422UnprocessableEntityStatus int
+
 const (
 	Err422UnprocessableEntityStatus422 Err422UnprocessableEntityStatus = 422
 )
 
 type Err429TooManyRequestsErrorKey string
+
 const (
 	Err429TooManyRequestsErrorKeyTooManyRequests Err429TooManyRequestsErrorKey = "too_many_requests"
 )
 
 type Err429TooManyRequestsFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err429TooManyRequestsStatus int
+
 const (
 	Err429TooManyRequestsStatus429 Err429TooManyRequestsStatus = 429
 )
 
 type Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKey string
+
 const (
 	Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKeyBatchDownloadFailed Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKey = "batch_download_failed"
-	Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKeyCaptchaUnavailable Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKey = "captcha_unavailable"
+	Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKeyCaptchaUnavailable  Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKey = "captcha_unavailable"
 	Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKeyInternalServerError Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorErrorKey = "internal_server_error"
 )
 
 type Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorStatus int
+
 const (
 	Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorStatus500 Err500BatchDownloadFailedCaptchaUnavailableInternalServerErrorStatus = 500
 )
 
 type Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKey string
+
 const (
-	Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKeyCaptchaUnavailable Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKey = "captcha_unavailable"
-	Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKeyExtractionFailed Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKey = "extraction_failed"
+	Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKeyCaptchaUnavailable  Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKey = "captcha_unavailable"
+	Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKeyExtractionFailed    Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKey = "extraction_failed"
 	Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKeyInternalServerError Err500CaptchaUnavailableExtractionFailedInternalServerErrorErrorKey = "internal_server_error"
 )
 
 type Err500CaptchaUnavailableExtractionFailedInternalServerErrorFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err500CaptchaUnavailableExtractionFailedInternalServerErrorStatus int
+
 const (
 	Err500CaptchaUnavailableExtractionFailedInternalServerErrorStatus500 Err500CaptchaUnavailableExtractionFailedInternalServerErrorStatus = 500
 )
 
 type Err500CaptchaUnavailableInternalServerErrorErrorKey string
+
 const (
-	Err500CaptchaUnavailableInternalServerErrorErrorKeyCaptchaUnavailable Err500CaptchaUnavailableInternalServerErrorErrorKey = "captcha_unavailable"
+	Err500CaptchaUnavailableInternalServerErrorErrorKeyCaptchaUnavailable  Err500CaptchaUnavailableInternalServerErrorErrorKey = "captcha_unavailable"
 	Err500CaptchaUnavailableInternalServerErrorErrorKeyInternalServerError Err500CaptchaUnavailableInternalServerErrorErrorKey = "internal_server_error"
 )
 
 type Err500CaptchaUnavailableInternalServerErrorFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err500CaptchaUnavailableInternalServerErrorStatus int
+
 const (
 	Err500CaptchaUnavailableInternalServerErrorStatus500 Err500CaptchaUnavailableInternalServerErrorStatus = 500
 )
 
 type Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKey string
+
 const (
-	Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKeyCaptchaUnavailable Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKey = "captcha_unavailable"
+	Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKeyCaptchaUnavailable  Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKey = "captcha_unavailable"
 	Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKeyInternalServerError Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKey = "internal_server_error"
-	Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKeyTableCreateFailed Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKey = "table_create_failed"
+	Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKeyTableCreateFailed   Err500CaptchaUnavailableInternalServerErrorTableCreateFailedErrorKey = "table_create_failed"
 )
 
 type Err500CaptchaUnavailableInternalServerErrorTableCreateFailedFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err500CaptchaUnavailableInternalServerErrorTableCreateFailedStatus int
+
 const (
 	Err500CaptchaUnavailableInternalServerErrorTableCreateFailedStatus500 Err500CaptchaUnavailableInternalServerErrorTableCreateFailedStatus = 500
 )
 
 type Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey string
+
 const (
-	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKeyCaptchaUnavailable Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey = "captcha_unavailable"
+	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKeyCaptchaUnavailable  Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey = "captcha_unavailable"
 	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKeyInternalServerError Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey = "internal_server_error"
 	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKeyWebhookUpdateFailed Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey = "webhook_update_failed"
 )
 
 type Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus int
+
 const (
 	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus500 Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus = 500
 )
 
 type Err502BadGatewayEmailSendFailedErrorKey string
+
 const (
-	Err502BadGatewayEmailSendFailedErrorKeyBadGateway Err502BadGatewayEmailSendFailedErrorKey = "bad_gateway"
+	Err502BadGatewayEmailSendFailedErrorKeyBadGateway      Err502BadGatewayEmailSendFailedErrorKey = "bad_gateway"
 	Err502BadGatewayEmailSendFailedErrorKeyEmailSendFailed Err502BadGatewayEmailSendFailedErrorKey = "email_send_failed"
 )
 
 type Err502BadGatewayEmailSendFailedFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err502BadGatewayEmailSendFailedStatus int
+
 const (
 	Err502BadGatewayEmailSendFailedStatus502 Err502BadGatewayEmailSendFailedStatus = 502
 )
 
 type Err502BadGatewayErrorKey string
+
 const (
 	Err502BadGatewayErrorKeyBadGateway Err502BadGatewayErrorKey = "bad_gateway"
 )
 
 type Err502BadGatewayFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err502BadGatewayStatus int
+
 const (
 	Err502BadGatewayStatus502 Err502BadGatewayStatus = 502
 )
 
 type Err503ExtractionUnavailableServiceUnavailableErrorKey string
+
 const (
 	Err503ExtractionUnavailableServiceUnavailableErrorKeyExtractionUnavailable Err503ExtractionUnavailableServiceUnavailableErrorKey = "extraction_unavailable"
-	Err503ExtractionUnavailableServiceUnavailableErrorKeyServiceUnavailable Err503ExtractionUnavailableServiceUnavailableErrorKey = "service_unavailable"
+	Err503ExtractionUnavailableServiceUnavailableErrorKeyServiceUnavailable    Err503ExtractionUnavailableServiceUnavailableErrorKey = "service_unavailable"
 )
 
 type Err503ExtractionUnavailableServiceUnavailableFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err503ExtractionUnavailableServiceUnavailableStatus int
+
 const (
 	Err503ExtractionUnavailableServiceUnavailableStatus503 Err503ExtractionUnavailableServiceUnavailableStatus = 503
 )
 
 type Err503ServiceUnavailableErrorKey string
+
 const (
 	Err503ServiceUnavailableErrorKeyServiceUnavailable Err503ServiceUnavailableErrorKey = "service_unavailable"
 )
 
 type Err503ServiceUnavailableFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err503ServiceUnavailableStatus int
+
 const (
 	Err503ServiceUnavailableStatus503 Err503ServiceUnavailableStatus = 503
 )
 
 type Err504GatewayTimeoutErrorKey string
+
 const (
 	Err504GatewayTimeoutErrorKeyGatewayTimeout Err504GatewayTimeoutErrorKey = "gateway_timeout"
 )
 
 type Err504GatewayTimeoutFieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type Err504GatewayTimeoutStatus int
+
 const (
 	Err504GatewayTimeoutStatus504 Err504GatewayTimeoutStatus = 504
 )
 
+// ExtractOnceBody is the multipart/form-data body of extract.once: a nil text part or a file part without Data is not sent.
+type ExtractOnceBody struct {
+	Columns     *string
+	File        FilePart
+	Instruction *string
+	Schema      *string
+	Strictness  *string
+	Text        *string
+}
+
+// ExtractStreamBody is the multipart/form-data body of extract.stream: a nil text part or a file part without Data is not sent.
+type ExtractStreamBody struct {
+	Columns     *string
+	File        FilePart
+	Instruction *string
+	Schema      *string
+	Strictness  *string
+	Text        *string
+}
+
+// ExtractTableOnceBody is the multipart/form-data body of extract.table.once: a nil text part or a file part without Data is not sent.
+type ExtractTableOnceBody struct {
+	File FilePart
+	Text *string
+}
+
+// ExtractTableStreamBody is the multipart/form-data body of extract.table.stream: a nil text part or a file part without Data is not sent.
+type ExtractTableStreamBody struct {
+	File FilePart
+	Text *string
+}
+
 type GetOrganizationsWebhookResponse200EventsItem string
+
 const (
 	GetOrganizationsWebhookResponse200EventsItemBatchComplete GetOrganizationsWebhookResponse200EventsItem = "batch.complete"
-	GetOrganizationsWebhookResponse200EventsItemBatchFailed GetOrganizationsWebhookResponse200EventsItem = "batch.failed"
-	GetOrganizationsWebhookResponse200EventsItemBatchPartial GetOrganizationsWebhookResponse200EventsItem = "batch.partial"
-	GetOrganizationsWebhookResponse200EventsItemPing GetOrganizationsWebhookResponse200EventsItem = "ping"
+	GetOrganizationsWebhookResponse200EventsItemBatchFailed   GetOrganizationsWebhookResponse200EventsItem = "batch.failed"
+	GetOrganizationsWebhookResponse200EventsItemBatchPartial  GetOrganizationsWebhookResponse200EventsItem = "batch.partial"
+	GetOrganizationsWebhookResponse200EventsItemPing          GetOrganizationsWebhookResponse200EventsItem = "ping"
 )
 
 type GetProjectsBatcheResponse200ActorType string
+
 const (
-	GetProjectsBatcheResponse200ActorTypeUser GetProjectsBatcheResponse200ActorType = "user"
+	GetProjectsBatcheResponse200ActorTypeUser   GetProjectsBatcheResponse200ActorType = "user"
 	GetProjectsBatcheResponse200ActorTypeApiKey GetProjectsBatcheResponse200ActorType = "api_key"
 )
 
 type GetProjectsBatcheResponse200ExtractionsItem struct {
-	BatchId string `json:"batch_id"`
-	Confidence *float64 `json:"confidence"`
-	CreatedAt int64 `json:"created_at"`
-	Error *string `json:"error"`
-	FileChecksum *string `json:"file_checksum"`
-	FileKey string `json:"file_key"`
-	FileName string `json:"file_name"`
-	FileType *GetProjectsBatcheResponse200ExtractionsItemFileType `json:"file_type"`
-	Id string `json:"id"`
-	RowCount *int64 `json:"row_count"`
-	RowsKey *string `json:"rows_key"`
-	Status GetProjectsBatcheResponse200ExtractionsItemStatus `json:"status"`
-	TableId *string `json:"table_id"`
+	BatchId      string                                               `json:"batch_id"`
+	Confidence   *float64                                             `json:"confidence"`
+	CreatedAt    int64                                                `json:"created_at"`
+	Error        *string                                              `json:"error"`
+	FileChecksum *string                                              `json:"file_checksum"`
+	FileKey      string                                               `json:"file_key"`
+	FileName     string                                               `json:"file_name"`
+	FileType     *GetProjectsBatcheResponse200ExtractionsItemFileType `json:"file_type"`
+	Id           string                                               `json:"id"`
+	RowCount     *int64                                               `json:"row_count"`
+	RowsKey      *string                                              `json:"rows_key"`
+	Status       GetProjectsBatcheResponse200ExtractionsItemStatus    `json:"status"`
+	TableId      *string                                              `json:"table_id"`
 }
 
 type GetProjectsBatcheResponse200ExtractionsItemFileType string
+
 const (
-	GetProjectsBatcheResponse200ExtractionsItemFileTypeTextPdf GetProjectsBatcheResponse200ExtractionsItemFileType = "text_pdf"
-	GetProjectsBatcheResponse200ExtractionsItemFileTypeScanned GetProjectsBatcheResponse200ExtractionsItemFileType = "scanned"
-	GetProjectsBatcheResponse200ExtractionsItemFileTypeImage GetProjectsBatcheResponse200ExtractionsItemFileType = "image"
-	GetProjectsBatcheResponse200ExtractionsItemFileTypeText GetProjectsBatcheResponse200ExtractionsItemFileType = "text"
+	GetProjectsBatcheResponse200ExtractionsItemFileTypeTextPdf  GetProjectsBatcheResponse200ExtractionsItemFileType = "text_pdf"
+	GetProjectsBatcheResponse200ExtractionsItemFileTypeScanned  GetProjectsBatcheResponse200ExtractionsItemFileType = "scanned"
+	GetProjectsBatcheResponse200ExtractionsItemFileTypeImage    GetProjectsBatcheResponse200ExtractionsItemFileType = "image"
+	GetProjectsBatcheResponse200ExtractionsItemFileTypeText     GetProjectsBatcheResponse200ExtractionsItemFileType = "text"
 	GetProjectsBatcheResponse200ExtractionsItemFileTypeDocument GetProjectsBatcheResponse200ExtractionsItemFileType = "document"
-	GetProjectsBatcheResponse200ExtractionsItemFileTypeUnknown GetProjectsBatcheResponse200ExtractionsItemFileType = "unknown"
+	GetProjectsBatcheResponse200ExtractionsItemFileTypeUnknown  GetProjectsBatcheResponse200ExtractionsItemFileType = "unknown"
 )
 
 type GetProjectsBatcheResponse200ExtractionsItemStatus string
+
 const (
-	GetProjectsBatcheResponse200ExtractionsItemStatusPending GetProjectsBatcheResponse200ExtractionsItemStatus = "pending"
+	GetProjectsBatcheResponse200ExtractionsItemStatusPending    GetProjectsBatcheResponse200ExtractionsItemStatus = "pending"
 	GetProjectsBatcheResponse200ExtractionsItemStatusProcessing GetProjectsBatcheResponse200ExtractionsItemStatus = "processing"
-	GetProjectsBatcheResponse200ExtractionsItemStatusComplete GetProjectsBatcheResponse200ExtractionsItemStatus = "complete"
-	GetProjectsBatcheResponse200ExtractionsItemStatusFailed GetProjectsBatcheResponse200ExtractionsItemStatus = "failed"
+	GetProjectsBatcheResponse200ExtractionsItemStatusComplete   GetProjectsBatcheResponse200ExtractionsItemStatus = "complete"
+	GetProjectsBatcheResponse200ExtractionsItemStatusFailed     GetProjectsBatcheResponse200ExtractionsItemStatus = "failed"
 )
 
 type GetProjectsBatcheResponse200InsertMode string
+
 const (
-	GetProjectsBatcheResponse200InsertModeAppend GetProjectsBatcheResponse200InsertMode = "append"
-	GetProjectsBatcheResponse200InsertModeDedup GetProjectsBatcheResponse200InsertMode = "dedup"
-	GetProjectsBatcheResponse200InsertModeMerge GetProjectsBatcheResponse200InsertMode = "merge"
+	GetProjectsBatcheResponse200InsertModeAppend  GetProjectsBatcheResponse200InsertMode = "append"
+	GetProjectsBatcheResponse200InsertModeDedup   GetProjectsBatcheResponse200InsertMode = "dedup"
+	GetProjectsBatcheResponse200InsertModeMerge   GetProjectsBatcheResponse200InsertMode = "merge"
 	GetProjectsBatcheResponse200InsertModeReplace GetProjectsBatcheResponse200InsertMode = "replace"
 )
 
 type GetProjectsBatcheResponse200SchemaJson struct {
-	Columns []GetProjectsBatcheResponse200SchemaJsonColumnsItem `json:"columns"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Strictness GetProjectsBatcheResponse200SchemaJsonStrictness `json:"strictness"`
+	Columns     []GetProjectsBatcheResponse200SchemaJsonColumnsItem `json:"columns"`
+	Instruction Nullable[string]                                    `json:"instruction,omitzero"`
+	Strictness  GetProjectsBatcheResponse200SchemaJsonStrictness    `json:"strictness"`
 }
 
 func (s GetProjectsBatcheResponse200SchemaJson) MarshalJSON() ([]byte, error) {
@@ -2971,169 +3073,182 @@ func (s GetProjectsBatcheResponse200SchemaJson) MarshalJSON() ([]byte, error) {
 }
 
 type GetProjectsBatcheResponse200SchemaJsonColumnsItem struct {
-	Description Nullable[string] `json:"description,omitzero"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Type GetProjectsBatcheResponse200SchemaJsonColumnsItemType `json:"type"`
+	Description Nullable[string]                                      `json:"description,omitzero"`
+	Instruction Nullable[string]                                      `json:"instruction,omitzero"`
+	Name        string                                                `json:"name"`
+	Type        GetProjectsBatcheResponse200SchemaJsonColumnsItemType `json:"type"`
 }
 
 type GetProjectsBatcheResponse200SchemaJsonColumnsItemType string
+
 const (
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeArray GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "array"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeBoolean GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "boolean"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeCurrency GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "currency"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeDate GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "date"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeEmail GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "email"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeEnum GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "enum"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeArray       GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "array"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeBoolean     GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "boolean"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeCurrency    GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "currency"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeDate        GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "date"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeEmail       GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "email"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeEnum        GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "enum"
 	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeMultiSelect GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "multi_select"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeNumber GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "number"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeString GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "string"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeText GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "text"
-	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeUrl GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "url"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeNumber      GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "number"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeString      GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "string"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeText        GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "text"
+	GetProjectsBatcheResponse200SchemaJsonColumnsItemTypeUrl         GetProjectsBatcheResponse200SchemaJsonColumnsItemType = "url"
 )
 
 type GetProjectsBatcheResponse200SchemaJsonStrictness string
+
 const (
-	GetProjectsBatcheResponse200SchemaJsonStrictnessStrict GetProjectsBatcheResponse200SchemaJsonStrictness = "strict"
+	GetProjectsBatcheResponse200SchemaJsonStrictnessStrict   GetProjectsBatcheResponse200SchemaJsonStrictness = "strict"
 	GetProjectsBatcheResponse200SchemaJsonStrictnessBalanced GetProjectsBatcheResponse200SchemaJsonStrictness = "balanced"
 	GetProjectsBatcheResponse200SchemaJsonStrictnessFlexible GetProjectsBatcheResponse200SchemaJsonStrictness = "flexible"
 )
 
 type GetProjectsBatcheResponse200Status string
+
 const (
-	GetProjectsBatcheResponse200StatusUploading GetProjectsBatcheResponse200Status = "uploading"
+	GetProjectsBatcheResponse200StatusUploading  GetProjectsBatcheResponse200Status = "uploading"
 	GetProjectsBatcheResponse200StatusProcessing GetProjectsBatcheResponse200Status = "processing"
-	GetProjectsBatcheResponse200StatusMerging GetProjectsBatcheResponse200Status = "merging"
-	GetProjectsBatcheResponse200StatusComplete GetProjectsBatcheResponse200Status = "complete"
-	GetProjectsBatcheResponse200StatusPartial GetProjectsBatcheResponse200Status = "partial"
-	GetProjectsBatcheResponse200StatusFailed GetProjectsBatcheResponse200Status = "failed"
+	GetProjectsBatcheResponse200StatusMerging    GetProjectsBatcheResponse200Status = "merging"
+	GetProjectsBatcheResponse200StatusComplete   GetProjectsBatcheResponse200Status = "complete"
+	GetProjectsBatcheResponse200StatusPartial    GetProjectsBatcheResponse200Status = "partial"
+	GetProjectsBatcheResponse200StatusFailed     GetProjectsBatcheResponse200Status = "failed"
 )
 
 type GetProjectsBatcheResponse404ErrorKey string
+
 const (
 	GetProjectsBatcheResponse404ErrorKeyBatchNotFound GetProjectsBatcheResponse404ErrorKey = "batch_not_found"
-	GetProjectsBatcheResponse404ErrorKeyNotFound GetProjectsBatcheResponse404ErrorKey = "not_found"
+	GetProjectsBatcheResponse404ErrorKeyNotFound      GetProjectsBatcheResponse404ErrorKey = "not_found"
 )
 
 type GetProjectsBatcheResponse404FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type GetProjectsBatcheResponse404Status int
+
 const (
 	GetProjectsBatcheResponse404Status404 GetProjectsBatcheResponse404Status = 404
 )
 
 type GetProjectsExportResponse200Status string
+
 const (
 	GetProjectsExportResponse200StatusProcessing GetProjectsExportResponse200Status = "processing"
-	GetProjectsExportResponse200StatusComplete GetProjectsExportResponse200Status = "complete"
-	GetProjectsExportResponse200StatusFailed GetProjectsExportResponse200Status = "failed"
+	GetProjectsExportResponse200StatusComplete   GetProjectsExportResponse200Status = "complete"
+	GetProjectsExportResponse200StatusFailed     GetProjectsExportResponse200Status = "failed"
 )
 
 type GetProjectsExportResponse404ErrorKey string
+
 const (
 	GetProjectsExportResponse404ErrorKeyExportNotFound GetProjectsExportResponse404ErrorKey = "export_not_found"
-	GetProjectsExportResponse404ErrorKeyNotFound GetProjectsExportResponse404ErrorKey = "not_found"
+	GetProjectsExportResponse404ErrorKeyNotFound       GetProjectsExportResponse404ErrorKey = "not_found"
 )
 
 type GetProjectsExportResponse404FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type GetProjectsExportResponse404Status int
+
 const (
 	GetProjectsExportResponse404Status404 GetProjectsExportResponse404Status = 404
 )
 
 type GetProjectsTableTemplateResponse200ColumnsJsonItem struct {
-	CurrencyCode *string `json:"currency_code,omitempty"`
-	Default json.RawMessage `json:"default,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	Id string `json:"id"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Options []string `json:"options,omitempty"`
-	Required bool `json:"required"`
-	Searchable *bool `json:"searchable,omitempty"`
-	Type GetProjectsTableTemplateResponse200ColumnsJsonItemType `json:"type"`
+	CurrencyCode *string                                                `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                        `json:"default,omitempty"`
+	Description  Nullable[string]                                       `json:"description,omitzero"`
+	Id           string                                                 `json:"id"`
+	Instruction  Nullable[string]                                       `json:"instruction,omitzero"`
+	Name         string                                                 `json:"name"`
+	Options      []string                                               `json:"options,omitempty"`
+	Required     bool                                                   `json:"required"`
+	Searchable   *bool                                                  `json:"searchable,omitempty"`
+	Type         GetProjectsTableTemplateResponse200ColumnsJsonItemType `json:"type"`
 }
 
 type GetProjectsTableTemplateResponse200ColumnsJsonItemType string
+
 const (
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeArray GetProjectsTableTemplateResponse200ColumnsJsonItemType = "array"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeBoolean GetProjectsTableTemplateResponse200ColumnsJsonItemType = "boolean"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeCurrency GetProjectsTableTemplateResponse200ColumnsJsonItemType = "currency"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeDate GetProjectsTableTemplateResponse200ColumnsJsonItemType = "date"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeEmail GetProjectsTableTemplateResponse200ColumnsJsonItemType = "email"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeEnum GetProjectsTableTemplateResponse200ColumnsJsonItemType = "enum"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeArray       GetProjectsTableTemplateResponse200ColumnsJsonItemType = "array"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeBoolean     GetProjectsTableTemplateResponse200ColumnsJsonItemType = "boolean"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeCurrency    GetProjectsTableTemplateResponse200ColumnsJsonItemType = "currency"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeDate        GetProjectsTableTemplateResponse200ColumnsJsonItemType = "date"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeEmail       GetProjectsTableTemplateResponse200ColumnsJsonItemType = "email"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeEnum        GetProjectsTableTemplateResponse200ColumnsJsonItemType = "enum"
 	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeMultiSelect GetProjectsTableTemplateResponse200ColumnsJsonItemType = "multi_select"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeNumber GetProjectsTableTemplateResponse200ColumnsJsonItemType = "number"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeString GetProjectsTableTemplateResponse200ColumnsJsonItemType = "string"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeText GetProjectsTableTemplateResponse200ColumnsJsonItemType = "text"
-	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeUrl GetProjectsTableTemplateResponse200ColumnsJsonItemType = "url"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeNumber      GetProjectsTableTemplateResponse200ColumnsJsonItemType = "number"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeString      GetProjectsTableTemplateResponse200ColumnsJsonItemType = "string"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeText        GetProjectsTableTemplateResponse200ColumnsJsonItemType = "text"
+	GetProjectsTableTemplateResponse200ColumnsJsonItemTypeUrl         GetProjectsTableTemplateResponse200ColumnsJsonItemType = "url"
 )
 
 type GetProjectsTableTemplateResponse200InsertMode string
+
 const (
-	GetProjectsTableTemplateResponse200InsertModeAppend GetProjectsTableTemplateResponse200InsertMode = "append"
-	GetProjectsTableTemplateResponse200InsertModeDedup GetProjectsTableTemplateResponse200InsertMode = "dedup"
-	GetProjectsTableTemplateResponse200InsertModeMerge GetProjectsTableTemplateResponse200InsertMode = "merge"
+	GetProjectsTableTemplateResponse200InsertModeAppend  GetProjectsTableTemplateResponse200InsertMode = "append"
+	GetProjectsTableTemplateResponse200InsertModeDedup   GetProjectsTableTemplateResponse200InsertMode = "dedup"
+	GetProjectsTableTemplateResponse200InsertModeMerge   GetProjectsTableTemplateResponse200InsertMode = "merge"
 	GetProjectsTableTemplateResponse200InsertModeReplace GetProjectsTableTemplateResponse200InsertMode = "replace"
 )
 
 type GetProjectsTableTemplateResponse200Strictness string
+
 const (
-	GetProjectsTableTemplateResponse200StrictnessStrict GetProjectsTableTemplateResponse200Strictness = "strict"
+	GetProjectsTableTemplateResponse200StrictnessStrict   GetProjectsTableTemplateResponse200Strictness = "strict"
 	GetProjectsTableTemplateResponse200StrictnessBalanced GetProjectsTableTemplateResponse200Strictness = "balanced"
 	GetProjectsTableTemplateResponse200StrictnessFlexible GetProjectsTableTemplateResponse200Strictness = "flexible"
 )
 
 type ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItem struct {
-	Attempt int64 `json:"attempt"`
-	CreatedAt int64 `json:"created_at"`
-	DeliveredAt *int64 `json:"delivered_at"`
-	Event ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent `json:"event"`
-	HttpStatus *int64 `json:"http_status"`
-	Id string `json:"id"`
-	NextRetryAt *int64 `json:"next_retry_at"`
-	PayloadJson string `json:"payload_json"`
-	ResponseBody *string `json:"response_body"`
-	Status ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus `json:"status"`
-	WebhookId string `json:"webhook_id"`
+	Attempt      int64                                                              `json:"attempt"`
+	CreatedAt    int64                                                              `json:"created_at"`
+	DeliveredAt  *int64                                                             `json:"delivered_at"`
+	Event        ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent  `json:"event"`
+	HttpStatus   *int64                                                             `json:"http_status"`
+	Id           string                                                             `json:"id"`
+	NextRetryAt  *int64                                                             `json:"next_retry_at"`
+	PayloadJson  string                                                             `json:"payload_json"`
+	ResponseBody *string                                                            `json:"response_body"`
+	Status       ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus `json:"status"`
+	WebhookId    string                                                             `json:"webhook_id"`
 }
 
 type ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent string
+
 const (
 	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventBatchComplete ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "batch.complete"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventBatchFailed ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "batch.failed"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventBatchPartial ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "batch.partial"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventPing ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "ping"
+	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventBatchFailed   ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "batch.failed"
+	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventBatchPartial  ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "batch.partial"
+	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventPing          ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "ping"
 )
 
 type ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus string
+
 const (
 	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatusPending ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus = "pending"
 	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatusSuccess ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus = "success"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatusFailed ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus = "failed"
+	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatusFailed  ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus = "failed"
 )
 
 type ListOrganizationsWebhooksResponse200WebhooksItem struct {
-	Active bool `json:"active"`
-	CreatedAt int64 `json:"created_at"`
-	Events []ListOrganizationsWebhooksResponse200WebhooksItemEventsItem `json:"events"`
-	FailureCount int64 `json:"failure_count"`
-	Id string `json:"id"`
-	LastTriggeredAt *int64 `json:"last_triggered_at"`
-	Name *string `json:"name"`
-	OrganizationId string `json:"organization_id"`
-	SecretRotatedAt *int64 `json:"secret_rotated_at"`
-	UpdatedAt int64 `json:"updated_at"`
-	Url string `json:"url"`
+	Active          bool                                                         `json:"active"`
+	CreatedAt       int64                                                        `json:"created_at"`
+	Events          []ListOrganizationsWebhooksResponse200WebhooksItemEventsItem `json:"events"`
+	FailureCount    int64                                                        `json:"failure_count"`
+	Id              string                                                       `json:"id"`
+	LastTriggeredAt *int64                                                       `json:"last_triggered_at"`
+	Name            *string                                                      `json:"name"`
+	OrganizationId  string                                                       `json:"organization_id"`
+	SecretRotatedAt *int64                                                       `json:"secret_rotated_at"`
+	UpdatedAt       int64                                                        `json:"updated_at"`
+	Url             string                                                       `json:"url"`
 }
 
 func (s ListOrganizationsWebhooksResponse200WebhooksItem) MarshalJSON() ([]byte, error) {
@@ -3146,54 +3261,57 @@ func (s ListOrganizationsWebhooksResponse200WebhooksItem) MarshalJSON() ([]byte,
 }
 
 type ListOrganizationsWebhooksResponse200WebhooksItemEventsItem string
+
 const (
 	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemBatchComplete ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "batch.complete"
-	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemBatchFailed ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "batch.failed"
-	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemBatchPartial ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "batch.partial"
-	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemPing ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "ping"
+	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemBatchFailed   ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "batch.failed"
+	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemBatchPartial  ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "batch.partial"
+	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemPing          ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "ping"
 )
 
 type ListProjectsBatchesResponse200BatchesItem struct {
-	ActorId string `json:"actor_id"`
-	ActorType ListProjectsBatchesResponse200BatchesItemActorType `json:"actor_type"`
-	Confidence *float64 `json:"confidence"`
-	CreatedAt int64 `json:"created_at"`
-	CsvKey *string `json:"csv_key"`
-	CurrentFile *string `json:"current_file"`
-	DurationMs *int64 `json:"duration_ms"`
-	Error *string `json:"error"`
-	FileCount int64 `json:"file_count"`
-	FilesDone int64 `json:"files_done"`
-	Id string `json:"id"`
-	InsertMode *ListProjectsBatchesResponse200BatchesItemInsertMode `json:"insert_mode"`
-	JsonKey *string `json:"json_key"`
-	ProjectId string `json:"project_id"`
-	SchemaJson ListProjectsBatchesResponse200BatchesItemSchemaJson `json:"schema_json"`
-	Status ListProjectsBatchesResponse200BatchesItemStatus `json:"status"`
-	TableId *string `json:"table_id"`
-	TotalRows *int64 `json:"total_rows"`
-	UpdatedAt int64 `json:"updated_at"`
-	XlsxKey *string `json:"xlsx_key"`
+	ActorId     string                                               `json:"actor_id"`
+	ActorType   ListProjectsBatchesResponse200BatchesItemActorType   `json:"actor_type"`
+	Confidence  *float64                                             `json:"confidence"`
+	CreatedAt   int64                                                `json:"created_at"`
+	CsvKey      *string                                              `json:"csv_key"`
+	CurrentFile *string                                              `json:"current_file"`
+	DurationMs  *int64                                               `json:"duration_ms"`
+	Error       *string                                              `json:"error"`
+	FileCount   int64                                                `json:"file_count"`
+	FilesDone   int64                                                `json:"files_done"`
+	Id          string                                               `json:"id"`
+	InsertMode  *ListProjectsBatchesResponse200BatchesItemInsertMode `json:"insert_mode"`
+	JsonKey     *string                                              `json:"json_key"`
+	ProjectId   string                                               `json:"project_id"`
+	SchemaJson  ListProjectsBatchesResponse200BatchesItemSchemaJson  `json:"schema_json"`
+	Status      ListProjectsBatchesResponse200BatchesItemStatus      `json:"status"`
+	TableId     *string                                              `json:"table_id"`
+	TotalRows   *int64                                               `json:"total_rows"`
+	UpdatedAt   int64                                                `json:"updated_at"`
+	XlsxKey     *string                                              `json:"xlsx_key"`
 }
 
 type ListProjectsBatchesResponse200BatchesItemActorType string
+
 const (
-	ListProjectsBatchesResponse200BatchesItemActorTypeUser ListProjectsBatchesResponse200BatchesItemActorType = "user"
+	ListProjectsBatchesResponse200BatchesItemActorTypeUser   ListProjectsBatchesResponse200BatchesItemActorType = "user"
 	ListProjectsBatchesResponse200BatchesItemActorTypeApiKey ListProjectsBatchesResponse200BatchesItemActorType = "api_key"
 )
 
 type ListProjectsBatchesResponse200BatchesItemInsertMode string
+
 const (
-	ListProjectsBatchesResponse200BatchesItemInsertModeAppend ListProjectsBatchesResponse200BatchesItemInsertMode = "append"
-	ListProjectsBatchesResponse200BatchesItemInsertModeDedup ListProjectsBatchesResponse200BatchesItemInsertMode = "dedup"
-	ListProjectsBatchesResponse200BatchesItemInsertModeMerge ListProjectsBatchesResponse200BatchesItemInsertMode = "merge"
+	ListProjectsBatchesResponse200BatchesItemInsertModeAppend  ListProjectsBatchesResponse200BatchesItemInsertMode = "append"
+	ListProjectsBatchesResponse200BatchesItemInsertModeDedup   ListProjectsBatchesResponse200BatchesItemInsertMode = "dedup"
+	ListProjectsBatchesResponse200BatchesItemInsertModeMerge   ListProjectsBatchesResponse200BatchesItemInsertMode = "merge"
 	ListProjectsBatchesResponse200BatchesItemInsertModeReplace ListProjectsBatchesResponse200BatchesItemInsertMode = "replace"
 )
 
 type ListProjectsBatchesResponse200BatchesItemSchemaJson struct {
-	Columns []ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItem `json:"columns"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Strictness ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictness `json:"strictness"`
+	Columns     []ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItem `json:"columns"`
+	Instruction Nullable[string]                                                 `json:"instruction,omitzero"`
+	Strictness  ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictness    `json:"strictness"`
 }
 
 func (s ListProjectsBatchesResponse200BatchesItemSchemaJson) MarshalJSON() ([]byte, error) {
@@ -3206,59 +3324,62 @@ func (s ListProjectsBatchesResponse200BatchesItemSchemaJson) MarshalJSON() ([]by
 }
 
 type ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItem struct {
-	Description Nullable[string] `json:"description,omitzero"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Type ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType `json:"type"`
+	Description Nullable[string]                                                   `json:"description,omitzero"`
+	Instruction Nullable[string]                                                   `json:"instruction,omitzero"`
+	Name        string                                                             `json:"name"`
+	Type        ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType `json:"type"`
 }
 
 type ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType string
+
 const (
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeArray ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "array"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeBoolean ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "boolean"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeCurrency ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "currency"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeDate ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "date"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeEmail ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "email"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeEnum ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "enum"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeArray       ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "array"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeBoolean     ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "boolean"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeCurrency    ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "currency"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeDate        ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "date"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeEmail       ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "email"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeEnum        ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "enum"
 	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeMultiSelect ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "multi_select"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeNumber ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "number"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeString ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "string"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeText ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "text"
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeUrl ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "url"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeNumber      ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "number"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeString      ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "string"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeText        ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "text"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemTypeUrl         ListProjectsBatchesResponse200BatchesItemSchemaJsonColumnsItemType = "url"
 )
 
 type ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictness string
+
 const (
-	ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictnessStrict ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictness = "strict"
+	ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictnessStrict   ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictness = "strict"
 	ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictnessBalanced ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictness = "balanced"
 	ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictnessFlexible ListProjectsBatchesResponse200BatchesItemSchemaJsonStrictness = "flexible"
 )
 
 type ListProjectsBatchesResponse200BatchesItemStatus string
+
 const (
-	ListProjectsBatchesResponse200BatchesItemStatusUploading ListProjectsBatchesResponse200BatchesItemStatus = "uploading"
+	ListProjectsBatchesResponse200BatchesItemStatusUploading  ListProjectsBatchesResponse200BatchesItemStatus = "uploading"
 	ListProjectsBatchesResponse200BatchesItemStatusProcessing ListProjectsBatchesResponse200BatchesItemStatus = "processing"
-	ListProjectsBatchesResponse200BatchesItemStatusMerging ListProjectsBatchesResponse200BatchesItemStatus = "merging"
-	ListProjectsBatchesResponse200BatchesItemStatusComplete ListProjectsBatchesResponse200BatchesItemStatus = "complete"
-	ListProjectsBatchesResponse200BatchesItemStatusPartial ListProjectsBatchesResponse200BatchesItemStatus = "partial"
-	ListProjectsBatchesResponse200BatchesItemStatusFailed ListProjectsBatchesResponse200BatchesItemStatus = "failed"
+	ListProjectsBatchesResponse200BatchesItemStatusMerging    ListProjectsBatchesResponse200BatchesItemStatus = "merging"
+	ListProjectsBatchesResponse200BatchesItemStatusComplete   ListProjectsBatchesResponse200BatchesItemStatus = "complete"
+	ListProjectsBatchesResponse200BatchesItemStatusPartial    ListProjectsBatchesResponse200BatchesItemStatus = "partial"
+	ListProjectsBatchesResponse200BatchesItemStatusFailed     ListProjectsBatchesResponse200BatchesItemStatus = "failed"
 )
 
 type ListProjectsTableTemplatesResponse200TemplatesItem struct {
-	Category string `json:"category"`
-	ColumnsJson []ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItem `json:"columns_json"`
-	CreatedAt int64 `json:"created_at"`
-	CreatorDisplayName *string `json:"creator_display_name"`
-	CreatorUserId *string `json:"creator_user_id"`
-	Description *string `json:"description"`
-	Id string `json:"id"`
-	InsertMode ListProjectsTableTemplatesResponse200TemplatesItemInsertMode `json:"insert_mode"`
-	Instruction *string `json:"instruction"`
-	MergeColumnsJson []string `json:"merge_columns_json"`
-	Name string `json:"name"`
-	Strictness ListProjectsTableTemplatesResponse200TemplatesItemStrictness `json:"strictness"`
-	UpdatedAt int64 `json:"updated_at"`
-	UsageCount int64 `json:"usage_count"`
+	Category           string                                                              `json:"category"`
+	ColumnsJson        []ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItem `json:"columns_json"`
+	CreatedAt          int64                                                               `json:"created_at"`
+	CreatorDisplayName *string                                                             `json:"creator_display_name"`
+	CreatorUserId      *string                                                             `json:"creator_user_id"`
+	Description        *string                                                             `json:"description"`
+	Id                 string                                                              `json:"id"`
+	InsertMode         ListProjectsTableTemplatesResponse200TemplatesItemInsertMode        `json:"insert_mode"`
+	Instruction        *string                                                             `json:"instruction"`
+	MergeColumnsJson   []string                                                            `json:"merge_columns_json"`
+	Name               string                                                              `json:"name"`
+	Strictness         ListProjectsTableTemplatesResponse200TemplatesItemStrictness        `json:"strictness"`
+	UpdatedAt          int64                                                               `json:"updated_at"`
+	UsageCount         int64                                                               `json:"usage_count"`
 }
 
 func (s ListProjectsTableTemplatesResponse200TemplatesItem) MarshalJSON() ([]byte, error) {
@@ -3274,103 +3395,110 @@ func (s ListProjectsTableTemplatesResponse200TemplatesItem) MarshalJSON() ([]byt
 }
 
 type ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItem struct {
-	CurrencyCode *string `json:"currency_code,omitempty"`
-	Default json.RawMessage `json:"default,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	Id string `json:"id"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Options []string `json:"options,omitempty"`
-	Required bool `json:"required"`
-	Searchable *bool `json:"searchable,omitempty"`
-	Type ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType `json:"type"`
+	CurrencyCode *string                                                               `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                                       `json:"default,omitempty"`
+	Description  Nullable[string]                                                      `json:"description,omitzero"`
+	Id           string                                                                `json:"id"`
+	Instruction  Nullable[string]                                                      `json:"instruction,omitzero"`
+	Name         string                                                                `json:"name"`
+	Options      []string                                                              `json:"options,omitempty"`
+	Required     bool                                                                  `json:"required"`
+	Searchable   *bool                                                                 `json:"searchable,omitempty"`
+	Type         ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType `json:"type"`
 }
 
 type ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType string
+
 const (
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeArray ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "array"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeBoolean ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "boolean"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeCurrency ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "currency"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeDate ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "date"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeEmail ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "email"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeEnum ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "enum"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeArray       ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "array"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeBoolean     ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "boolean"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeCurrency    ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "currency"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeDate        ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "date"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeEmail       ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "email"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeEnum        ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "enum"
 	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeMultiSelect ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "multi_select"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeNumber ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "number"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeString ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "string"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeText ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "text"
-	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeUrl ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "url"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeNumber      ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "number"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeString      ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "string"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeText        ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "text"
+	ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeUrl         ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "url"
 )
 
 type ListProjectsTableTemplatesResponse200TemplatesItemInsertMode string
+
 const (
-	ListProjectsTableTemplatesResponse200TemplatesItemInsertModeAppend ListProjectsTableTemplatesResponse200TemplatesItemInsertMode = "append"
-	ListProjectsTableTemplatesResponse200TemplatesItemInsertModeDedup ListProjectsTableTemplatesResponse200TemplatesItemInsertMode = "dedup"
-	ListProjectsTableTemplatesResponse200TemplatesItemInsertModeMerge ListProjectsTableTemplatesResponse200TemplatesItemInsertMode = "merge"
+	ListProjectsTableTemplatesResponse200TemplatesItemInsertModeAppend  ListProjectsTableTemplatesResponse200TemplatesItemInsertMode = "append"
+	ListProjectsTableTemplatesResponse200TemplatesItemInsertModeDedup   ListProjectsTableTemplatesResponse200TemplatesItemInsertMode = "dedup"
+	ListProjectsTableTemplatesResponse200TemplatesItemInsertModeMerge   ListProjectsTableTemplatesResponse200TemplatesItemInsertMode = "merge"
 	ListProjectsTableTemplatesResponse200TemplatesItemInsertModeReplace ListProjectsTableTemplatesResponse200TemplatesItemInsertMode = "replace"
 )
 
 type ListProjectsTableTemplatesResponse200TemplatesItemStrictness string
+
 const (
-	ListProjectsTableTemplatesResponse200TemplatesItemStrictnessStrict ListProjectsTableTemplatesResponse200TemplatesItemStrictness = "strict"
+	ListProjectsTableTemplatesResponse200TemplatesItemStrictnessStrict   ListProjectsTableTemplatesResponse200TemplatesItemStrictness = "strict"
 	ListProjectsTableTemplatesResponse200TemplatesItemStrictnessBalanced ListProjectsTableTemplatesResponse200TemplatesItemStrictness = "balanced"
 	ListProjectsTableTemplatesResponse200TemplatesItemStrictnessFlexible ListProjectsTableTemplatesResponse200TemplatesItemStrictness = "flexible"
 )
 
 type ListProjectsTablesExportResponse402ErrorKey string
+
 const (
 	ListProjectsTablesExportResponse402ErrorKeyApiRequestLimitExceeded ListProjectsTablesExportResponse402ErrorKey = "api_request_limit_exceeded"
-	ListProjectsTablesExportResponse402ErrorKeyExportLimitExceeded ListProjectsTablesExportResponse402ErrorKey = "export_limit_exceeded"
-	ListProjectsTablesExportResponse402ErrorKeyFeatureNotAvailable ListProjectsTablesExportResponse402ErrorKey = "feature_not_available"
+	ListProjectsTablesExportResponse402ErrorKeyExportLimitExceeded     ListProjectsTablesExportResponse402ErrorKey = "export_limit_exceeded"
+	ListProjectsTablesExportResponse402ErrorKeyFeatureNotAvailable     ListProjectsTablesExportResponse402ErrorKey = "feature_not_available"
 )
 
 type ListProjectsTablesExportResponse402FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type ListProjectsTablesExportResponse402Status int
+
 const (
 	ListProjectsTablesExportResponse402Status402 ListProjectsTablesExportResponse402Status = 402
 )
 
 type ListProjectsTablesExportResponse500ErrorKey string
+
 const (
-	ListProjectsTablesExportResponse500ErrorKeyCaptchaUnavailable ListProjectsTablesExportResponse500ErrorKey = "captcha_unavailable"
-	ListProjectsTablesExportResponse500ErrorKeyExportFailed ListProjectsTablesExportResponse500ErrorKey = "export_failed"
+	ListProjectsTablesExportResponse500ErrorKeyCaptchaUnavailable  ListProjectsTablesExportResponse500ErrorKey = "captcha_unavailable"
+	ListProjectsTablesExportResponse500ErrorKeyExportFailed        ListProjectsTablesExportResponse500ErrorKey = "export_failed"
 	ListProjectsTablesExportResponse500ErrorKeyInternalServerError ListProjectsTablesExportResponse500ErrorKey = "internal_server_error"
 )
 
 type ListProjectsTablesExportResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type ListProjectsTablesExportResponse500Status int
+
 const (
 	ListProjectsTablesExportResponse500Status500 ListProjectsTablesExportResponse500Status = 500
 )
 
 type ListProjectsTablesResponse200TablesItem struct {
-	ColumnsJson []ListProjectsTablesResponse200TablesItemColumnsJsonItem `json:"columns_json"`
-	CreatedAt int64 `json:"created_at"`
-	DataVersion int64 `json:"data_version"`
-	DefaultSort *string `json:"default_sort"`
-	DeletedAt *int64 `json:"deleted_at"`
-	FtsVersion int64 `json:"fts_version"`
-	Id string `json:"id"`
-	InsertMode ListProjectsTablesResponse200TablesItemInsertMode `json:"insert_mode"`
-	Instruction *string `json:"instruction"`
-	LastUsedAt *int64 `json:"last_used_at"`
-	MergeColumnsJson []string `json:"merge_columns_json"`
-	Name string `json:"name"`
-	ProjectId string `json:"project_id"`
-	RowCount int64 `json:"row_count"`
-	Slug string `json:"slug"`
-	Strictness ListProjectsTablesResponse200TablesItemStrictness `json:"strictness"`
-	UpdatedAt int64 `json:"updated_at"`
-	UsageCount int64 `json:"usage_count"`
+	ColumnsJson      []ListProjectsTablesResponse200TablesItemColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                                    `json:"created_at"`
+	DataVersion      int64                                                    `json:"data_version"`
+	DefaultSort      *string                                                  `json:"default_sort"`
+	DeletedAt        *int64                                                   `json:"deleted_at"`
+	FtsVersion       int64                                                    `json:"fts_version"`
+	Id               string                                                   `json:"id"`
+	InsertMode       ListProjectsTablesResponse200TablesItemInsertMode        `json:"insert_mode"`
+	Instruction      *string                                                  `json:"instruction"`
+	LastUsedAt       *int64                                                   `json:"last_used_at"`
+	MergeColumnsJson []string                                                 `json:"merge_columns_json"`
+	Name             string                                                   `json:"name"`
+	ProjectId        string                                                   `json:"project_id"`
+	RowCount         int64                                                    `json:"row_count"`
+	Slug             string                                                   `json:"slug"`
+	Strictness       ListProjectsTablesResponse200TablesItemStrictness        `json:"strictness"`
+	UpdatedAt        int64                                                    `json:"updated_at"`
+	UsageCount       int64                                                    `json:"usage_count"`
 }
 
 func (s ListProjectsTablesResponse200TablesItem) MarshalJSON() ([]byte, error) {
@@ -3386,305 +3514,332 @@ func (s ListProjectsTablesResponse200TablesItem) MarshalJSON() ([]byte, error) {
 }
 
 type ListProjectsTablesResponse200TablesItemColumnsJsonItem struct {
-	CurrencyCode *string `json:"currency_code,omitempty"`
-	Default json.RawMessage `json:"default,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	Id string `json:"id"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Options []string `json:"options,omitempty"`
-	Required bool `json:"required"`
-	Searchable *bool `json:"searchable,omitempty"`
-	Type ListProjectsTablesResponse200TablesItemColumnsJsonItemType `json:"type"`
+	CurrencyCode *string                                                    `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                            `json:"default,omitempty"`
+	Description  Nullable[string]                                           `json:"description,omitzero"`
+	Id           string                                                     `json:"id"`
+	Instruction  Nullable[string]                                           `json:"instruction,omitzero"`
+	Name         string                                                     `json:"name"`
+	Options      []string                                                   `json:"options,omitempty"`
+	Required     bool                                                       `json:"required"`
+	Searchable   *bool                                                      `json:"searchable,omitempty"`
+	Type         ListProjectsTablesResponse200TablesItemColumnsJsonItemType `json:"type"`
 }
 
 type ListProjectsTablesResponse200TablesItemColumnsJsonItemType string
+
 const (
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeArray ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "array"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeBoolean ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "boolean"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeCurrency ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "currency"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeDate ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "date"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeEmail ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "email"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeEnum ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "enum"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeArray       ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "array"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeBoolean     ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "boolean"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeCurrency    ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "currency"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeDate        ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "date"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeEmail       ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "email"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeEnum        ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "enum"
 	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeMultiSelect ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "multi_select"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeNumber ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "number"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeString ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "string"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeText ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "text"
-	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeUrl ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "url"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeNumber      ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "number"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeString      ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "string"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeText        ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "text"
+	ListProjectsTablesResponse200TablesItemColumnsJsonItemTypeUrl         ListProjectsTablesResponse200TablesItemColumnsJsonItemType = "url"
 )
 
 type ListProjectsTablesResponse200TablesItemInsertMode string
+
 const (
-	ListProjectsTablesResponse200TablesItemInsertModeAppend ListProjectsTablesResponse200TablesItemInsertMode = "append"
-	ListProjectsTablesResponse200TablesItemInsertModeDedup ListProjectsTablesResponse200TablesItemInsertMode = "dedup"
-	ListProjectsTablesResponse200TablesItemInsertModeMerge ListProjectsTablesResponse200TablesItemInsertMode = "merge"
+	ListProjectsTablesResponse200TablesItemInsertModeAppend  ListProjectsTablesResponse200TablesItemInsertMode = "append"
+	ListProjectsTablesResponse200TablesItemInsertModeDedup   ListProjectsTablesResponse200TablesItemInsertMode = "dedup"
+	ListProjectsTablesResponse200TablesItemInsertModeMerge   ListProjectsTablesResponse200TablesItemInsertMode = "merge"
 	ListProjectsTablesResponse200TablesItemInsertModeReplace ListProjectsTablesResponse200TablesItemInsertMode = "replace"
 )
 
 type ListProjectsTablesResponse200TablesItemStrictness string
+
 const (
-	ListProjectsTablesResponse200TablesItemStrictnessStrict ListProjectsTablesResponse200TablesItemStrictness = "strict"
+	ListProjectsTablesResponse200TablesItemStrictnessStrict   ListProjectsTablesResponse200TablesItemStrictness = "strict"
 	ListProjectsTablesResponse200TablesItemStrictnessBalanced ListProjectsTablesResponse200TablesItemStrictness = "balanced"
 	ListProjectsTablesResponse200TablesItemStrictnessFlexible ListProjectsTablesResponse200TablesItemStrictness = "flexible"
 )
 
 type ListProjectsTablesRowsResponse400ErrorKey string
+
 const (
-	ListProjectsTablesRowsResponse400ErrorKeyCaptchaFailed ListProjectsTablesRowsResponse400ErrorKey = "captcha_failed"
-	ListProjectsTablesRowsResponse400ErrorKeyCaptchaRequired ListProjectsTablesRowsResponse400ErrorKey = "captcha_required"
+	ListProjectsTablesRowsResponse400ErrorKeyCaptchaFailed      ListProjectsTablesRowsResponse400ErrorKey = "captcha_failed"
+	ListProjectsTablesRowsResponse400ErrorKeyCaptchaRequired    ListProjectsTablesRowsResponse400ErrorKey = "captcha_required"
 	ListProjectsTablesRowsResponse400ErrorKeyInvalidAggregation ListProjectsTablesRowsResponse400ErrorKey = "invalid_aggregation"
-	ListProjectsTablesRowsResponse400ErrorKeyInvalidFilter ListProjectsTablesRowsResponse400ErrorKey = "invalid_filter"
-	ListProjectsTablesRowsResponse400ErrorKeyInvalidInput ListProjectsTablesRowsResponse400ErrorKey = "invalid_input"
+	ListProjectsTablesRowsResponse400ErrorKeyInvalidFilter      ListProjectsTablesRowsResponse400ErrorKey = "invalid_filter"
+	ListProjectsTablesRowsResponse400ErrorKeyInvalidInput       ListProjectsTablesRowsResponse400ErrorKey = "invalid_input"
 )
 
 type ListProjectsTablesRowsResponse400FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type ListProjectsTablesRowsResponse400Status int
+
 const (
 	ListProjectsTablesRowsResponse400Status400 ListProjectsTablesRowsResponse400Status = 400
 )
 
 type ListProjectsTablesRowsSourceResponse404ErrorKey string
+
 const (
-	ListProjectsTablesRowsSourceResponse404ErrorKeyNotFound ListProjectsTablesRowsSourceResponse404ErrorKey = "not_found"
-	ListProjectsTablesRowsSourceResponse404ErrorKeyRowNotFound ListProjectsTablesRowsSourceResponse404ErrorKey = "row_not_found"
+	ListProjectsTablesRowsSourceResponse404ErrorKeyNotFound          ListProjectsTablesRowsSourceResponse404ErrorKey = "not_found"
+	ListProjectsTablesRowsSourceResponse404ErrorKeyRowNotFound       ListProjectsTablesRowsSourceResponse404ErrorKey = "row_not_found"
 	ListProjectsTablesRowsSourceResponse404ErrorKeyRowSourceNotFound ListProjectsTablesRowsSourceResponse404ErrorKey = "row_source_not_found"
-	ListProjectsTablesRowsSourceResponse404ErrorKeyTableNotFound ListProjectsTablesRowsSourceResponse404ErrorKey = "table_not_found"
+	ListProjectsTablesRowsSourceResponse404ErrorKeyTableNotFound     ListProjectsTablesRowsSourceResponse404ErrorKey = "table_not_found"
 )
 
 type ListProjectsTablesRowsSourceResponse404FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type ListProjectsTablesRowsSourceResponse404Status int
+
 const (
 	ListProjectsTablesRowsSourceResponse404Status404 ListProjectsTablesRowsSourceResponse404Status = 404
 )
 
 type ReplaceProjectsTablesColumnResponse400ErrorKey string
+
 const (
-	ReplaceProjectsTablesColumnResponse400ErrorKeyCaptchaFailed ReplaceProjectsTablesColumnResponse400ErrorKey = "captcha_failed"
-	ReplaceProjectsTablesColumnResponse400ErrorKeyCaptchaRequired ReplaceProjectsTablesColumnResponse400ErrorKey = "captcha_required"
+	ReplaceProjectsTablesColumnResponse400ErrorKeyCaptchaFailed         ReplaceProjectsTablesColumnResponse400ErrorKey = "captcha_failed"
+	ReplaceProjectsTablesColumnResponse400ErrorKeyCaptchaRequired       ReplaceProjectsTablesColumnResponse400ErrorKey = "captcha_required"
 	ReplaceProjectsTablesColumnResponse400ErrorKeyColumnReorderMismatch ReplaceProjectsTablesColumnResponse400ErrorKey = "column_reorder_mismatch"
-	ReplaceProjectsTablesColumnResponse400ErrorKeyInvalidInput ReplaceProjectsTablesColumnResponse400ErrorKey = "invalid_input"
+	ReplaceProjectsTablesColumnResponse400ErrorKeyInvalidInput          ReplaceProjectsTablesColumnResponse400ErrorKey = "invalid_input"
 )
 
 type ReplaceProjectsTablesColumnResponse400FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type ReplaceProjectsTablesColumnResponse400Status int
+
 const (
 	ReplaceProjectsTablesColumnResponse400Status400 ReplaceProjectsTablesColumnResponse400Status = 400
 )
 
 type ReplaceProjectsTablesColumnResponse409ErrorKey string
+
 const (
 	ReplaceProjectsTablesColumnResponse409ErrorKeyOptimisticLockConflict ReplaceProjectsTablesColumnResponse409ErrorKey = "optimistic_lock_conflict"
 )
 
 type ReplaceProjectsTablesColumnResponse409FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type ReplaceProjectsTablesColumnResponse409Status int
+
 const (
 	ReplaceProjectsTablesColumnResponse409Status409 ReplaceProjectsTablesColumnResponse409Status = 409
 )
 
 type RowSourceOptsDisposition string
+
 const (
 	RowSourceOptsDispositionAttachment RowSourceOptsDisposition = "attachment"
-	RowSourceOptsDispositionInline RowSourceOptsDisposition = "inline"
+	RowSourceOptsDispositionInline     RowSourceOptsDisposition = "inline"
 )
 
+// SuggestSchemaBody is the multipart/form-data body of suggest.schema: a nil text part or a file part without Data is not sent.
+type SuggestSchemaBody struct {
+	File FilePart
+	Text *string
+}
+
 type TableExportOptsFormat string
+
 const (
-	TableExportOptsFormatCsv TableExportOptsFormat = "csv"
+	TableExportOptsFormatCsv  TableExportOptsFormat = "csv"
 	TableExportOptsFormatJson TableExportOptsFormat = "json"
 	TableExportOptsFormatXlsx TableExportOptsFormat = "xlsx"
 )
 
 type TableExportOptsSchema string
+
 const (
-	TableExportOptsSchemaTrue TableExportOptsSchema = "true"
+	TableExportOptsSchemaTrue  TableExportOptsSchema = "true"
 	TableExportOptsSchemaFalse TableExportOptsSchema = "false"
 )
 
 type UpdateOrganizationsWebhookRequestEventsItem string
+
 const (
 	UpdateOrganizationsWebhookRequestEventsItemBatchComplete UpdateOrganizationsWebhookRequestEventsItem = "batch.complete"
-	UpdateOrganizationsWebhookRequestEventsItemBatchFailed UpdateOrganizationsWebhookRequestEventsItem = "batch.failed"
-	UpdateOrganizationsWebhookRequestEventsItemBatchPartial UpdateOrganizationsWebhookRequestEventsItem = "batch.partial"
-	UpdateOrganizationsWebhookRequestEventsItemPing UpdateOrganizationsWebhookRequestEventsItem = "ping"
+	UpdateOrganizationsWebhookRequestEventsItemBatchFailed   UpdateOrganizationsWebhookRequestEventsItem = "batch.failed"
+	UpdateOrganizationsWebhookRequestEventsItemBatchPartial  UpdateOrganizationsWebhookRequestEventsItem = "batch.partial"
+	UpdateOrganizationsWebhookRequestEventsItemPing          UpdateOrganizationsWebhookRequestEventsItem = "ping"
 )
 
 type UpdateProjectsTableRequestInsertMode string
+
 const (
-	UpdateProjectsTableRequestInsertModeAppend UpdateProjectsTableRequestInsertMode = "append"
-	UpdateProjectsTableRequestInsertModeDedup UpdateProjectsTableRequestInsertMode = "dedup"
-	UpdateProjectsTableRequestInsertModeMerge UpdateProjectsTableRequestInsertMode = "merge"
+	UpdateProjectsTableRequestInsertModeAppend  UpdateProjectsTableRequestInsertMode = "append"
+	UpdateProjectsTableRequestInsertModeDedup   UpdateProjectsTableRequestInsertMode = "dedup"
+	UpdateProjectsTableRequestInsertModeMerge   UpdateProjectsTableRequestInsertMode = "merge"
 	UpdateProjectsTableRequestInsertModeReplace UpdateProjectsTableRequestInsertMode = "replace"
 )
 
 type UpdateProjectsTableRequestStrictness string
+
 const (
-	UpdateProjectsTableRequestStrictnessStrict UpdateProjectsTableRequestStrictness = "strict"
+	UpdateProjectsTableRequestStrictnessStrict   UpdateProjectsTableRequestStrictness = "strict"
 	UpdateProjectsTableRequestStrictnessBalanced UpdateProjectsTableRequestStrictness = "balanced"
 	UpdateProjectsTableRequestStrictnessFlexible UpdateProjectsTableRequestStrictness = "flexible"
 )
 
 type UpdateProjectsTableResponse500ErrorKey string
+
 const (
-	UpdateProjectsTableResponse500ErrorKeyCaptchaUnavailable UpdateProjectsTableResponse500ErrorKey = "captcha_unavailable"
+	UpdateProjectsTableResponse500ErrorKeyCaptchaUnavailable  UpdateProjectsTableResponse500ErrorKey = "captcha_unavailable"
 	UpdateProjectsTableResponse500ErrorKeyInternalServerError UpdateProjectsTableResponse500ErrorKey = "internal_server_error"
-	UpdateProjectsTableResponse500ErrorKeyTableUpdateFailed UpdateProjectsTableResponse500ErrorKey = "table_update_failed"
+	UpdateProjectsTableResponse500ErrorKeyTableUpdateFailed   UpdateProjectsTableResponse500ErrorKey = "table_update_failed"
 )
 
 type UpdateProjectsTableResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type UpdateProjectsTableResponse500Status int
+
 const (
 	UpdateProjectsTableResponse500Status500 UpdateProjectsTableResponse500Status = 500
 )
 
 type UpdateProjectsTablesColumnRequestType string
+
 const (
-	UpdateProjectsTablesColumnRequestTypeArray UpdateProjectsTablesColumnRequestType = "array"
-	UpdateProjectsTablesColumnRequestTypeBoolean UpdateProjectsTablesColumnRequestType = "boolean"
-	UpdateProjectsTablesColumnRequestTypeCurrency UpdateProjectsTablesColumnRequestType = "currency"
-	UpdateProjectsTablesColumnRequestTypeDate UpdateProjectsTablesColumnRequestType = "date"
-	UpdateProjectsTablesColumnRequestTypeEmail UpdateProjectsTablesColumnRequestType = "email"
-	UpdateProjectsTablesColumnRequestTypeEnum UpdateProjectsTablesColumnRequestType = "enum"
+	UpdateProjectsTablesColumnRequestTypeArray       UpdateProjectsTablesColumnRequestType = "array"
+	UpdateProjectsTablesColumnRequestTypeBoolean     UpdateProjectsTablesColumnRequestType = "boolean"
+	UpdateProjectsTablesColumnRequestTypeCurrency    UpdateProjectsTablesColumnRequestType = "currency"
+	UpdateProjectsTablesColumnRequestTypeDate        UpdateProjectsTablesColumnRequestType = "date"
+	UpdateProjectsTablesColumnRequestTypeEmail       UpdateProjectsTablesColumnRequestType = "email"
+	UpdateProjectsTablesColumnRequestTypeEnum        UpdateProjectsTablesColumnRequestType = "enum"
 	UpdateProjectsTablesColumnRequestTypeMultiSelect UpdateProjectsTablesColumnRequestType = "multi_select"
-	UpdateProjectsTablesColumnRequestTypeNumber UpdateProjectsTablesColumnRequestType = "number"
-	UpdateProjectsTablesColumnRequestTypeString UpdateProjectsTablesColumnRequestType = "string"
-	UpdateProjectsTablesColumnRequestTypeText UpdateProjectsTablesColumnRequestType = "text"
-	UpdateProjectsTablesColumnRequestTypeUrl UpdateProjectsTablesColumnRequestType = "url"
+	UpdateProjectsTablesColumnRequestTypeNumber      UpdateProjectsTablesColumnRequestType = "number"
+	UpdateProjectsTablesColumnRequestTypeString      UpdateProjectsTablesColumnRequestType = "string"
+	UpdateProjectsTablesColumnRequestTypeText        UpdateProjectsTablesColumnRequestType = "text"
+	UpdateProjectsTablesColumnRequestTypeUrl         UpdateProjectsTablesColumnRequestType = "url"
+)
+
+type UpdateProjectsTablesColumnResponse422ErrorKey string
+
+const (
+	UpdateProjectsTablesColumnResponse422ErrorKeyColumnRetypeTooLarge UpdateProjectsTablesColumnResponse422ErrorKey = "column_retype_too_large"
+	UpdateProjectsTablesColumnResponse422ErrorKeyUnprocessableEntity  UpdateProjectsTablesColumnResponse422ErrorKey = "unprocessable_entity"
+)
+
+type UpdateProjectsTablesColumnResponse422FieldsItem struct {
+	ErrorKey string `json:"error_key"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
+}
+
+type UpdateProjectsTablesColumnResponse422Status int
+
+const (
+	UpdateProjectsTablesColumnResponse422Status422 UpdateProjectsTablesColumnResponse422Status = 422
 )
 
 type UpdateProjectsTablesColumnResponse500ErrorKey string
+
 const (
-	UpdateProjectsTablesColumnResponse500ErrorKeyCaptchaUnavailable UpdateProjectsTablesColumnResponse500ErrorKey = "captcha_unavailable"
-	UpdateProjectsTablesColumnResponse500ErrorKeyColumnRenameFailed UpdateProjectsTablesColumnResponse500ErrorKey = "column_rename_failed"
+	UpdateProjectsTablesColumnResponse500ErrorKeyCaptchaUnavailable  UpdateProjectsTablesColumnResponse500ErrorKey = "captcha_unavailable"
+	UpdateProjectsTablesColumnResponse500ErrorKeyColumnRenameFailed  UpdateProjectsTablesColumnResponse500ErrorKey = "column_rename_failed"
 	UpdateProjectsTablesColumnResponse500ErrorKeyInternalServerError UpdateProjectsTablesColumnResponse500ErrorKey = "internal_server_error"
 )
 
 type UpdateProjectsTablesColumnResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type UpdateProjectsTablesColumnResponse500Status int
+
 const (
 	UpdateProjectsTablesColumnResponse500Status500 UpdateProjectsTablesColumnResponse500Status = 500
 )
 
 type UpdateProjectsTablesRowResponse500ErrorKey string
+
 const (
-	UpdateProjectsTablesRowResponse500ErrorKeyCaptchaUnavailable UpdateProjectsTablesRowResponse500ErrorKey = "captcha_unavailable"
+	UpdateProjectsTablesRowResponse500ErrorKeyCaptchaUnavailable  UpdateProjectsTablesRowResponse500ErrorKey = "captcha_unavailable"
 	UpdateProjectsTablesRowResponse500ErrorKeyInternalServerError UpdateProjectsTablesRowResponse500ErrorKey = "internal_server_error"
-	UpdateProjectsTablesRowResponse500ErrorKeyRowUpdateFailed UpdateProjectsTablesRowResponse500ErrorKey = "row_update_failed"
+	UpdateProjectsTablesRowResponse500ErrorKeyRowUpdateFailed     UpdateProjectsTablesRowResponse500ErrorKey = "row_update_failed"
 )
 
 type UpdateProjectsTablesRowResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type UpdateProjectsTablesRowResponse500Status int
+
 const (
 	UpdateProjectsTablesRowResponse500Status500 UpdateProjectsTablesRowResponse500Status = 500
 )
 
-type UpdateTableTemplateRequestColumnsJsonItem struct {
-	CurrencyCode *string `json:"currency_code,omitempty"`
-	Default json.RawMessage `json:"default,omitempty"`
-	Description Nullable[string] `json:"description,omitzero"`
-	Id string `json:"id"`
-	Instruction Nullable[string] `json:"instruction,omitzero"`
-	Name string `json:"name"`
-	Options []string `json:"options,omitempty"`
-	Required *bool `json:"required,omitempty"`
-	Searchable *bool `json:"searchable,omitempty"`
-	Type *UpdateTableTemplateRequestColumnsJsonItemType `json:"type,omitempty"`
-}
-
-type UpdateTableTemplateRequestColumnsJsonItemType string
-const (
-	UpdateTableTemplateRequestColumnsJsonItemTypeArray UpdateTableTemplateRequestColumnsJsonItemType = "array"
-	UpdateTableTemplateRequestColumnsJsonItemTypeBoolean UpdateTableTemplateRequestColumnsJsonItemType = "boolean"
-	UpdateTableTemplateRequestColumnsJsonItemTypeCurrency UpdateTableTemplateRequestColumnsJsonItemType = "currency"
-	UpdateTableTemplateRequestColumnsJsonItemTypeDate UpdateTableTemplateRequestColumnsJsonItemType = "date"
-	UpdateTableTemplateRequestColumnsJsonItemTypeEmail UpdateTableTemplateRequestColumnsJsonItemType = "email"
-	UpdateTableTemplateRequestColumnsJsonItemTypeEnum UpdateTableTemplateRequestColumnsJsonItemType = "enum"
-	UpdateTableTemplateRequestColumnsJsonItemTypeMultiSelect UpdateTableTemplateRequestColumnsJsonItemType = "multi_select"
-	UpdateTableTemplateRequestColumnsJsonItemTypeNumber UpdateTableTemplateRequestColumnsJsonItemType = "number"
-	UpdateTableTemplateRequestColumnsJsonItemTypeString UpdateTableTemplateRequestColumnsJsonItemType = "string"
-	UpdateTableTemplateRequestColumnsJsonItemTypeText UpdateTableTemplateRequestColumnsJsonItemType = "text"
-	UpdateTableTemplateRequestColumnsJsonItemTypeUrl UpdateTableTemplateRequestColumnsJsonItemType = "url"
-)
-
 type UpdateTableTemplateRequestInsertMode string
+
 const (
-	UpdateTableTemplateRequestInsertModeAppend UpdateTableTemplateRequestInsertMode = "append"
-	UpdateTableTemplateRequestInsertModeDedup UpdateTableTemplateRequestInsertMode = "dedup"
-	UpdateTableTemplateRequestInsertModeMerge UpdateTableTemplateRequestInsertMode = "merge"
+	UpdateTableTemplateRequestInsertModeAppend  UpdateTableTemplateRequestInsertMode = "append"
+	UpdateTableTemplateRequestInsertModeDedup   UpdateTableTemplateRequestInsertMode = "dedup"
+	UpdateTableTemplateRequestInsertModeMerge   UpdateTableTemplateRequestInsertMode = "merge"
 	UpdateTableTemplateRequestInsertModeReplace UpdateTableTemplateRequestInsertMode = "replace"
 )
 
 type UpdateTableTemplateRequestStrictness string
+
 const (
-	UpdateTableTemplateRequestStrictnessStrict UpdateTableTemplateRequestStrictness = "strict"
+	UpdateTableTemplateRequestStrictnessStrict   UpdateTableTemplateRequestStrictness = "strict"
 	UpdateTableTemplateRequestStrictnessBalanced UpdateTableTemplateRequestStrictness = "balanced"
 	UpdateTableTemplateRequestStrictnessFlexible UpdateTableTemplateRequestStrictness = "flexible"
 )
 
 type UpdateTableTemplateResponse500ErrorKey string
+
 const (
-	UpdateTableTemplateResponse500ErrorKeyCaptchaUnavailable UpdateTableTemplateResponse500ErrorKey = "captcha_unavailable"
-	UpdateTableTemplateResponse500ErrorKeyInternalServerError UpdateTableTemplateResponse500ErrorKey = "internal_server_error"
+	UpdateTableTemplateResponse500ErrorKeyCaptchaUnavailable        UpdateTableTemplateResponse500ErrorKey = "captcha_unavailable"
+	UpdateTableTemplateResponse500ErrorKeyInternalServerError       UpdateTableTemplateResponse500ErrorKey = "internal_server_error"
 	UpdateTableTemplateResponse500ErrorKeyTableTemplateUpdateFailed UpdateTableTemplateResponse500ErrorKey = "table_template_update_failed"
 )
 
 type UpdateTableTemplateResponse500FieldsItem struct {
 	ErrorKey string `json:"error_key"`
-	Message string `json:"message"`
-	Path string `json:"path"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
 type UpdateTableTemplateResponse500Status int
+
 const (
 	UpdateTableTemplateResponse500Status500 UpdateTableTemplateResponse500Status = 500
 )
 
 type WebhookDeliveriesOptsEvent string
+
 const (
 	WebhookDeliveriesOptsEventBatchComplete WebhookDeliveriesOptsEvent = "batch.complete"
-	WebhookDeliveriesOptsEventBatchFailed WebhookDeliveriesOptsEvent = "batch.failed"
-	WebhookDeliveriesOptsEventBatchPartial WebhookDeliveriesOptsEvent = "batch.partial"
-	WebhookDeliveriesOptsEventPing WebhookDeliveriesOptsEvent = "ping"
+	WebhookDeliveriesOptsEventBatchFailed   WebhookDeliveriesOptsEvent = "batch.failed"
+	WebhookDeliveriesOptsEventBatchPartial  WebhookDeliveriesOptsEvent = "batch.partial"
+	WebhookDeliveriesOptsEventPing          WebhookDeliveriesOptsEvent = "ping"
 )
 
 type WebhookDeliveriesOptsStatus string
+
 const (
 	WebhookDeliveriesOptsStatusPending WebhookDeliveriesOptsStatus = "pending"
 	WebhookDeliveriesOptsStatusSuccess WebhookDeliveriesOptsStatus = "success"
-	WebhookDeliveriesOptsStatusFailed WebhookDeliveriesOptsStatus = "failed"
+	WebhookDeliveriesOptsStatusFailed  WebhookDeliveriesOptsStatus = "failed"
 )

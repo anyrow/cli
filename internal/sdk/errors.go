@@ -4,221 +4,170 @@ package sdk
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 )
 
-// APIError is the interface implemented by all SDK error types.
-// Use errors.As(err, &NotFoundError{}) to discriminate by status code.
+// APIError is implemented by every error for a non-2xx answer: *ClientError and the per-status
+// types that embed it.
 type APIError interface {
 	error
 	Status() int
 }
 
-type BadRequestError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
+// ErrorKey is a honey error key. A declared key is a constant that is itself an error, so
+// errors.Is(err, ErrItemNotFound) matches any *ClientError carrying that key.
+type ErrorKey string
+
+func (k ErrorKey) Error() string { return string(k) }
+
+// FieldError is one problem with one input field.
+type FieldError struct {
+	ErrorKey string `json:"error_key"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
 }
 
-func (e *BadRequestError) Error() string { return fmt.Sprintf("400 Bad Request: %s", e.Message) }
-func (e *BadRequestError) Status() int   { return 400 }
-
-type UnauthorizedError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
+// ErrorEnvelope is honey's error body. Members it does not name, or that have another type than
+// the envelope's, are kept raw in Extra.
+type ErrorEnvelope struct {
+	Status    int                        `json:"status,omitempty"`
+	ErrorKey  string                     `json:"error_key,omitempty"`
+	StatusKey string                     `json:"status_key,omitempty"`
+	Message   string                     `json:"message,omitempty"`
+	Fields    map[string][]FieldError    `json:"fields,omitempty"`
+	Extra     map[string]json.RawMessage `json:"-"`
 }
 
-func (e *UnauthorizedError) Error() string { return fmt.Sprintf("401 Unauthorized: %s", e.Message) }
-func (e *UnauthorizedError) Status() int   { return 401 }
-
-type ForbiddenError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *ForbiddenError) Error() string { return fmt.Sprintf("403 Forbidden: %s", e.Message) }
-func (e *ForbiddenError) Status() int   { return 403 }
-
-type NotFoundError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *NotFoundError) Error() string { return fmt.Sprintf("404 Not Found: %s", e.Message) }
-func (e *NotFoundError) Status() int   { return 404 }
-
-type ConflictError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *ConflictError) Error() string { return fmt.Sprintf("409 Conflict: %s", e.Message) }
-func (e *ConflictError) Status() int   { return 409 }
-
-type UnprocessableEntityError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *UnprocessableEntityError) Error() string {
-	return fmt.Sprintf("422 Unprocessable Entity: %s", e.Message)
-}
-func (e *UnprocessableEntityError) Status() int { return 422 }
-
-type RateLimitError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *RateLimitError) Error() string { return fmt.Sprintf("429 Too Many Requests: %s", e.Message) }
-func (e *RateLimitError) Status() int   { return 429 }
-
-type InternalServerError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *InternalServerError) Error() string {
-	return fmt.Sprintf("500 Internal Server Error: %s", e.Message)
-}
-func (e *InternalServerError) Status() int { return 500 }
-
-type BadGatewayError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *BadGatewayError) Error() string { return fmt.Sprintf("502 Bad Gateway: %s", e.Message) }
-func (e *BadGatewayError) Status() int   { return 502 }
-
-type ServiceUnavailableError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *ServiceUnavailableError) Error() string {
-	return fmt.Sprintf("503 Service Unavailable: %s", e.Message)
-}
-func (e *ServiceUnavailableError) Status() int { return 503 }
-
-type GatewayTimeoutError struct {
-	Message  string
-	Body     []byte
-	Data     any
-	Response *http.Response
-}
-
-func (e *GatewayTimeoutError) Error() string {
-	return fmt.Sprintf("504 Gateway Timeout: %s", e.Message)
-}
-func (e *GatewayTimeoutError) Status() int { return 504 }
-
-// StatusError is the fallback for any non-2xx status not covered by a concrete type.
-// Carries Status int field for runtime lookup.
-type StatusError struct {
-	Message    string
+// ClientError is a non-2xx answer: its status, honey error key, a sanitized message, the parsed
+// envelope, the raw body and the response (its Body re-readable). Reach it with errors.As:
+//
+//	var ce *ClientError
+//	if errors.As(err, &ce) { ... }
+//
+// The known statuses come as a per-status type embedding it (var nf *NotFoundError; errors.As(err, &nf)).
+type ClientError struct {
 	StatusCode int
+	Key        ErrorKey
+	Message    string
+	Envelope   ErrorEnvelope
 	Body       []byte
-	Data       any
 	Response   *http.Response
 }
 
-func (e *StatusError) Error() string { return fmt.Sprintf("%d: %s", e.StatusCode, e.Message) }
-func (e *StatusError) Status() int   { return e.StatusCode }
-
-// StatusErrorMeta is emitted solely so tests asserting `Status int` struct
-// field in errors.go pass (concrete errors use methods, not fields). Unused
-// at runtime.
-type StatusErrorMeta struct {
-	Status int
+func (e *ClientError) Error() string {
+	head := "HTTP " + strconv.Itoa(e.StatusCode)
+	if e.Message == "" {
+		return head
+	}
+	return head + ": " + e.Message
 }
 
-var statusErrorMap = map[int]func(status int, body []byte, data any, resp *http.Response) APIError{
-	400: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &BadRequestError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	401: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &UnauthorizedError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	403: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &ForbiddenError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	404: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &NotFoundError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	409: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &ConflictError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	422: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &UnprocessableEntityError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	429: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &RateLimitError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	500: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &InternalServerError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	502: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &BadGatewayError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	503: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &ServiceUnavailableError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
-	504: func(s int, b []byte, d any, r *http.Response) APIError {
-		return &GatewayTimeoutError{Body: b, Data: d, Response: r, Message: errorMessage(b, d)}
-	},
+// Status returns the HTTP status code.
+func (e *ClientError) Status() int { return e.StatusCode }
+
+// Is matches an ErrorKey equal to the error's key.
+func (e *ClientError) Is(target error) bool {
+	k, ok := target.(ErrorKey)
+	return ok && k != "" && k == e.Key
 }
 
-// raiseForStatus returns the appropriate typed error for non-2xx responses,
-// or nil when the status code is in the 2xx range. Eagerly parses JSON into Data;
-// parse failure leaves Data as nil with Body retaining the raw bytes.
+// DecodeBody decodes the raw error body into v, for a declared per-key schema.
+func (e *ClientError) DecodeBody(v any) error { return json.Unmarshal(e.Body, v) }
+
+// The per-status errors, one for each status the TypeScript SDK names. Each embeds *ClientError
+// and unwraps to it, so errors.As reaches either the status type or the base.
+type (
+	BadRequestError          struct{ *ClientError }
+	UnauthorizedError        struct{ *ClientError }
+	ForbiddenError           struct{ *ClientError }
+	NotFoundError            struct{ *ClientError }
+	ConflictError            struct{ *ClientError }
+	UnprocessableEntityError struct{ *ClientError }
+	RateLimitError           struct{ *ClientError }
+	InternalServerError      struct{ *ClientError }
+	BadGatewayError          struct{ *ClientError }
+	ServiceUnavailableError  struct{ *ClientError }
+	GatewayTimeoutError      struct{ *ClientError }
+)
+
+func (e *BadRequestError) Unwrap() error          { return e.ClientError }
+func (e *UnauthorizedError) Unwrap() error        { return e.ClientError }
+func (e *ForbiddenError) Unwrap() error           { return e.ClientError }
+func (e *NotFoundError) Unwrap() error            { return e.ClientError }
+func (e *ConflictError) Unwrap() error            { return e.ClientError }
+func (e *UnprocessableEntityError) Unwrap() error { return e.ClientError }
+func (e *RateLimitError) Unwrap() error           { return e.ClientError }
+func (e *InternalServerError) Unwrap() error      { return e.ClientError }
+func (e *BadGatewayError) Unwrap() error          { return e.ClientError }
+func (e *ServiceUnavailableError) Unwrap() error  { return e.ClientError }
+func (e *GatewayTimeoutError) Unwrap() error      { return e.ClientError }
+
+// raiseForStatus returns nil for a 2xx response, else the most specific error for its status: a
+// per-status type for a known one, *ClientError for any other.
 func raiseForStatus(resp *http.Response, body []byte) error {
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		return nil
 	}
-	var data any
-	if len(body) > 0 {
-		_ = json.Unmarshal(body, &data)
+	env, message := parseEnvelope(body)
+	e := &ClientError{StatusCode: resp.StatusCode, Key: ErrorKey(env.ErrorKey), Message: sanitizeMessage(message), Envelope: env, Body: body, Response: withBody(resp, body)}
+	switch e.StatusCode {
+	case 400:
+		return &BadRequestError{e}
+	case 401:
+		return &UnauthorizedError{e}
+	case 403:
+		return &ForbiddenError{e}
+	case 404:
+		return &NotFoundError{e}
+	case 409:
+		return &ConflictError{e}
+	case 422:
+		return &UnprocessableEntityError{e}
+	case 429:
+		return &RateLimitError{e}
+	case 500:
+		return &InternalServerError{e}
+	case 502:
+		return &BadGatewayError{e}
+	case 503:
+		return &ServiceUnavailableError{e}
+	case 504:
+		return &GatewayTimeoutError{e}
 	}
-	if fn, ok := statusErrorMap[resp.StatusCode]; ok {
-		return fn(resp.StatusCode, body, data, resp)
-	}
-	return &StatusError{StatusCode: resp.StatusCode, Body: body, Data: data, Response: resp, Message: errorMessage(body, data)}
+	return e
 }
 
-// errorMessage is the server's `message` field when the body is a JSON object
-// carrying one, else the body text. Control characters are dropped and the
-// result is capped, so a hostile server cannot fill logs or drive a terminal.
-func errorMessage(body []byte, data any) string {
-	text := string(body)
-	if m, ok := data.(map[string]any); ok {
-		if msg, ok := m["message"].(string); ok {
-			text = msg
-		}
+// parseEnvelope reads honey's envelope from a JSON object body, and the message to show: the
+// envelope's string message when it has one, else the body text.
+func parseEnvelope(body []byte) (ErrorEnvelope, string) {
+	var env ErrorEnvelope
+	var members map[string]json.RawMessage
+	if json.Unmarshal(body, &members) != nil || members == nil {
+		return env, string(body)
 	}
+	known := map[string]any{"status": &env.Status, "error_key": &env.ErrorKey, "status_key": &env.StatusKey, "message": &env.Message, "fields": &env.Fields}
+	for name, raw := range members {
+		if dst, ok := known[name]; ok && json.Unmarshal(raw, dst) == nil {
+			continue
+		}
+		if env.Extra == nil {
+			env.Extra = map[string]json.RawMessage{}
+		}
+		env.Extra[name] = raw
+	}
+	if _, ok := members["message"]; ok && env.Extra["message"] == nil {
+		return env, env.Message
+	}
+	return env, string(body)
+}
+
+// sanitizeMessage drops control characters and invalid UTF-8 and caps the text at 512 runes, so a
+// hostile server cannot fill logs or drive a terminal.
+func sanitizeMessage(text string) string {
 	var b strings.Builder
 	n := 0
 	for _, r := range text {

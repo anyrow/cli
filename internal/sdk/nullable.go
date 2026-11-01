@@ -7,9 +7,9 @@ import (
 	"encoding/json"
 )
 
-// Nullable is an optional field that may also be null. Its zero value is "absent": the key is
-// left out of the request (the field carries `omitzero`). NullOf sends an explicit null, Some a
-// value. Decoding sets it from the response: absent stays absent, null becomes null.
+// Nullable is an optional field that may also be null. Its zero value is "absent": the key is left
+// out of the request (the field carries `omitzero`). NullOf sends an explicit null, Some a value.
+// Decoding sets it from the response: absent stays absent, null becomes null.
 type Nullable[T any] struct {
 	value T
 	set   bool
@@ -41,6 +41,7 @@ func (n Nullable[T]) Get() (T, bool) {
 	return n.value, n.set && !n.null
 }
 
+// MarshalJSON encodes null for an explicit null (an absent field is left out by omitzero).
 func (n Nullable[T]) MarshalJSON() ([]byte, error) {
 	if !n.set || n.null {
 		return []byte("null"), nil
@@ -48,6 +49,7 @@ func (n Nullable[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(n.value)
 }
 
+// UnmarshalJSON sets a present value or an explicit null.
 func (n *Nullable[T]) UnmarshalJSON(data []byte) error {
 	if bytes.Equal(bytes.TrimSpace(data), []byte("null")) {
 		*n = NullOf[T]()

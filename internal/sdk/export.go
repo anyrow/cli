@@ -8,17 +8,16 @@ import (
 	"net/http"
 )
 
-// The Honey* functions expose the SDK's URL, SSE and error handling to the
-// generated CLI, so both send byte-identical requests.
+// The Honey* functions expose the SDK's URL, SSE and error handling to the generated CLI, so both
+// send byte-identical requests and read answers the same way.
 
-// HoneyExpandPath fills `{name}` placeholders with escaped values and rejects
-// "", "." and "..".
+// HoneyExpandPath fills a path template with escaped values and refuses "", "." and "..".
 func HoneyExpandPath(template string, params map[string]string) (string, error) {
 	return expandPath(template, params)
 }
 
-// HoneyBuildURL joins base and an escaped path (keeping the base path) and
-// appends the query pairs in order.
+// HoneyBuildURL joins base and an escaped path (keeping the base path) and appends the query pairs
+// in order.
 func HoneyBuildURL(baseURL, path string, query [][2]string) (string, error) {
 	q := make(queryList, 0, len(query))
 	for _, p := range query {
@@ -28,17 +27,11 @@ func HoneyBuildURL(baseURL, path string, query [][2]string) (string, error) {
 }
 
 // HoneyParseSSEStream yields the events of an SSE response and closes its body.
-func HoneyParseSSEStream(ctx context.Context, resp *http.Response) iter.Seq2[SSEEvent, error] {
+func HoneyParseSSEStream(ctx context.Context, resp *http.Response) iter.Seq2[SSEEvent[string], error] {
 	return parseSSEStream(ctx, resp)
 }
 
 // HoneyRaiseForStatus returns the typed error for a non-2xx response, or nil.
 func HoneyRaiseForStatus(resp *http.Response, body []byte) error {
 	return raiseForStatus(resp, body)
-}
-
-// HoneyFormatQueryValue renders a query or header value the way every SDK
-// language does.
-func HoneyFormatQueryValue(v any) string {
-	return formatQueryValue(v)
 }
