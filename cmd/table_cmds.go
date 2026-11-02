@@ -26,6 +26,7 @@ func newTableCreateCmd() *cobra.Command {
 	p.Data("the JSON body")
 	p.Flag("insert-mode", "string", false, false, "the body's insert_mode", "append", "dedup", "merge", "replace")
 	p.Flag("instruction", "string", false, false, "the body's instruction")
+	p.Flag("merge-columns-json", "string", true, false, "the body's merge_columns_json")
 	p.Flag("name", "string", false, false, "the body's name")
 	p.Flag("strictness", "string", false, false, "the body's strictness", "strict", "balanced", "flexible")
 	cmd.RunE = func(c *cobra.Command, args []string) error {
@@ -35,7 +36,7 @@ func newTableCreateCmd() *cobra.Command {
 		path := p.PathValues(args)
 		opts := &sdk.TableCreateOpts{}
 		var body sdk.CreateProjectsTableRequest
-		if err := p.JSON(&body, true, map[string]string{"insert-mode": "insert_mode", "instruction": "instruction", "name": "name", "strictness": "strictness"}); err != nil {
+		if err := p.JSON(&body, true, map[string]string{"insert-mode": "insert_mode", "instruction": "instruction", "merge-columns-json": "merge_columns_json", "name": "name", "strictness": "strictness"}); err != nil {
 			return err
 		}
 		client, err := newClient(c)
@@ -272,6 +273,7 @@ func newTableUpdateCmd() *cobra.Command {
 	p.Flag("default-sort", "string", false, false, "the body's default_sort")
 	p.Flag("insert-mode", "string", false, false, "the body's insert_mode", "append", "dedup", "merge", "replace")
 	p.Flag("instruction", "string", false, false, "the body's instruction")
+	p.Flag("merge-columns-json", "string", true, false, "the body's merge_columns_json")
 	p.Flag("name", "string", false, false, "the body's name")
 	p.Flag("slug", "string", false, false, "Stored lowercased: `Quarterly Report` reads back as `quarterly report`.")
 	p.Flag("strictness", "string", false, false, "the body's strictness", "strict", "balanced", "flexible")
@@ -282,7 +284,7 @@ func newTableUpdateCmd() *cobra.Command {
 		path := p.PathValues(args)
 		opts := &sdk.TableUpdateOpts{}
 		var body sdk.UpdateProjectsTableRequest
-		if err := p.JSON(&body, true, map[string]string{"default-sort": "default_sort", "insert-mode": "insert_mode", "instruction": "instruction", "name": "name", "slug": "slug", "strictness": "strictness"}); err != nil {
+		if err := p.JSON(&body, true, map[string]string{"default-sort": "default_sort", "insert-mode": "insert_mode", "instruction": "instruction", "merge-columns-json": "merge_columns_json", "name": "name", "slug": "slug", "strictness": "strictness"}); err != nil {
 			return err
 		}
 		client, err := newClient(c)

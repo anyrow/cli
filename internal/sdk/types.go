@@ -146,7 +146,7 @@ type CreateProjectsTableRequest struct {
 	ColumnsJson      json.RawMessage                       `json:"columns_json"`
 	InsertMode       *CreateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
 	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[json.RawMessage]             `json:"merge_columns_json,omitzero"`
+	MergeColumnsJson Nullable[[]string]                    `json:"merge_columns_json,omitzero"`
 	Name             string                                `json:"name"`
 	Strictness       *CreateProjectsTableRequestStrictness `json:"strictness,omitempty"`
 }
@@ -399,7 +399,7 @@ type CreateTableTemplateRequest struct {
 	Description      Nullable[string]                      `json:"description,omitzero"`
 	InsertMode       *CreateTableTemplateRequestInsertMode `json:"insert_mode,omitempty"`
 	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[json.RawMessage]             `json:"merge_columns_json,omitzero"`
+	MergeColumnsJson Nullable[[]string]                    `json:"merge_columns_json,omitzero"`
 	Name             string                                `json:"name"`
 	Strictness       *CreateTableTemplateRequestStrictness `json:"strictness,omitempty"`
 }
@@ -1623,7 +1623,7 @@ type UpdateProjectsTableRequest struct {
 	DefaultSort      Nullable[string]                      `json:"default_sort,omitzero"`
 	InsertMode       *UpdateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
 	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[json.RawMessage]             `json:"merge_columns_json,omitzero"`
+	MergeColumnsJson Nullable[[]string]                    `json:"merge_columns_json,omitzero"`
 	Name             *string                               `json:"name,omitempty"`
 	Slug             *string                               `json:"slug,omitempty"`
 	Strictness       *UpdateProjectsTableRequestStrictness `json:"strictness,omitempty"`
@@ -1721,7 +1721,7 @@ type UpdateTableTemplateRequest struct {
 	Description      Nullable[string]                      `json:"description,omitzero"`
 	InsertMode       *UpdateTableTemplateRequestInsertMode `json:"insert_mode,omitempty"`
 	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[json.RawMessage]             `json:"merge_columns_json,omitzero"`
+	MergeColumnsJson Nullable[[]string]                    `json:"merge_columns_json,omitzero"`
 	Name             *string                               `json:"name,omitempty"`
 	Strictness       *UpdateTableTemplateRequestStrictness `json:"strictness,omitempty"`
 }

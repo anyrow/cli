@@ -27,6 +27,7 @@ func newTableTemplateCreateCmd() *cobra.Command {
 	p.Flag("description", "string", false, false, "the body's description")
 	p.Flag("insert-mode", "string", false, false, "the body's insert_mode", "append", "dedup", "merge", "replace")
 	p.Flag("instruction", "string", false, false, "the body's instruction")
+	p.Flag("merge-columns-json", "string", true, false, "the body's merge_columns_json")
 	p.Flag("name", "string", false, false, "the body's name")
 	p.Flag("strictness", "string", false, false, "the body's strictness", "strict", "balanced", "flexible")
 	cmd.RunE = func(c *cobra.Command, _ []string) error {
@@ -35,7 +36,7 @@ func newTableTemplateCreateCmd() *cobra.Command {
 		}
 		opts := &sdk.TableTemplateCreateOpts{}
 		var body sdk.CreateTableTemplateRequest
-		if err := p.JSON(&body, true, map[string]string{"category": "category", "description": "description", "insert-mode": "insert_mode", "instruction": "instruction", "name": "name", "strictness": "strictness"}); err != nil {
+		if err := p.JSON(&body, true, map[string]string{"category": "category", "description": "description", "insert-mode": "insert_mode", "instruction": "instruction", "merge-columns-json": "merge_columns_json", "name": "name", "strictness": "strictness"}); err != nil {
 			return err
 		}
 		client, err := newClient(c)
@@ -212,6 +213,7 @@ func newTableTemplateUpdateCmd() *cobra.Command {
 	p.Flag("description", "string", false, false, "the body's description")
 	p.Flag("insert-mode", "string", false, false, "the body's insert_mode", "append", "dedup", "merge", "replace")
 	p.Flag("instruction", "string", false, false, "the body's instruction")
+	p.Flag("merge-columns-json", "string", true, false, "the body's merge_columns_json")
 	p.Flag("name", "string", false, false, "the body's name")
 	p.Flag("strictness", "string", false, false, "the body's strictness", "strict", "balanced", "flexible")
 	cmd.RunE = func(c *cobra.Command, args []string) error {
@@ -221,7 +223,7 @@ func newTableTemplateUpdateCmd() *cobra.Command {
 		path := p.PathValues(args)
 		opts := &sdk.TableTemplateUpdateOpts{}
 		var body sdk.UpdateTableTemplateRequest
-		if err := p.JSON(&body, true, map[string]string{"category": "category", "description": "description", "insert-mode": "insert_mode", "instruction": "instruction", "name": "name", "strictness": "strictness"}); err != nil {
+		if err := p.JSON(&body, true, map[string]string{"category": "category", "description": "description", "insert-mode": "insert_mode", "instruction": "instruction", "merge-columns-json": "merge_columns_json", "name": "name", "strictness": "strictness"}); err != nil {
 			return err
 		}
 		client, err := newClient(c)
