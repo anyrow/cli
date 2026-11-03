@@ -9,3 +9,4 @@ go.sum
 install.sh
 install.ps1
 skills/
+.honey-generated.json
