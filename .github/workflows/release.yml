@@ -45,7 +45,7 @@ jobs:
           node-version: "24"
           package-manager-cache: false
       - name: Check every file the install scripts fetch for this tag
-        run: npx --yes --package @workerstack/clients@1.0.0-rc.25 installgen check --default-version "$GITHUB_REF_NAME"
+        run: npx --yes --package @workerstack/clients@1.0.0-rc.26 installgen check --default-version "$GITHUB_REF_NAME"
       - name: Check latest reads this tag
         shell: bash
         env:
@@ -56,7 +56,7 @@ jobs:
             echo "$GITHUB_REF_NAME is a prerelease: latest stays on the last release"
             exit 0
           fi
-          url="$(npx --yes --package @workerstack/clients@1.0.0-rc.25 installgen check --list | awk '$1 == "latest" { print $2 }')"
+          url="$(npx --yes --package @workerstack/clients@1.0.0-rc.26 installgen check --list | awk '$1 == "latest" { print $2 }')"
           latest="$(curl -fsSL --retry 3 "$url" | tr -d '[:space:]')"
           if [ "$latest" != "$GITHUB_REF_NAME" ]; then
             echo "::error::$url reads '$latest', not $GITHUB_REF_NAME"
