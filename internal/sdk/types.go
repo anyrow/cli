@@ -6,89 +6,6 @@ import (
 	"encoding/json"
 )
 
-type CreateOrganizationsWebhookRequest struct {
-	Events []CreateOrganizationsWebhookRequestEventsItem `json:"events"`
-	Name   *string                                       `json:"name,omitempty"`
-	Url    string                                        `json:"url"`
-}
-
-func (s CreateOrganizationsWebhookRequest) MarshalJSON() ([]byte, error) {
-	type plain CreateOrganizationsWebhookRequest
-	p := plain(s)
-	if p.Events == nil {
-		p.Events = []CreateOrganizationsWebhookRequestEventsItem{}
-	}
-	return json.Marshal(p)
-}
-
-type CreateOrganizationsWebhookResponse201 struct {
-	Active          bool                                              `json:"active"`
-	CreatedAt       int64                                             `json:"created_at"`
-	Events          []CreateOrganizationsWebhookResponse201EventsItem `json:"events"`
-	FailureCount    int64                                             `json:"failure_count"`
-	Id              string                                            `json:"id"`
-	LastTriggeredAt *int64                                            `json:"last_triggered_at"`
-	Name            *string                                           `json:"name"`
-	OrganizationId  string                                            `json:"organization_id"`
-	Secret          string                                            `json:"secret"`
-	SecretRotatedAt *int64                                            `json:"secret_rotated_at"`
-	UpdatedAt       int64                                             `json:"updated_at"`
-	Url             string                                            `json:"url"`
-}
-
-func (s CreateOrganizationsWebhookResponse201) MarshalJSON() ([]byte, error) {
-	type plain CreateOrganizationsWebhookResponse201
-	p := plain(s)
-	if p.Events == nil {
-		p.Events = []CreateOrganizationsWebhookResponse201EventsItem{}
-	}
-	return json.Marshal(p)
-}
-
-type CreateOrganizationsWebhookResponse500 struct {
-	ErrorKey  CreateOrganizationsWebhookResponse500ErrorKey                `json:"error_key"`
-	Fields    map[string][]CreateOrganizationsWebhookResponse500FieldsItem `json:"fields"`
-	Message   string                                                       `json:"message"`
-	Status    CreateOrganizationsWebhookResponse500Status                  `json:"status"`
-	StatusKey string                                                       `json:"status_key"`
-	Success   bool                                                         `json:"success"`
-	Vars      map[string]json.RawMessage                                   `json:"vars,omitempty"`
-}
-
-func (s CreateOrganizationsWebhookResponse500) MarshalJSON() ([]byte, error) {
-	type plain CreateOrganizationsWebhookResponse500
-	p := plain(s)
-	if p.Fields == nil {
-		p.Fields = map[string][]CreateOrganizationsWebhookResponse500FieldsItem{}
-	}
-	return json.Marshal(p)
-}
-
-type CreateOrganizationsWebhooksTestResponse200 struct {
-	HttpStatus   *float64                                         `json:"http_status"`
-	ResponseBody *string                                          `json:"response_body"`
-	Status       CreateOrganizationsWebhooksTestResponse200Status `json:"status"`
-}
-
-type CreateOrganizationsWebhooksTestResponse500 struct {
-	ErrorKey  CreateOrganizationsWebhooksTestResponse500ErrorKey                `json:"error_key"`
-	Fields    map[string][]CreateOrganizationsWebhooksTestResponse500FieldsItem `json:"fields"`
-	Message   string                                                            `json:"message"`
-	Status    CreateOrganizationsWebhooksTestResponse500Status                  `json:"status"`
-	StatusKey string                                                            `json:"status_key"`
-	Success   bool                                                              `json:"success"`
-	Vars      map[string]json.RawMessage                                        `json:"vars,omitempty"`
-}
-
-func (s CreateOrganizationsWebhooksTestResponse500) MarshalJSON() ([]byte, error) {
-	type plain CreateOrganizationsWebhooksTestResponse500
-	p := plain(s)
-	if p.Fields == nil {
-		p.Fields = map[string][]CreateOrganizationsWebhooksTestResponse500FieldsItem{}
-	}
-	return json.Marshal(p)
-}
-
 type CreateProjectsExtractRequest struct {
 	Columns     *string                                 `json:"columns,omitempty"`
 	File        *string                                 `json:"file,omitempty"`
@@ -143,12 +60,54 @@ func (s CreateProjectsSuggestSchemaResponse200) MarshalJSON() ([]byte, error) {
 }
 
 type CreateProjectsTableRequest struct {
-	ColumnsJson      json.RawMessage                       `json:"columns_json"`
-	InsertMode       *CreateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
-	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[[]string]                    `json:"merge_columns_json,omitzero"`
-	Name             string                                `json:"name"`
-	Strictness       *CreateProjectsTableRequestStrictness `json:"strictness,omitempty"`
+	ColumnsJson      []CreateProjectsTableRequestColumnsJsonItem `json:"columns_json"`
+	InsertMode       *CreateProjectsTableRequestInsertMode       `json:"insert_mode,omitempty"`
+	Instruction      Nullable[string]                            `json:"instruction,omitzero"`
+	MergeColumnsJson Nullable[[]string]                          `json:"merge_columns_json,omitzero"`
+	Name             string                                      `json:"name"`
+	Strictness       *CreateProjectsTableRequestStrictness       `json:"strictness,omitempty"`
+}
+
+func (s CreateProjectsTableRequest) MarshalJSON() ([]byte, error) {
+	type plain CreateProjectsTableRequest
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []CreateProjectsTableRequestColumnsJsonItem{}
+	}
+	return json.Marshal(p)
+}
+
+type CreateProjectsTableResponse201 struct {
+	ColumnsJson      []CreateProjectsTableResponse201ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                           `json:"created_at"`
+	DataVersion      int64                                           `json:"data_version"`
+	DefaultSort      *string                                         `json:"default_sort"`
+	DeletedAt        *int64                                          `json:"deleted_at"`
+	FtsVersion       int64                                           `json:"fts_version"`
+	Id               string                                          `json:"id"`
+	InsertMode       CreateProjectsTableResponse201InsertMode        `json:"insert_mode"`
+	Instruction      *string                                         `json:"instruction"`
+	LastUsedAt       *int64                                          `json:"last_used_at"`
+	MergeColumnsJson []string                                        `json:"merge_columns_json"`
+	Name             string                                          `json:"name"`
+	ProjectId        string                                          `json:"project_id"`
+	RowCount         int64                                           `json:"row_count"`
+	Slug             string                                          `json:"slug"`
+	Strictness       CreateProjectsTableResponse201Strictness        `json:"strictness"`
+	UpdatedAt        int64                                           `json:"updated_at"`
+	UsageCount       int64                                           `json:"usage_count"`
+}
+
+func (s CreateProjectsTableResponse201) MarshalJSON() ([]byte, error) {
+	type plain CreateProjectsTableResponse201
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []CreateProjectsTableResponse201ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
 }
 
 type CreateProjectsTableResponse402 struct {
@@ -228,13 +187,46 @@ func (s CreateProjectsTableTemplatesUseResponse402) MarshalJSON() ([]byte, error
 }
 
 type CreateProjectsTablesColumnRequest struct {
-	CurrencyCode *string                                `json:"currency_code,omitempty"`
+	CurrencyCode *CurrencyCode8                         `json:"currency_code,omitempty"`
 	Description  Nullable[string]                       `json:"description,omitzero"`
 	Instruction  Nullable[string]                       `json:"instruction,omitzero"`
 	Name         string                                 `json:"name"`
 	Options      []string                               `json:"options,omitempty"`
 	Required     *bool                                  `json:"required,omitempty"`
 	Type         *CreateProjectsTablesColumnRequestType `json:"type,omitempty"`
+}
+
+type CreateProjectsTablesColumnResponse200 struct {
+	ColumnsJson      []CreateProjectsTablesColumnResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                                  `json:"created_at"`
+	DataVersion      int64                                                  `json:"data_version"`
+	DefaultSort      *string                                                `json:"default_sort"`
+	DeletedAt        *int64                                                 `json:"deleted_at"`
+	FtsVersion       int64                                                  `json:"fts_version"`
+	Id               string                                                 `json:"id"`
+	InsertMode       CreateProjectsTablesColumnResponse200InsertMode        `json:"insert_mode"`
+	Instruction      *string                                                `json:"instruction"`
+	LastUsedAt       *int64                                                 `json:"last_used_at"`
+	MergeColumnsJson []string                                               `json:"merge_columns_json"`
+	Name             string                                                 `json:"name"`
+	ProjectId        string                                                 `json:"project_id"`
+	RowCount         int64                                                  `json:"row_count"`
+	Slug             string                                                 `json:"slug"`
+	Strictness       CreateProjectsTablesColumnResponse200Strictness        `json:"strictness"`
+	UpdatedAt        int64                                                  `json:"updated_at"`
+	UsageCount       int64                                                  `json:"usage_count"`
+}
+
+func (s CreateProjectsTablesColumnResponse200) MarshalJSON() ([]byte, error) {
+	type plain CreateProjectsTablesColumnResponse200
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []CreateProjectsTablesColumnResponse200ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
 }
 
 type CreateProjectsTablesColumnResponse402 struct {
@@ -280,6 +272,39 @@ type CreateProjectsTablesDuplicateRequest struct {
 	Slug string `json:"slug"`
 }
 
+type CreateProjectsTablesDuplicateResponse201 struct {
+	ColumnsJson      []CreateProjectsTablesDuplicateResponse201ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                                     `json:"created_at"`
+	DataVersion      int64                                                     `json:"data_version"`
+	DefaultSort      *string                                                   `json:"default_sort"`
+	DeletedAt        *int64                                                    `json:"deleted_at"`
+	FtsVersion       int64                                                     `json:"fts_version"`
+	Id               string                                                    `json:"id"`
+	InsertMode       CreateProjectsTablesDuplicateResponse201InsertMode        `json:"insert_mode"`
+	Instruction      *string                                                   `json:"instruction"`
+	LastUsedAt       *int64                                                    `json:"last_used_at"`
+	MergeColumnsJson []string                                                  `json:"merge_columns_json"`
+	Name             string                                                    `json:"name"`
+	ProjectId        string                                                    `json:"project_id"`
+	RowCount         int64                                                     `json:"row_count"`
+	Slug             string                                                    `json:"slug"`
+	Strictness       CreateProjectsTablesDuplicateResponse201Strictness        `json:"strictness"`
+	UpdatedAt        int64                                                     `json:"updated_at"`
+	UsageCount       int64                                                     `json:"usage_count"`
+}
+
+func (s CreateProjectsTablesDuplicateResponse201) MarshalJSON() ([]byte, error) {
+	type plain CreateProjectsTablesDuplicateResponse201
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []CreateProjectsTablesDuplicateResponse201ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
+}
+
 type CreateProjectsTablesDuplicateResponse500 struct {
 	ErrorKey  CreateProjectsTablesDuplicateResponse500ErrorKey                `json:"error_key"`
 	Fields    map[string][]CreateProjectsTablesDuplicateResponse500FieldsItem `json:"fields"`
@@ -301,6 +326,39 @@ func (s CreateProjectsTablesDuplicateResponse500) MarshalJSON() ([]byte, error) 
 
 type CreateProjectsTablesRestoreRequest struct {
 	Slug *string `json:"slug,omitempty"`
+}
+
+type CreateProjectsTablesRestoreResponse200 struct {
+	ColumnsJson      []CreateProjectsTablesRestoreResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                                   `json:"created_at"`
+	DataVersion      int64                                                   `json:"data_version"`
+	DefaultSort      *string                                                 `json:"default_sort"`
+	DeletedAt        *int64                                                  `json:"deleted_at"`
+	FtsVersion       int64                                                   `json:"fts_version"`
+	Id               string                                                  `json:"id"`
+	InsertMode       CreateProjectsTablesRestoreResponse200InsertMode        `json:"insert_mode"`
+	Instruction      *string                                                 `json:"instruction"`
+	LastUsedAt       *int64                                                  `json:"last_used_at"`
+	MergeColumnsJson []string                                                `json:"merge_columns_json"`
+	Name             string                                                  `json:"name"`
+	ProjectId        string                                                  `json:"project_id"`
+	RowCount         int64                                                   `json:"row_count"`
+	Slug             string                                                  `json:"slug"`
+	Strictness       CreateProjectsTablesRestoreResponse200Strictness        `json:"strictness"`
+	UpdatedAt        int64                                                   `json:"updated_at"`
+	UsageCount       int64                                                   `json:"usage_count"`
+}
+
+func (s CreateProjectsTablesRestoreResponse200) MarshalJSON() ([]byte, error) {
+	type plain CreateProjectsTablesRestoreResponse200
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []CreateProjectsTablesRestoreResponse200ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
 }
 
 type CreateProjectsTablesRestoreResponse410 struct {
@@ -374,34 +432,72 @@ func (s CreateProjectsTablesRowResponse500) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p)
 }
 
-type CreateProjectsTablesRowResponse500534f56 struct {
-	ErrorKey  CreateProjectsTablesRowResponse500534f56ErrorKey                `json:"error_key"`
-	Fields    map[string][]CreateProjectsTablesRowResponse500534f56FieldsItem `json:"fields"`
+type CreateProjectsTablesRowResponse5009205f1 struct {
+	ErrorKey  CreateProjectsTablesRowResponse5009205f1ErrorKey                `json:"error_key"`
+	Fields    map[string][]CreateProjectsTablesRowResponse5009205f1FieldsItem `json:"fields"`
 	Message   string                                                          `json:"message"`
-	Status    CreateProjectsTablesRowResponse500534f56Status                  `json:"status"`
+	Status    CreateProjectsTablesRowResponse5009205f1Status                  `json:"status"`
 	StatusKey string                                                          `json:"status_key"`
 	Success   bool                                                            `json:"success"`
 	Vars      map[string]json.RawMessage                                      `json:"vars,omitempty"`
 }
 
-func (s CreateProjectsTablesRowResponse500534f56) MarshalJSON() ([]byte, error) {
-	type plain CreateProjectsTablesRowResponse500534f56
+func (s CreateProjectsTablesRowResponse5009205f1) MarshalJSON() ([]byte, error) {
+	type plain CreateProjectsTablesRowResponse5009205f1
 	p := plain(s)
 	if p.Fields == nil {
-		p.Fields = map[string][]CreateProjectsTablesRowResponse500534f56FieldsItem{}
+		p.Fields = map[string][]CreateProjectsTablesRowResponse5009205f1FieldsItem{}
 	}
 	return json.Marshal(p)
 }
 
 type CreateTableTemplateRequest struct {
-	Category         string                                `json:"category"`
-	ColumnsJson      json.RawMessage                       `json:"columns_json"`
-	Description      Nullable[string]                      `json:"description,omitzero"`
-	InsertMode       *CreateTableTemplateRequestInsertMode `json:"insert_mode,omitempty"`
-	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[[]string]                    `json:"merge_columns_json,omitzero"`
-	Name             string                                `json:"name"`
-	Strictness       *CreateTableTemplateRequestStrictness `json:"strictness,omitempty"`
+	Category         string                                      `json:"category"`
+	ColumnsJson      []CreateTableTemplateRequestColumnsJsonItem `json:"columns_json"`
+	Description      Nullable[string]                            `json:"description,omitzero"`
+	InsertMode       *CreateTableTemplateRequestInsertMode       `json:"insert_mode,omitempty"`
+	Instruction      Nullable[string]                            `json:"instruction,omitzero"`
+	MergeColumnsJson Nullable[[]string]                          `json:"merge_columns_json,omitzero"`
+	Name             string                                      `json:"name"`
+	Strictness       *CreateTableTemplateRequestStrictness       `json:"strictness,omitempty"`
+}
+
+func (s CreateTableTemplateRequest) MarshalJSON() ([]byte, error) {
+	type plain CreateTableTemplateRequest
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []CreateTableTemplateRequestColumnsJsonItem{}
+	}
+	return json.Marshal(p)
+}
+
+type CreateTableTemplateResponse201 struct {
+	Category           string                                          `json:"category"`
+	ColumnsJson        []CreateTableTemplateResponse201ColumnsJsonItem `json:"columns_json"`
+	CreatedAt          int64                                           `json:"created_at"`
+	CreatorDisplayName *string                                         `json:"creator_display_name"`
+	CreatorUserId      *string                                         `json:"creator_user_id"`
+	Description        *string                                         `json:"description"`
+	Id                 string                                          `json:"id"`
+	InsertMode         CreateTableTemplateResponse201InsertMode        `json:"insert_mode"`
+	Instruction        *string                                         `json:"instruction"`
+	MergeColumnsJson   []string                                        `json:"merge_columns_json"`
+	Name               string                                          `json:"name"`
+	Strictness         CreateTableTemplateResponse201Strictness        `json:"strictness"`
+	UpdatedAt          int64                                           `json:"updated_at"`
+	UsageCount         int64                                           `json:"usage_count"`
+}
+
+func (s CreateTableTemplateResponse201) MarshalJSON() ([]byte, error) {
+	type plain CreateTableTemplateResponse201
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []CreateTableTemplateResponse201ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
 }
 
 type CreateTableTemplateResponse500 struct {
@@ -423,8 +519,3521 @@ func (s CreateTableTemplateResponse500) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p)
 }
 
-type DeleteOrganizationsWebhookResponse200 struct {
+type CurrencyCode string
+
+const (
+	CurrencyCodeAED  CurrencyCode = "AED"
+	CurrencyCodeAFN  CurrencyCode = "AFN"
+	CurrencyCodeALL  CurrencyCode = "ALL"
+	CurrencyCodeAMD  CurrencyCode = "AMD"
+	CurrencyCodeAOA  CurrencyCode = "AOA"
+	CurrencyCodeARS  CurrencyCode = "ARS"
+	CurrencyCodeAUD  CurrencyCode = "AUD"
+	CurrencyCodeAWG  CurrencyCode = "AWG"
+	CurrencyCodeAZN  CurrencyCode = "AZN"
+	CurrencyCodeBAM  CurrencyCode = "BAM"
+	CurrencyCodeBBD  CurrencyCode = "BBD"
+	CurrencyCodeBDT  CurrencyCode = "BDT"
+	CurrencyCodeBHD  CurrencyCode = "BHD"
+	CurrencyCodeBIF  CurrencyCode = "BIF"
+	CurrencyCodeBMD  CurrencyCode = "BMD"
+	CurrencyCodeBND  CurrencyCode = "BND"
+	CurrencyCodeBOB  CurrencyCode = "BOB"
+	CurrencyCodeBOV  CurrencyCode = "BOV"
+	CurrencyCodeBRL  CurrencyCode = "BRL"
+	CurrencyCodeBSD  CurrencyCode = "BSD"
+	CurrencyCodeBTN  CurrencyCode = "BTN"
+	CurrencyCodeBWP  CurrencyCode = "BWP"
+	CurrencyCodeBYN  CurrencyCode = "BYN"
+	CurrencyCodeBZD  CurrencyCode = "BZD"
+	CurrencyCodeCAD  CurrencyCode = "CAD"
+	CurrencyCodeCDF  CurrencyCode = "CDF"
+	CurrencyCodeCHE  CurrencyCode = "CHE"
+	CurrencyCodeCHF  CurrencyCode = "CHF"
+	CurrencyCodeCHW  CurrencyCode = "CHW"
+	CurrencyCodeCLF  CurrencyCode = "CLF"
+	CurrencyCodeCLP  CurrencyCode = "CLP"
+	CurrencyCodeCNY  CurrencyCode = "CNY"
+	CurrencyCodeCOP  CurrencyCode = "COP"
+	CurrencyCodeCOU  CurrencyCode = "COU"
+	CurrencyCodeCRC  CurrencyCode = "CRC"
+	CurrencyCodeCUP  CurrencyCode = "CUP"
+	CurrencyCodeCVE  CurrencyCode = "CVE"
+	CurrencyCodeCZK  CurrencyCode = "CZK"
+	CurrencyCodeDJF  CurrencyCode = "DJF"
+	CurrencyCodeDKK  CurrencyCode = "DKK"
+	CurrencyCodeDOP  CurrencyCode = "DOP"
+	CurrencyCodeDZD  CurrencyCode = "DZD"
+	CurrencyCodeEGP  CurrencyCode = "EGP"
+	CurrencyCodeERN  CurrencyCode = "ERN"
+	CurrencyCodeETB  CurrencyCode = "ETB"
+	CurrencyCodeEUR  CurrencyCode = "EUR"
+	CurrencyCodeFJD  CurrencyCode = "FJD"
+	CurrencyCodeFKP  CurrencyCode = "FKP"
+	CurrencyCodeGBP  CurrencyCode = "GBP"
+	CurrencyCodeGEL  CurrencyCode = "GEL"
+	CurrencyCodeGHS  CurrencyCode = "GHS"
+	CurrencyCodeGIP  CurrencyCode = "GIP"
+	CurrencyCodeGMD  CurrencyCode = "GMD"
+	CurrencyCodeGNF  CurrencyCode = "GNF"
+	CurrencyCodeGTQ  CurrencyCode = "GTQ"
+	CurrencyCodeGYD  CurrencyCode = "GYD"
+	CurrencyCodeHKD  CurrencyCode = "HKD"
+	CurrencyCodeHNL  CurrencyCode = "HNL"
+	CurrencyCodeHTG  CurrencyCode = "HTG"
+	CurrencyCodeHUF  CurrencyCode = "HUF"
+	CurrencyCodeIDR  CurrencyCode = "IDR"
+	CurrencyCodeILS  CurrencyCode = "ILS"
+	CurrencyCodeINR  CurrencyCode = "INR"
+	CurrencyCodeIQD  CurrencyCode = "IQD"
+	CurrencyCodeIRR  CurrencyCode = "IRR"
+	CurrencyCodeISK  CurrencyCode = "ISK"
+	CurrencyCodeJMD  CurrencyCode = "JMD"
+	CurrencyCodeJOD  CurrencyCode = "JOD"
+	CurrencyCodeJPY  CurrencyCode = "JPY"
+	CurrencyCodeKES  CurrencyCode = "KES"
+	CurrencyCodeKGS  CurrencyCode = "KGS"
+	CurrencyCodeKHR  CurrencyCode = "KHR"
+	CurrencyCodeKMF  CurrencyCode = "KMF"
+	CurrencyCodeKPW  CurrencyCode = "KPW"
+	CurrencyCodeKRW  CurrencyCode = "KRW"
+	CurrencyCodeKWD  CurrencyCode = "KWD"
+	CurrencyCodeKYD  CurrencyCode = "KYD"
+	CurrencyCodeKZT  CurrencyCode = "KZT"
+	CurrencyCodeLAK  CurrencyCode = "LAK"
+	CurrencyCodeLBP  CurrencyCode = "LBP"
+	CurrencyCodeLKR  CurrencyCode = "LKR"
+	CurrencyCodeLRD  CurrencyCode = "LRD"
+	CurrencyCodeLSL  CurrencyCode = "LSL"
+	CurrencyCodeLYD  CurrencyCode = "LYD"
+	CurrencyCodeMAD  CurrencyCode = "MAD"
+	CurrencyCodeMDL  CurrencyCode = "MDL"
+	CurrencyCodeMGA  CurrencyCode = "MGA"
+	CurrencyCodeMKD  CurrencyCode = "MKD"
+	CurrencyCodeMMK  CurrencyCode = "MMK"
+	CurrencyCodeMNT  CurrencyCode = "MNT"
+	CurrencyCodeMOP  CurrencyCode = "MOP"
+	CurrencyCodeMRU  CurrencyCode = "MRU"
+	CurrencyCodeMUR  CurrencyCode = "MUR"
+	CurrencyCodeMVR  CurrencyCode = "MVR"
+	CurrencyCodeMWK  CurrencyCode = "MWK"
+	CurrencyCodeMXN  CurrencyCode = "MXN"
+	CurrencyCodeMXV  CurrencyCode = "MXV"
+	CurrencyCodeMYR  CurrencyCode = "MYR"
+	CurrencyCodeMZN  CurrencyCode = "MZN"
+	CurrencyCodeNAD  CurrencyCode = "NAD"
+	CurrencyCodeNGN  CurrencyCode = "NGN"
+	CurrencyCodeNIO  CurrencyCode = "NIO"
+	CurrencyCodeNOK  CurrencyCode = "NOK"
+	CurrencyCodeNPR  CurrencyCode = "NPR"
+	CurrencyCodeNZD  CurrencyCode = "NZD"
+	CurrencyCodeOMR  CurrencyCode = "OMR"
+	CurrencyCodePAB  CurrencyCode = "PAB"
+	CurrencyCodePEN  CurrencyCode = "PEN"
+	CurrencyCodePGK  CurrencyCode = "PGK"
+	CurrencyCodePHP  CurrencyCode = "PHP"
+	CurrencyCodePKR  CurrencyCode = "PKR"
+	CurrencyCodePLN  CurrencyCode = "PLN"
+	CurrencyCodePYG  CurrencyCode = "PYG"
+	CurrencyCodeQAR  CurrencyCode = "QAR"
+	CurrencyCodeRON  CurrencyCode = "RON"
+	CurrencyCodeRSD  CurrencyCode = "RSD"
+	CurrencyCodeRUB  CurrencyCode = "RUB"
+	CurrencyCodeRWF  CurrencyCode = "RWF"
+	CurrencyCodeSAR  CurrencyCode = "SAR"
+	CurrencyCodeSBD  CurrencyCode = "SBD"
+	CurrencyCodeSCR  CurrencyCode = "SCR"
+	CurrencyCodeSDG  CurrencyCode = "SDG"
+	CurrencyCodeSEK  CurrencyCode = "SEK"
+	CurrencyCodeSGD  CurrencyCode = "SGD"
+	CurrencyCodeSHP  CurrencyCode = "SHP"
+	CurrencyCodeSLE  CurrencyCode = "SLE"
+	CurrencyCodeSOS  CurrencyCode = "SOS"
+	CurrencyCodeSRD  CurrencyCode = "SRD"
+	CurrencyCodeSSP  CurrencyCode = "SSP"
+	CurrencyCodeSTN  CurrencyCode = "STN"
+	CurrencyCodeSVC  CurrencyCode = "SVC"
+	CurrencyCodeSYP  CurrencyCode = "SYP"
+	CurrencyCodeSZL  CurrencyCode = "SZL"
+	CurrencyCodeTHB  CurrencyCode = "THB"
+	CurrencyCodeTJS  CurrencyCode = "TJS"
+	CurrencyCodeTMT  CurrencyCode = "TMT"
+	CurrencyCodeTND  CurrencyCode = "TND"
+	CurrencyCodeTOP  CurrencyCode = "TOP"
+	CurrencyCodeTRY  CurrencyCode = "TRY"
+	CurrencyCodeTTD  CurrencyCode = "TTD"
+	CurrencyCodeTWD  CurrencyCode = "TWD"
+	CurrencyCodeTZS  CurrencyCode = "TZS"
+	CurrencyCodeUAH  CurrencyCode = "UAH"
+	CurrencyCodeUGX  CurrencyCode = "UGX"
+	CurrencyCodeUSD  CurrencyCode = "USD"
+	CurrencyCodeUSN  CurrencyCode = "USN"
+	CurrencyCodeUYI  CurrencyCode = "UYI"
+	CurrencyCodeUYU  CurrencyCode = "UYU"
+	CurrencyCodeUYW  CurrencyCode = "UYW"
+	CurrencyCodeUZS  CurrencyCode = "UZS"
+	CurrencyCodeVED  CurrencyCode = "VED"
+	CurrencyCodeVES  CurrencyCode = "VES"
+	CurrencyCodeVND  CurrencyCode = "VND"
+	CurrencyCodeVUV  CurrencyCode = "VUV"
+	CurrencyCodeWST  CurrencyCode = "WST"
+	CurrencyCodeXAD  CurrencyCode = "XAD"
+	CurrencyCodeXAF  CurrencyCode = "XAF"
+	CurrencyCodeXCD  CurrencyCode = "XCD"
+	CurrencyCodeXCG  CurrencyCode = "XCG"
+	CurrencyCodeXOF  CurrencyCode = "XOF"
+	CurrencyCodeXPF  CurrencyCode = "XPF"
+	CurrencyCodeYER  CurrencyCode = "YER"
+	CurrencyCodeZAR  CurrencyCode = "ZAR"
+	CurrencyCodeZMW  CurrencyCode = "ZMW"
+	CurrencyCodeZWG  CurrencyCode = "ZWG"
+	CurrencyCodeBTC  CurrencyCode = "BTC"
+	CurrencyCodeETH  CurrencyCode = "ETH"
+	CurrencyCodeUSDC CurrencyCode = "USDC"
+	CurrencyCodeUSDT CurrencyCode = "USDT"
+)
+
+type CurrencyCode10 string
+
+const (
+	CurrencyCode10AED  CurrencyCode10 = "AED"
+	CurrencyCode10AFN  CurrencyCode10 = "AFN"
+	CurrencyCode10ALL  CurrencyCode10 = "ALL"
+	CurrencyCode10AMD  CurrencyCode10 = "AMD"
+	CurrencyCode10AOA  CurrencyCode10 = "AOA"
+	CurrencyCode10ARS  CurrencyCode10 = "ARS"
+	CurrencyCode10AUD  CurrencyCode10 = "AUD"
+	CurrencyCode10AWG  CurrencyCode10 = "AWG"
+	CurrencyCode10AZN  CurrencyCode10 = "AZN"
+	CurrencyCode10BAM  CurrencyCode10 = "BAM"
+	CurrencyCode10BBD  CurrencyCode10 = "BBD"
+	CurrencyCode10BDT  CurrencyCode10 = "BDT"
+	CurrencyCode10BHD  CurrencyCode10 = "BHD"
+	CurrencyCode10BIF  CurrencyCode10 = "BIF"
+	CurrencyCode10BMD  CurrencyCode10 = "BMD"
+	CurrencyCode10BND  CurrencyCode10 = "BND"
+	CurrencyCode10BOB  CurrencyCode10 = "BOB"
+	CurrencyCode10BOV  CurrencyCode10 = "BOV"
+	CurrencyCode10BRL  CurrencyCode10 = "BRL"
+	CurrencyCode10BSD  CurrencyCode10 = "BSD"
+	CurrencyCode10BTN  CurrencyCode10 = "BTN"
+	CurrencyCode10BWP  CurrencyCode10 = "BWP"
+	CurrencyCode10BYN  CurrencyCode10 = "BYN"
+	CurrencyCode10BZD  CurrencyCode10 = "BZD"
+	CurrencyCode10CAD  CurrencyCode10 = "CAD"
+	CurrencyCode10CDF  CurrencyCode10 = "CDF"
+	CurrencyCode10CHE  CurrencyCode10 = "CHE"
+	CurrencyCode10CHF  CurrencyCode10 = "CHF"
+	CurrencyCode10CHW  CurrencyCode10 = "CHW"
+	CurrencyCode10CLF  CurrencyCode10 = "CLF"
+	CurrencyCode10CLP  CurrencyCode10 = "CLP"
+	CurrencyCode10CNY  CurrencyCode10 = "CNY"
+	CurrencyCode10COP  CurrencyCode10 = "COP"
+	CurrencyCode10COU  CurrencyCode10 = "COU"
+	CurrencyCode10CRC  CurrencyCode10 = "CRC"
+	CurrencyCode10CUP  CurrencyCode10 = "CUP"
+	CurrencyCode10CVE  CurrencyCode10 = "CVE"
+	CurrencyCode10CZK  CurrencyCode10 = "CZK"
+	CurrencyCode10DJF  CurrencyCode10 = "DJF"
+	CurrencyCode10DKK  CurrencyCode10 = "DKK"
+	CurrencyCode10DOP  CurrencyCode10 = "DOP"
+	CurrencyCode10DZD  CurrencyCode10 = "DZD"
+	CurrencyCode10EGP  CurrencyCode10 = "EGP"
+	CurrencyCode10ERN  CurrencyCode10 = "ERN"
+	CurrencyCode10ETB  CurrencyCode10 = "ETB"
+	CurrencyCode10EUR  CurrencyCode10 = "EUR"
+	CurrencyCode10FJD  CurrencyCode10 = "FJD"
+	CurrencyCode10FKP  CurrencyCode10 = "FKP"
+	CurrencyCode10GBP  CurrencyCode10 = "GBP"
+	CurrencyCode10GEL  CurrencyCode10 = "GEL"
+	CurrencyCode10GHS  CurrencyCode10 = "GHS"
+	CurrencyCode10GIP  CurrencyCode10 = "GIP"
+	CurrencyCode10GMD  CurrencyCode10 = "GMD"
+	CurrencyCode10GNF  CurrencyCode10 = "GNF"
+	CurrencyCode10GTQ  CurrencyCode10 = "GTQ"
+	CurrencyCode10GYD  CurrencyCode10 = "GYD"
+	CurrencyCode10HKD  CurrencyCode10 = "HKD"
+	CurrencyCode10HNL  CurrencyCode10 = "HNL"
+	CurrencyCode10HTG  CurrencyCode10 = "HTG"
+	CurrencyCode10HUF  CurrencyCode10 = "HUF"
+	CurrencyCode10IDR  CurrencyCode10 = "IDR"
+	CurrencyCode10ILS  CurrencyCode10 = "ILS"
+	CurrencyCode10INR  CurrencyCode10 = "INR"
+	CurrencyCode10IQD  CurrencyCode10 = "IQD"
+	CurrencyCode10IRR  CurrencyCode10 = "IRR"
+	CurrencyCode10ISK  CurrencyCode10 = "ISK"
+	CurrencyCode10JMD  CurrencyCode10 = "JMD"
+	CurrencyCode10JOD  CurrencyCode10 = "JOD"
+	CurrencyCode10JPY  CurrencyCode10 = "JPY"
+	CurrencyCode10KES  CurrencyCode10 = "KES"
+	CurrencyCode10KGS  CurrencyCode10 = "KGS"
+	CurrencyCode10KHR  CurrencyCode10 = "KHR"
+	CurrencyCode10KMF  CurrencyCode10 = "KMF"
+	CurrencyCode10KPW  CurrencyCode10 = "KPW"
+	CurrencyCode10KRW  CurrencyCode10 = "KRW"
+	CurrencyCode10KWD  CurrencyCode10 = "KWD"
+	CurrencyCode10KYD  CurrencyCode10 = "KYD"
+	CurrencyCode10KZT  CurrencyCode10 = "KZT"
+	CurrencyCode10LAK  CurrencyCode10 = "LAK"
+	CurrencyCode10LBP  CurrencyCode10 = "LBP"
+	CurrencyCode10LKR  CurrencyCode10 = "LKR"
+	CurrencyCode10LRD  CurrencyCode10 = "LRD"
+	CurrencyCode10LSL  CurrencyCode10 = "LSL"
+	CurrencyCode10LYD  CurrencyCode10 = "LYD"
+	CurrencyCode10MAD  CurrencyCode10 = "MAD"
+	CurrencyCode10MDL  CurrencyCode10 = "MDL"
+	CurrencyCode10MGA  CurrencyCode10 = "MGA"
+	CurrencyCode10MKD  CurrencyCode10 = "MKD"
+	CurrencyCode10MMK  CurrencyCode10 = "MMK"
+	CurrencyCode10MNT  CurrencyCode10 = "MNT"
+	CurrencyCode10MOP  CurrencyCode10 = "MOP"
+	CurrencyCode10MRU  CurrencyCode10 = "MRU"
+	CurrencyCode10MUR  CurrencyCode10 = "MUR"
+	CurrencyCode10MVR  CurrencyCode10 = "MVR"
+	CurrencyCode10MWK  CurrencyCode10 = "MWK"
+	CurrencyCode10MXN  CurrencyCode10 = "MXN"
+	CurrencyCode10MXV  CurrencyCode10 = "MXV"
+	CurrencyCode10MYR  CurrencyCode10 = "MYR"
+	CurrencyCode10MZN  CurrencyCode10 = "MZN"
+	CurrencyCode10NAD  CurrencyCode10 = "NAD"
+	CurrencyCode10NGN  CurrencyCode10 = "NGN"
+	CurrencyCode10NIO  CurrencyCode10 = "NIO"
+	CurrencyCode10NOK  CurrencyCode10 = "NOK"
+	CurrencyCode10NPR  CurrencyCode10 = "NPR"
+	CurrencyCode10NZD  CurrencyCode10 = "NZD"
+	CurrencyCode10OMR  CurrencyCode10 = "OMR"
+	CurrencyCode10PAB  CurrencyCode10 = "PAB"
+	CurrencyCode10PEN  CurrencyCode10 = "PEN"
+	CurrencyCode10PGK  CurrencyCode10 = "PGK"
+	CurrencyCode10PHP  CurrencyCode10 = "PHP"
+	CurrencyCode10PKR  CurrencyCode10 = "PKR"
+	CurrencyCode10PLN  CurrencyCode10 = "PLN"
+	CurrencyCode10PYG  CurrencyCode10 = "PYG"
+	CurrencyCode10QAR  CurrencyCode10 = "QAR"
+	CurrencyCode10RON  CurrencyCode10 = "RON"
+	CurrencyCode10RSD  CurrencyCode10 = "RSD"
+	CurrencyCode10RUB  CurrencyCode10 = "RUB"
+	CurrencyCode10RWF  CurrencyCode10 = "RWF"
+	CurrencyCode10SAR  CurrencyCode10 = "SAR"
+	CurrencyCode10SBD  CurrencyCode10 = "SBD"
+	CurrencyCode10SCR  CurrencyCode10 = "SCR"
+	CurrencyCode10SDG  CurrencyCode10 = "SDG"
+	CurrencyCode10SEK  CurrencyCode10 = "SEK"
+	CurrencyCode10SGD  CurrencyCode10 = "SGD"
+	CurrencyCode10SHP  CurrencyCode10 = "SHP"
+	CurrencyCode10SLE  CurrencyCode10 = "SLE"
+	CurrencyCode10SOS  CurrencyCode10 = "SOS"
+	CurrencyCode10SRD  CurrencyCode10 = "SRD"
+	CurrencyCode10SSP  CurrencyCode10 = "SSP"
+	CurrencyCode10STN  CurrencyCode10 = "STN"
+	CurrencyCode10SVC  CurrencyCode10 = "SVC"
+	CurrencyCode10SYP  CurrencyCode10 = "SYP"
+	CurrencyCode10SZL  CurrencyCode10 = "SZL"
+	CurrencyCode10THB  CurrencyCode10 = "THB"
+	CurrencyCode10TJS  CurrencyCode10 = "TJS"
+	CurrencyCode10TMT  CurrencyCode10 = "TMT"
+	CurrencyCode10TND  CurrencyCode10 = "TND"
+	CurrencyCode10TOP  CurrencyCode10 = "TOP"
+	CurrencyCode10TRY  CurrencyCode10 = "TRY"
+	CurrencyCode10TTD  CurrencyCode10 = "TTD"
+	CurrencyCode10TWD  CurrencyCode10 = "TWD"
+	CurrencyCode10TZS  CurrencyCode10 = "TZS"
+	CurrencyCode10UAH  CurrencyCode10 = "UAH"
+	CurrencyCode10UGX  CurrencyCode10 = "UGX"
+	CurrencyCode10USD  CurrencyCode10 = "USD"
+	CurrencyCode10USN  CurrencyCode10 = "USN"
+	CurrencyCode10UYI  CurrencyCode10 = "UYI"
+	CurrencyCode10UYU  CurrencyCode10 = "UYU"
+	CurrencyCode10UYW  CurrencyCode10 = "UYW"
+	CurrencyCode10UZS  CurrencyCode10 = "UZS"
+	CurrencyCode10VED  CurrencyCode10 = "VED"
+	CurrencyCode10VES  CurrencyCode10 = "VES"
+	CurrencyCode10VND  CurrencyCode10 = "VND"
+	CurrencyCode10VUV  CurrencyCode10 = "VUV"
+	CurrencyCode10WST  CurrencyCode10 = "WST"
+	CurrencyCode10XAD  CurrencyCode10 = "XAD"
+	CurrencyCode10XAF  CurrencyCode10 = "XAF"
+	CurrencyCode10XCD  CurrencyCode10 = "XCD"
+	CurrencyCode10XCG  CurrencyCode10 = "XCG"
+	CurrencyCode10XOF  CurrencyCode10 = "XOF"
+	CurrencyCode10XPF  CurrencyCode10 = "XPF"
+	CurrencyCode10YER  CurrencyCode10 = "YER"
+	CurrencyCode10ZAR  CurrencyCode10 = "ZAR"
+	CurrencyCode10ZMW  CurrencyCode10 = "ZMW"
+	CurrencyCode10ZWG  CurrencyCode10 = "ZWG"
+	CurrencyCode10BTC  CurrencyCode10 = "BTC"
+	CurrencyCode10ETH  CurrencyCode10 = "ETH"
+	CurrencyCode10USDC CurrencyCode10 = "USDC"
+	CurrencyCode10USDT CurrencyCode10 = "USDT"
+)
+
+type CurrencyCode11 string
+
+const (
+	CurrencyCode11AED  CurrencyCode11 = "AED"
+	CurrencyCode11AFN  CurrencyCode11 = "AFN"
+	CurrencyCode11ALL  CurrencyCode11 = "ALL"
+	CurrencyCode11AMD  CurrencyCode11 = "AMD"
+	CurrencyCode11AOA  CurrencyCode11 = "AOA"
+	CurrencyCode11ARS  CurrencyCode11 = "ARS"
+	CurrencyCode11AUD  CurrencyCode11 = "AUD"
+	CurrencyCode11AWG  CurrencyCode11 = "AWG"
+	CurrencyCode11AZN  CurrencyCode11 = "AZN"
+	CurrencyCode11BAM  CurrencyCode11 = "BAM"
+	CurrencyCode11BBD  CurrencyCode11 = "BBD"
+	CurrencyCode11BDT  CurrencyCode11 = "BDT"
+	CurrencyCode11BHD  CurrencyCode11 = "BHD"
+	CurrencyCode11BIF  CurrencyCode11 = "BIF"
+	CurrencyCode11BMD  CurrencyCode11 = "BMD"
+	CurrencyCode11BND  CurrencyCode11 = "BND"
+	CurrencyCode11BOB  CurrencyCode11 = "BOB"
+	CurrencyCode11BOV  CurrencyCode11 = "BOV"
+	CurrencyCode11BRL  CurrencyCode11 = "BRL"
+	CurrencyCode11BSD  CurrencyCode11 = "BSD"
+	CurrencyCode11BTN  CurrencyCode11 = "BTN"
+	CurrencyCode11BWP  CurrencyCode11 = "BWP"
+	CurrencyCode11BYN  CurrencyCode11 = "BYN"
+	CurrencyCode11BZD  CurrencyCode11 = "BZD"
+	CurrencyCode11CAD  CurrencyCode11 = "CAD"
+	CurrencyCode11CDF  CurrencyCode11 = "CDF"
+	CurrencyCode11CHE  CurrencyCode11 = "CHE"
+	CurrencyCode11CHF  CurrencyCode11 = "CHF"
+	CurrencyCode11CHW  CurrencyCode11 = "CHW"
+	CurrencyCode11CLF  CurrencyCode11 = "CLF"
+	CurrencyCode11CLP  CurrencyCode11 = "CLP"
+	CurrencyCode11CNY  CurrencyCode11 = "CNY"
+	CurrencyCode11COP  CurrencyCode11 = "COP"
+	CurrencyCode11COU  CurrencyCode11 = "COU"
+	CurrencyCode11CRC  CurrencyCode11 = "CRC"
+	CurrencyCode11CUP  CurrencyCode11 = "CUP"
+	CurrencyCode11CVE  CurrencyCode11 = "CVE"
+	CurrencyCode11CZK  CurrencyCode11 = "CZK"
+	CurrencyCode11DJF  CurrencyCode11 = "DJF"
+	CurrencyCode11DKK  CurrencyCode11 = "DKK"
+	CurrencyCode11DOP  CurrencyCode11 = "DOP"
+	CurrencyCode11DZD  CurrencyCode11 = "DZD"
+	CurrencyCode11EGP  CurrencyCode11 = "EGP"
+	CurrencyCode11ERN  CurrencyCode11 = "ERN"
+	CurrencyCode11ETB  CurrencyCode11 = "ETB"
+	CurrencyCode11EUR  CurrencyCode11 = "EUR"
+	CurrencyCode11FJD  CurrencyCode11 = "FJD"
+	CurrencyCode11FKP  CurrencyCode11 = "FKP"
+	CurrencyCode11GBP  CurrencyCode11 = "GBP"
+	CurrencyCode11GEL  CurrencyCode11 = "GEL"
+	CurrencyCode11GHS  CurrencyCode11 = "GHS"
+	CurrencyCode11GIP  CurrencyCode11 = "GIP"
+	CurrencyCode11GMD  CurrencyCode11 = "GMD"
+	CurrencyCode11GNF  CurrencyCode11 = "GNF"
+	CurrencyCode11GTQ  CurrencyCode11 = "GTQ"
+	CurrencyCode11GYD  CurrencyCode11 = "GYD"
+	CurrencyCode11HKD  CurrencyCode11 = "HKD"
+	CurrencyCode11HNL  CurrencyCode11 = "HNL"
+	CurrencyCode11HTG  CurrencyCode11 = "HTG"
+	CurrencyCode11HUF  CurrencyCode11 = "HUF"
+	CurrencyCode11IDR  CurrencyCode11 = "IDR"
+	CurrencyCode11ILS  CurrencyCode11 = "ILS"
+	CurrencyCode11INR  CurrencyCode11 = "INR"
+	CurrencyCode11IQD  CurrencyCode11 = "IQD"
+	CurrencyCode11IRR  CurrencyCode11 = "IRR"
+	CurrencyCode11ISK  CurrencyCode11 = "ISK"
+	CurrencyCode11JMD  CurrencyCode11 = "JMD"
+	CurrencyCode11JOD  CurrencyCode11 = "JOD"
+	CurrencyCode11JPY  CurrencyCode11 = "JPY"
+	CurrencyCode11KES  CurrencyCode11 = "KES"
+	CurrencyCode11KGS  CurrencyCode11 = "KGS"
+	CurrencyCode11KHR  CurrencyCode11 = "KHR"
+	CurrencyCode11KMF  CurrencyCode11 = "KMF"
+	CurrencyCode11KPW  CurrencyCode11 = "KPW"
+	CurrencyCode11KRW  CurrencyCode11 = "KRW"
+	CurrencyCode11KWD  CurrencyCode11 = "KWD"
+	CurrencyCode11KYD  CurrencyCode11 = "KYD"
+	CurrencyCode11KZT  CurrencyCode11 = "KZT"
+	CurrencyCode11LAK  CurrencyCode11 = "LAK"
+	CurrencyCode11LBP  CurrencyCode11 = "LBP"
+	CurrencyCode11LKR  CurrencyCode11 = "LKR"
+	CurrencyCode11LRD  CurrencyCode11 = "LRD"
+	CurrencyCode11LSL  CurrencyCode11 = "LSL"
+	CurrencyCode11LYD  CurrencyCode11 = "LYD"
+	CurrencyCode11MAD  CurrencyCode11 = "MAD"
+	CurrencyCode11MDL  CurrencyCode11 = "MDL"
+	CurrencyCode11MGA  CurrencyCode11 = "MGA"
+	CurrencyCode11MKD  CurrencyCode11 = "MKD"
+	CurrencyCode11MMK  CurrencyCode11 = "MMK"
+	CurrencyCode11MNT  CurrencyCode11 = "MNT"
+	CurrencyCode11MOP  CurrencyCode11 = "MOP"
+	CurrencyCode11MRU  CurrencyCode11 = "MRU"
+	CurrencyCode11MUR  CurrencyCode11 = "MUR"
+	CurrencyCode11MVR  CurrencyCode11 = "MVR"
+	CurrencyCode11MWK  CurrencyCode11 = "MWK"
+	CurrencyCode11MXN  CurrencyCode11 = "MXN"
+	CurrencyCode11MXV  CurrencyCode11 = "MXV"
+	CurrencyCode11MYR  CurrencyCode11 = "MYR"
+	CurrencyCode11MZN  CurrencyCode11 = "MZN"
+	CurrencyCode11NAD  CurrencyCode11 = "NAD"
+	CurrencyCode11NGN  CurrencyCode11 = "NGN"
+	CurrencyCode11NIO  CurrencyCode11 = "NIO"
+	CurrencyCode11NOK  CurrencyCode11 = "NOK"
+	CurrencyCode11NPR  CurrencyCode11 = "NPR"
+	CurrencyCode11NZD  CurrencyCode11 = "NZD"
+	CurrencyCode11OMR  CurrencyCode11 = "OMR"
+	CurrencyCode11PAB  CurrencyCode11 = "PAB"
+	CurrencyCode11PEN  CurrencyCode11 = "PEN"
+	CurrencyCode11PGK  CurrencyCode11 = "PGK"
+	CurrencyCode11PHP  CurrencyCode11 = "PHP"
+	CurrencyCode11PKR  CurrencyCode11 = "PKR"
+	CurrencyCode11PLN  CurrencyCode11 = "PLN"
+	CurrencyCode11PYG  CurrencyCode11 = "PYG"
+	CurrencyCode11QAR  CurrencyCode11 = "QAR"
+	CurrencyCode11RON  CurrencyCode11 = "RON"
+	CurrencyCode11RSD  CurrencyCode11 = "RSD"
+	CurrencyCode11RUB  CurrencyCode11 = "RUB"
+	CurrencyCode11RWF  CurrencyCode11 = "RWF"
+	CurrencyCode11SAR  CurrencyCode11 = "SAR"
+	CurrencyCode11SBD  CurrencyCode11 = "SBD"
+	CurrencyCode11SCR  CurrencyCode11 = "SCR"
+	CurrencyCode11SDG  CurrencyCode11 = "SDG"
+	CurrencyCode11SEK  CurrencyCode11 = "SEK"
+	CurrencyCode11SGD  CurrencyCode11 = "SGD"
+	CurrencyCode11SHP  CurrencyCode11 = "SHP"
+	CurrencyCode11SLE  CurrencyCode11 = "SLE"
+	CurrencyCode11SOS  CurrencyCode11 = "SOS"
+	CurrencyCode11SRD  CurrencyCode11 = "SRD"
+	CurrencyCode11SSP  CurrencyCode11 = "SSP"
+	CurrencyCode11STN  CurrencyCode11 = "STN"
+	CurrencyCode11SVC  CurrencyCode11 = "SVC"
+	CurrencyCode11SYP  CurrencyCode11 = "SYP"
+	CurrencyCode11SZL  CurrencyCode11 = "SZL"
+	CurrencyCode11THB  CurrencyCode11 = "THB"
+	CurrencyCode11TJS  CurrencyCode11 = "TJS"
+	CurrencyCode11TMT  CurrencyCode11 = "TMT"
+	CurrencyCode11TND  CurrencyCode11 = "TND"
+	CurrencyCode11TOP  CurrencyCode11 = "TOP"
+	CurrencyCode11TRY  CurrencyCode11 = "TRY"
+	CurrencyCode11TTD  CurrencyCode11 = "TTD"
+	CurrencyCode11TWD  CurrencyCode11 = "TWD"
+	CurrencyCode11TZS  CurrencyCode11 = "TZS"
+	CurrencyCode11UAH  CurrencyCode11 = "UAH"
+	CurrencyCode11UGX  CurrencyCode11 = "UGX"
+	CurrencyCode11USD  CurrencyCode11 = "USD"
+	CurrencyCode11USN  CurrencyCode11 = "USN"
+	CurrencyCode11UYI  CurrencyCode11 = "UYI"
+	CurrencyCode11UYU  CurrencyCode11 = "UYU"
+	CurrencyCode11UYW  CurrencyCode11 = "UYW"
+	CurrencyCode11UZS  CurrencyCode11 = "UZS"
+	CurrencyCode11VED  CurrencyCode11 = "VED"
+	CurrencyCode11VES  CurrencyCode11 = "VES"
+	CurrencyCode11VND  CurrencyCode11 = "VND"
+	CurrencyCode11VUV  CurrencyCode11 = "VUV"
+	CurrencyCode11WST  CurrencyCode11 = "WST"
+	CurrencyCode11XAD  CurrencyCode11 = "XAD"
+	CurrencyCode11XAF  CurrencyCode11 = "XAF"
+	CurrencyCode11XCD  CurrencyCode11 = "XCD"
+	CurrencyCode11XCG  CurrencyCode11 = "XCG"
+	CurrencyCode11XOF  CurrencyCode11 = "XOF"
+	CurrencyCode11XPF  CurrencyCode11 = "XPF"
+	CurrencyCode11YER  CurrencyCode11 = "YER"
+	CurrencyCode11ZAR  CurrencyCode11 = "ZAR"
+	CurrencyCode11ZMW  CurrencyCode11 = "ZMW"
+	CurrencyCode11ZWG  CurrencyCode11 = "ZWG"
+	CurrencyCode11BTC  CurrencyCode11 = "BTC"
+	CurrencyCode11ETH  CurrencyCode11 = "ETH"
+	CurrencyCode11USDC CurrencyCode11 = "USDC"
+	CurrencyCode11USDT CurrencyCode11 = "USDT"
+)
+
+type CurrencyCode12 string
+
+const (
+	CurrencyCode12AED  CurrencyCode12 = "AED"
+	CurrencyCode12AFN  CurrencyCode12 = "AFN"
+	CurrencyCode12ALL  CurrencyCode12 = "ALL"
+	CurrencyCode12AMD  CurrencyCode12 = "AMD"
+	CurrencyCode12AOA  CurrencyCode12 = "AOA"
+	CurrencyCode12ARS  CurrencyCode12 = "ARS"
+	CurrencyCode12AUD  CurrencyCode12 = "AUD"
+	CurrencyCode12AWG  CurrencyCode12 = "AWG"
+	CurrencyCode12AZN  CurrencyCode12 = "AZN"
+	CurrencyCode12BAM  CurrencyCode12 = "BAM"
+	CurrencyCode12BBD  CurrencyCode12 = "BBD"
+	CurrencyCode12BDT  CurrencyCode12 = "BDT"
+	CurrencyCode12BHD  CurrencyCode12 = "BHD"
+	CurrencyCode12BIF  CurrencyCode12 = "BIF"
+	CurrencyCode12BMD  CurrencyCode12 = "BMD"
+	CurrencyCode12BND  CurrencyCode12 = "BND"
+	CurrencyCode12BOB  CurrencyCode12 = "BOB"
+	CurrencyCode12BOV  CurrencyCode12 = "BOV"
+	CurrencyCode12BRL  CurrencyCode12 = "BRL"
+	CurrencyCode12BSD  CurrencyCode12 = "BSD"
+	CurrencyCode12BTN  CurrencyCode12 = "BTN"
+	CurrencyCode12BWP  CurrencyCode12 = "BWP"
+	CurrencyCode12BYN  CurrencyCode12 = "BYN"
+	CurrencyCode12BZD  CurrencyCode12 = "BZD"
+	CurrencyCode12CAD  CurrencyCode12 = "CAD"
+	CurrencyCode12CDF  CurrencyCode12 = "CDF"
+	CurrencyCode12CHE  CurrencyCode12 = "CHE"
+	CurrencyCode12CHF  CurrencyCode12 = "CHF"
+	CurrencyCode12CHW  CurrencyCode12 = "CHW"
+	CurrencyCode12CLF  CurrencyCode12 = "CLF"
+	CurrencyCode12CLP  CurrencyCode12 = "CLP"
+	CurrencyCode12CNY  CurrencyCode12 = "CNY"
+	CurrencyCode12COP  CurrencyCode12 = "COP"
+	CurrencyCode12COU  CurrencyCode12 = "COU"
+	CurrencyCode12CRC  CurrencyCode12 = "CRC"
+	CurrencyCode12CUP  CurrencyCode12 = "CUP"
+	CurrencyCode12CVE  CurrencyCode12 = "CVE"
+	CurrencyCode12CZK  CurrencyCode12 = "CZK"
+	CurrencyCode12DJF  CurrencyCode12 = "DJF"
+	CurrencyCode12DKK  CurrencyCode12 = "DKK"
+	CurrencyCode12DOP  CurrencyCode12 = "DOP"
+	CurrencyCode12DZD  CurrencyCode12 = "DZD"
+	CurrencyCode12EGP  CurrencyCode12 = "EGP"
+	CurrencyCode12ERN  CurrencyCode12 = "ERN"
+	CurrencyCode12ETB  CurrencyCode12 = "ETB"
+	CurrencyCode12EUR  CurrencyCode12 = "EUR"
+	CurrencyCode12FJD  CurrencyCode12 = "FJD"
+	CurrencyCode12FKP  CurrencyCode12 = "FKP"
+	CurrencyCode12GBP  CurrencyCode12 = "GBP"
+	CurrencyCode12GEL  CurrencyCode12 = "GEL"
+	CurrencyCode12GHS  CurrencyCode12 = "GHS"
+	CurrencyCode12GIP  CurrencyCode12 = "GIP"
+	CurrencyCode12GMD  CurrencyCode12 = "GMD"
+	CurrencyCode12GNF  CurrencyCode12 = "GNF"
+	CurrencyCode12GTQ  CurrencyCode12 = "GTQ"
+	CurrencyCode12GYD  CurrencyCode12 = "GYD"
+	CurrencyCode12HKD  CurrencyCode12 = "HKD"
+	CurrencyCode12HNL  CurrencyCode12 = "HNL"
+	CurrencyCode12HTG  CurrencyCode12 = "HTG"
+	CurrencyCode12HUF  CurrencyCode12 = "HUF"
+	CurrencyCode12IDR  CurrencyCode12 = "IDR"
+	CurrencyCode12ILS  CurrencyCode12 = "ILS"
+	CurrencyCode12INR  CurrencyCode12 = "INR"
+	CurrencyCode12IQD  CurrencyCode12 = "IQD"
+	CurrencyCode12IRR  CurrencyCode12 = "IRR"
+	CurrencyCode12ISK  CurrencyCode12 = "ISK"
+	CurrencyCode12JMD  CurrencyCode12 = "JMD"
+	CurrencyCode12JOD  CurrencyCode12 = "JOD"
+	CurrencyCode12JPY  CurrencyCode12 = "JPY"
+	CurrencyCode12KES  CurrencyCode12 = "KES"
+	CurrencyCode12KGS  CurrencyCode12 = "KGS"
+	CurrencyCode12KHR  CurrencyCode12 = "KHR"
+	CurrencyCode12KMF  CurrencyCode12 = "KMF"
+	CurrencyCode12KPW  CurrencyCode12 = "KPW"
+	CurrencyCode12KRW  CurrencyCode12 = "KRW"
+	CurrencyCode12KWD  CurrencyCode12 = "KWD"
+	CurrencyCode12KYD  CurrencyCode12 = "KYD"
+	CurrencyCode12KZT  CurrencyCode12 = "KZT"
+	CurrencyCode12LAK  CurrencyCode12 = "LAK"
+	CurrencyCode12LBP  CurrencyCode12 = "LBP"
+	CurrencyCode12LKR  CurrencyCode12 = "LKR"
+	CurrencyCode12LRD  CurrencyCode12 = "LRD"
+	CurrencyCode12LSL  CurrencyCode12 = "LSL"
+	CurrencyCode12LYD  CurrencyCode12 = "LYD"
+	CurrencyCode12MAD  CurrencyCode12 = "MAD"
+	CurrencyCode12MDL  CurrencyCode12 = "MDL"
+	CurrencyCode12MGA  CurrencyCode12 = "MGA"
+	CurrencyCode12MKD  CurrencyCode12 = "MKD"
+	CurrencyCode12MMK  CurrencyCode12 = "MMK"
+	CurrencyCode12MNT  CurrencyCode12 = "MNT"
+	CurrencyCode12MOP  CurrencyCode12 = "MOP"
+	CurrencyCode12MRU  CurrencyCode12 = "MRU"
+	CurrencyCode12MUR  CurrencyCode12 = "MUR"
+	CurrencyCode12MVR  CurrencyCode12 = "MVR"
+	CurrencyCode12MWK  CurrencyCode12 = "MWK"
+	CurrencyCode12MXN  CurrencyCode12 = "MXN"
+	CurrencyCode12MXV  CurrencyCode12 = "MXV"
+	CurrencyCode12MYR  CurrencyCode12 = "MYR"
+	CurrencyCode12MZN  CurrencyCode12 = "MZN"
+	CurrencyCode12NAD  CurrencyCode12 = "NAD"
+	CurrencyCode12NGN  CurrencyCode12 = "NGN"
+	CurrencyCode12NIO  CurrencyCode12 = "NIO"
+	CurrencyCode12NOK  CurrencyCode12 = "NOK"
+	CurrencyCode12NPR  CurrencyCode12 = "NPR"
+	CurrencyCode12NZD  CurrencyCode12 = "NZD"
+	CurrencyCode12OMR  CurrencyCode12 = "OMR"
+	CurrencyCode12PAB  CurrencyCode12 = "PAB"
+	CurrencyCode12PEN  CurrencyCode12 = "PEN"
+	CurrencyCode12PGK  CurrencyCode12 = "PGK"
+	CurrencyCode12PHP  CurrencyCode12 = "PHP"
+	CurrencyCode12PKR  CurrencyCode12 = "PKR"
+	CurrencyCode12PLN  CurrencyCode12 = "PLN"
+	CurrencyCode12PYG  CurrencyCode12 = "PYG"
+	CurrencyCode12QAR  CurrencyCode12 = "QAR"
+	CurrencyCode12RON  CurrencyCode12 = "RON"
+	CurrencyCode12RSD  CurrencyCode12 = "RSD"
+	CurrencyCode12RUB  CurrencyCode12 = "RUB"
+	CurrencyCode12RWF  CurrencyCode12 = "RWF"
+	CurrencyCode12SAR  CurrencyCode12 = "SAR"
+	CurrencyCode12SBD  CurrencyCode12 = "SBD"
+	CurrencyCode12SCR  CurrencyCode12 = "SCR"
+	CurrencyCode12SDG  CurrencyCode12 = "SDG"
+	CurrencyCode12SEK  CurrencyCode12 = "SEK"
+	CurrencyCode12SGD  CurrencyCode12 = "SGD"
+	CurrencyCode12SHP  CurrencyCode12 = "SHP"
+	CurrencyCode12SLE  CurrencyCode12 = "SLE"
+	CurrencyCode12SOS  CurrencyCode12 = "SOS"
+	CurrencyCode12SRD  CurrencyCode12 = "SRD"
+	CurrencyCode12SSP  CurrencyCode12 = "SSP"
+	CurrencyCode12STN  CurrencyCode12 = "STN"
+	CurrencyCode12SVC  CurrencyCode12 = "SVC"
+	CurrencyCode12SYP  CurrencyCode12 = "SYP"
+	CurrencyCode12SZL  CurrencyCode12 = "SZL"
+	CurrencyCode12THB  CurrencyCode12 = "THB"
+	CurrencyCode12TJS  CurrencyCode12 = "TJS"
+	CurrencyCode12TMT  CurrencyCode12 = "TMT"
+	CurrencyCode12TND  CurrencyCode12 = "TND"
+	CurrencyCode12TOP  CurrencyCode12 = "TOP"
+	CurrencyCode12TRY  CurrencyCode12 = "TRY"
+	CurrencyCode12TTD  CurrencyCode12 = "TTD"
+	CurrencyCode12TWD  CurrencyCode12 = "TWD"
+	CurrencyCode12TZS  CurrencyCode12 = "TZS"
+	CurrencyCode12UAH  CurrencyCode12 = "UAH"
+	CurrencyCode12UGX  CurrencyCode12 = "UGX"
+	CurrencyCode12USD  CurrencyCode12 = "USD"
+	CurrencyCode12USN  CurrencyCode12 = "USN"
+	CurrencyCode12UYI  CurrencyCode12 = "UYI"
+	CurrencyCode12UYU  CurrencyCode12 = "UYU"
+	CurrencyCode12UYW  CurrencyCode12 = "UYW"
+	CurrencyCode12UZS  CurrencyCode12 = "UZS"
+	CurrencyCode12VED  CurrencyCode12 = "VED"
+	CurrencyCode12VES  CurrencyCode12 = "VES"
+	CurrencyCode12VND  CurrencyCode12 = "VND"
+	CurrencyCode12VUV  CurrencyCode12 = "VUV"
+	CurrencyCode12WST  CurrencyCode12 = "WST"
+	CurrencyCode12XAD  CurrencyCode12 = "XAD"
+	CurrencyCode12XAF  CurrencyCode12 = "XAF"
+	CurrencyCode12XCD  CurrencyCode12 = "XCD"
+	CurrencyCode12XCG  CurrencyCode12 = "XCG"
+	CurrencyCode12XOF  CurrencyCode12 = "XOF"
+	CurrencyCode12XPF  CurrencyCode12 = "XPF"
+	CurrencyCode12YER  CurrencyCode12 = "YER"
+	CurrencyCode12ZAR  CurrencyCode12 = "ZAR"
+	CurrencyCode12ZMW  CurrencyCode12 = "ZMW"
+	CurrencyCode12ZWG  CurrencyCode12 = "ZWG"
+	CurrencyCode12BTC  CurrencyCode12 = "BTC"
+	CurrencyCode12ETH  CurrencyCode12 = "ETH"
+	CurrencyCode12USDC CurrencyCode12 = "USDC"
+	CurrencyCode12USDT CurrencyCode12 = "USDT"
+)
+
+type CurrencyCode13 string
+
+const (
+	CurrencyCode13AED  CurrencyCode13 = "AED"
+	CurrencyCode13AFN  CurrencyCode13 = "AFN"
+	CurrencyCode13ALL  CurrencyCode13 = "ALL"
+	CurrencyCode13AMD  CurrencyCode13 = "AMD"
+	CurrencyCode13AOA  CurrencyCode13 = "AOA"
+	CurrencyCode13ARS  CurrencyCode13 = "ARS"
+	CurrencyCode13AUD  CurrencyCode13 = "AUD"
+	CurrencyCode13AWG  CurrencyCode13 = "AWG"
+	CurrencyCode13AZN  CurrencyCode13 = "AZN"
+	CurrencyCode13BAM  CurrencyCode13 = "BAM"
+	CurrencyCode13BBD  CurrencyCode13 = "BBD"
+	CurrencyCode13BDT  CurrencyCode13 = "BDT"
+	CurrencyCode13BHD  CurrencyCode13 = "BHD"
+	CurrencyCode13BIF  CurrencyCode13 = "BIF"
+	CurrencyCode13BMD  CurrencyCode13 = "BMD"
+	CurrencyCode13BND  CurrencyCode13 = "BND"
+	CurrencyCode13BOB  CurrencyCode13 = "BOB"
+	CurrencyCode13BOV  CurrencyCode13 = "BOV"
+	CurrencyCode13BRL  CurrencyCode13 = "BRL"
+	CurrencyCode13BSD  CurrencyCode13 = "BSD"
+	CurrencyCode13BTN  CurrencyCode13 = "BTN"
+	CurrencyCode13BWP  CurrencyCode13 = "BWP"
+	CurrencyCode13BYN  CurrencyCode13 = "BYN"
+	CurrencyCode13BZD  CurrencyCode13 = "BZD"
+	CurrencyCode13CAD  CurrencyCode13 = "CAD"
+	CurrencyCode13CDF  CurrencyCode13 = "CDF"
+	CurrencyCode13CHE  CurrencyCode13 = "CHE"
+	CurrencyCode13CHF  CurrencyCode13 = "CHF"
+	CurrencyCode13CHW  CurrencyCode13 = "CHW"
+	CurrencyCode13CLF  CurrencyCode13 = "CLF"
+	CurrencyCode13CLP  CurrencyCode13 = "CLP"
+	CurrencyCode13CNY  CurrencyCode13 = "CNY"
+	CurrencyCode13COP  CurrencyCode13 = "COP"
+	CurrencyCode13COU  CurrencyCode13 = "COU"
+	CurrencyCode13CRC  CurrencyCode13 = "CRC"
+	CurrencyCode13CUP  CurrencyCode13 = "CUP"
+	CurrencyCode13CVE  CurrencyCode13 = "CVE"
+	CurrencyCode13CZK  CurrencyCode13 = "CZK"
+	CurrencyCode13DJF  CurrencyCode13 = "DJF"
+	CurrencyCode13DKK  CurrencyCode13 = "DKK"
+	CurrencyCode13DOP  CurrencyCode13 = "DOP"
+	CurrencyCode13DZD  CurrencyCode13 = "DZD"
+	CurrencyCode13EGP  CurrencyCode13 = "EGP"
+	CurrencyCode13ERN  CurrencyCode13 = "ERN"
+	CurrencyCode13ETB  CurrencyCode13 = "ETB"
+	CurrencyCode13EUR  CurrencyCode13 = "EUR"
+	CurrencyCode13FJD  CurrencyCode13 = "FJD"
+	CurrencyCode13FKP  CurrencyCode13 = "FKP"
+	CurrencyCode13GBP  CurrencyCode13 = "GBP"
+	CurrencyCode13GEL  CurrencyCode13 = "GEL"
+	CurrencyCode13GHS  CurrencyCode13 = "GHS"
+	CurrencyCode13GIP  CurrencyCode13 = "GIP"
+	CurrencyCode13GMD  CurrencyCode13 = "GMD"
+	CurrencyCode13GNF  CurrencyCode13 = "GNF"
+	CurrencyCode13GTQ  CurrencyCode13 = "GTQ"
+	CurrencyCode13GYD  CurrencyCode13 = "GYD"
+	CurrencyCode13HKD  CurrencyCode13 = "HKD"
+	CurrencyCode13HNL  CurrencyCode13 = "HNL"
+	CurrencyCode13HTG  CurrencyCode13 = "HTG"
+	CurrencyCode13HUF  CurrencyCode13 = "HUF"
+	CurrencyCode13IDR  CurrencyCode13 = "IDR"
+	CurrencyCode13ILS  CurrencyCode13 = "ILS"
+	CurrencyCode13INR  CurrencyCode13 = "INR"
+	CurrencyCode13IQD  CurrencyCode13 = "IQD"
+	CurrencyCode13IRR  CurrencyCode13 = "IRR"
+	CurrencyCode13ISK  CurrencyCode13 = "ISK"
+	CurrencyCode13JMD  CurrencyCode13 = "JMD"
+	CurrencyCode13JOD  CurrencyCode13 = "JOD"
+	CurrencyCode13JPY  CurrencyCode13 = "JPY"
+	CurrencyCode13KES  CurrencyCode13 = "KES"
+	CurrencyCode13KGS  CurrencyCode13 = "KGS"
+	CurrencyCode13KHR  CurrencyCode13 = "KHR"
+	CurrencyCode13KMF  CurrencyCode13 = "KMF"
+	CurrencyCode13KPW  CurrencyCode13 = "KPW"
+	CurrencyCode13KRW  CurrencyCode13 = "KRW"
+	CurrencyCode13KWD  CurrencyCode13 = "KWD"
+	CurrencyCode13KYD  CurrencyCode13 = "KYD"
+	CurrencyCode13KZT  CurrencyCode13 = "KZT"
+	CurrencyCode13LAK  CurrencyCode13 = "LAK"
+	CurrencyCode13LBP  CurrencyCode13 = "LBP"
+	CurrencyCode13LKR  CurrencyCode13 = "LKR"
+	CurrencyCode13LRD  CurrencyCode13 = "LRD"
+	CurrencyCode13LSL  CurrencyCode13 = "LSL"
+	CurrencyCode13LYD  CurrencyCode13 = "LYD"
+	CurrencyCode13MAD  CurrencyCode13 = "MAD"
+	CurrencyCode13MDL  CurrencyCode13 = "MDL"
+	CurrencyCode13MGA  CurrencyCode13 = "MGA"
+	CurrencyCode13MKD  CurrencyCode13 = "MKD"
+	CurrencyCode13MMK  CurrencyCode13 = "MMK"
+	CurrencyCode13MNT  CurrencyCode13 = "MNT"
+	CurrencyCode13MOP  CurrencyCode13 = "MOP"
+	CurrencyCode13MRU  CurrencyCode13 = "MRU"
+	CurrencyCode13MUR  CurrencyCode13 = "MUR"
+	CurrencyCode13MVR  CurrencyCode13 = "MVR"
+	CurrencyCode13MWK  CurrencyCode13 = "MWK"
+	CurrencyCode13MXN  CurrencyCode13 = "MXN"
+	CurrencyCode13MXV  CurrencyCode13 = "MXV"
+	CurrencyCode13MYR  CurrencyCode13 = "MYR"
+	CurrencyCode13MZN  CurrencyCode13 = "MZN"
+	CurrencyCode13NAD  CurrencyCode13 = "NAD"
+	CurrencyCode13NGN  CurrencyCode13 = "NGN"
+	CurrencyCode13NIO  CurrencyCode13 = "NIO"
+	CurrencyCode13NOK  CurrencyCode13 = "NOK"
+	CurrencyCode13NPR  CurrencyCode13 = "NPR"
+	CurrencyCode13NZD  CurrencyCode13 = "NZD"
+	CurrencyCode13OMR  CurrencyCode13 = "OMR"
+	CurrencyCode13PAB  CurrencyCode13 = "PAB"
+	CurrencyCode13PEN  CurrencyCode13 = "PEN"
+	CurrencyCode13PGK  CurrencyCode13 = "PGK"
+	CurrencyCode13PHP  CurrencyCode13 = "PHP"
+	CurrencyCode13PKR  CurrencyCode13 = "PKR"
+	CurrencyCode13PLN  CurrencyCode13 = "PLN"
+	CurrencyCode13PYG  CurrencyCode13 = "PYG"
+	CurrencyCode13QAR  CurrencyCode13 = "QAR"
+	CurrencyCode13RON  CurrencyCode13 = "RON"
+	CurrencyCode13RSD  CurrencyCode13 = "RSD"
+	CurrencyCode13RUB  CurrencyCode13 = "RUB"
+	CurrencyCode13RWF  CurrencyCode13 = "RWF"
+	CurrencyCode13SAR  CurrencyCode13 = "SAR"
+	CurrencyCode13SBD  CurrencyCode13 = "SBD"
+	CurrencyCode13SCR  CurrencyCode13 = "SCR"
+	CurrencyCode13SDG  CurrencyCode13 = "SDG"
+	CurrencyCode13SEK  CurrencyCode13 = "SEK"
+	CurrencyCode13SGD  CurrencyCode13 = "SGD"
+	CurrencyCode13SHP  CurrencyCode13 = "SHP"
+	CurrencyCode13SLE  CurrencyCode13 = "SLE"
+	CurrencyCode13SOS  CurrencyCode13 = "SOS"
+	CurrencyCode13SRD  CurrencyCode13 = "SRD"
+	CurrencyCode13SSP  CurrencyCode13 = "SSP"
+	CurrencyCode13STN  CurrencyCode13 = "STN"
+	CurrencyCode13SVC  CurrencyCode13 = "SVC"
+	CurrencyCode13SYP  CurrencyCode13 = "SYP"
+	CurrencyCode13SZL  CurrencyCode13 = "SZL"
+	CurrencyCode13THB  CurrencyCode13 = "THB"
+	CurrencyCode13TJS  CurrencyCode13 = "TJS"
+	CurrencyCode13TMT  CurrencyCode13 = "TMT"
+	CurrencyCode13TND  CurrencyCode13 = "TND"
+	CurrencyCode13TOP  CurrencyCode13 = "TOP"
+	CurrencyCode13TRY  CurrencyCode13 = "TRY"
+	CurrencyCode13TTD  CurrencyCode13 = "TTD"
+	CurrencyCode13TWD  CurrencyCode13 = "TWD"
+	CurrencyCode13TZS  CurrencyCode13 = "TZS"
+	CurrencyCode13UAH  CurrencyCode13 = "UAH"
+	CurrencyCode13UGX  CurrencyCode13 = "UGX"
+	CurrencyCode13USD  CurrencyCode13 = "USD"
+	CurrencyCode13USN  CurrencyCode13 = "USN"
+	CurrencyCode13UYI  CurrencyCode13 = "UYI"
+	CurrencyCode13UYU  CurrencyCode13 = "UYU"
+	CurrencyCode13UYW  CurrencyCode13 = "UYW"
+	CurrencyCode13UZS  CurrencyCode13 = "UZS"
+	CurrencyCode13VED  CurrencyCode13 = "VED"
+	CurrencyCode13VES  CurrencyCode13 = "VES"
+	CurrencyCode13VND  CurrencyCode13 = "VND"
+	CurrencyCode13VUV  CurrencyCode13 = "VUV"
+	CurrencyCode13WST  CurrencyCode13 = "WST"
+	CurrencyCode13XAD  CurrencyCode13 = "XAD"
+	CurrencyCode13XAF  CurrencyCode13 = "XAF"
+	CurrencyCode13XCD  CurrencyCode13 = "XCD"
+	CurrencyCode13XCG  CurrencyCode13 = "XCG"
+	CurrencyCode13XOF  CurrencyCode13 = "XOF"
+	CurrencyCode13XPF  CurrencyCode13 = "XPF"
+	CurrencyCode13YER  CurrencyCode13 = "YER"
+	CurrencyCode13ZAR  CurrencyCode13 = "ZAR"
+	CurrencyCode13ZMW  CurrencyCode13 = "ZMW"
+	CurrencyCode13ZWG  CurrencyCode13 = "ZWG"
+	CurrencyCode13BTC  CurrencyCode13 = "BTC"
+	CurrencyCode13ETH  CurrencyCode13 = "ETH"
+	CurrencyCode13USDC CurrencyCode13 = "USDC"
+	CurrencyCode13USDT CurrencyCode13 = "USDT"
+)
+
+type CurrencyCode14 string
+
+const (
+	CurrencyCode14AED  CurrencyCode14 = "AED"
+	CurrencyCode14AFN  CurrencyCode14 = "AFN"
+	CurrencyCode14ALL  CurrencyCode14 = "ALL"
+	CurrencyCode14AMD  CurrencyCode14 = "AMD"
+	CurrencyCode14AOA  CurrencyCode14 = "AOA"
+	CurrencyCode14ARS  CurrencyCode14 = "ARS"
+	CurrencyCode14AUD  CurrencyCode14 = "AUD"
+	CurrencyCode14AWG  CurrencyCode14 = "AWG"
+	CurrencyCode14AZN  CurrencyCode14 = "AZN"
+	CurrencyCode14BAM  CurrencyCode14 = "BAM"
+	CurrencyCode14BBD  CurrencyCode14 = "BBD"
+	CurrencyCode14BDT  CurrencyCode14 = "BDT"
+	CurrencyCode14BHD  CurrencyCode14 = "BHD"
+	CurrencyCode14BIF  CurrencyCode14 = "BIF"
+	CurrencyCode14BMD  CurrencyCode14 = "BMD"
+	CurrencyCode14BND  CurrencyCode14 = "BND"
+	CurrencyCode14BOB  CurrencyCode14 = "BOB"
+	CurrencyCode14BOV  CurrencyCode14 = "BOV"
+	CurrencyCode14BRL  CurrencyCode14 = "BRL"
+	CurrencyCode14BSD  CurrencyCode14 = "BSD"
+	CurrencyCode14BTN  CurrencyCode14 = "BTN"
+	CurrencyCode14BWP  CurrencyCode14 = "BWP"
+	CurrencyCode14BYN  CurrencyCode14 = "BYN"
+	CurrencyCode14BZD  CurrencyCode14 = "BZD"
+	CurrencyCode14CAD  CurrencyCode14 = "CAD"
+	CurrencyCode14CDF  CurrencyCode14 = "CDF"
+	CurrencyCode14CHE  CurrencyCode14 = "CHE"
+	CurrencyCode14CHF  CurrencyCode14 = "CHF"
+	CurrencyCode14CHW  CurrencyCode14 = "CHW"
+	CurrencyCode14CLF  CurrencyCode14 = "CLF"
+	CurrencyCode14CLP  CurrencyCode14 = "CLP"
+	CurrencyCode14CNY  CurrencyCode14 = "CNY"
+	CurrencyCode14COP  CurrencyCode14 = "COP"
+	CurrencyCode14COU  CurrencyCode14 = "COU"
+	CurrencyCode14CRC  CurrencyCode14 = "CRC"
+	CurrencyCode14CUP  CurrencyCode14 = "CUP"
+	CurrencyCode14CVE  CurrencyCode14 = "CVE"
+	CurrencyCode14CZK  CurrencyCode14 = "CZK"
+	CurrencyCode14DJF  CurrencyCode14 = "DJF"
+	CurrencyCode14DKK  CurrencyCode14 = "DKK"
+	CurrencyCode14DOP  CurrencyCode14 = "DOP"
+	CurrencyCode14DZD  CurrencyCode14 = "DZD"
+	CurrencyCode14EGP  CurrencyCode14 = "EGP"
+	CurrencyCode14ERN  CurrencyCode14 = "ERN"
+	CurrencyCode14ETB  CurrencyCode14 = "ETB"
+	CurrencyCode14EUR  CurrencyCode14 = "EUR"
+	CurrencyCode14FJD  CurrencyCode14 = "FJD"
+	CurrencyCode14FKP  CurrencyCode14 = "FKP"
+	CurrencyCode14GBP  CurrencyCode14 = "GBP"
+	CurrencyCode14GEL  CurrencyCode14 = "GEL"
+	CurrencyCode14GHS  CurrencyCode14 = "GHS"
+	CurrencyCode14GIP  CurrencyCode14 = "GIP"
+	CurrencyCode14GMD  CurrencyCode14 = "GMD"
+	CurrencyCode14GNF  CurrencyCode14 = "GNF"
+	CurrencyCode14GTQ  CurrencyCode14 = "GTQ"
+	CurrencyCode14GYD  CurrencyCode14 = "GYD"
+	CurrencyCode14HKD  CurrencyCode14 = "HKD"
+	CurrencyCode14HNL  CurrencyCode14 = "HNL"
+	CurrencyCode14HTG  CurrencyCode14 = "HTG"
+	CurrencyCode14HUF  CurrencyCode14 = "HUF"
+	CurrencyCode14IDR  CurrencyCode14 = "IDR"
+	CurrencyCode14ILS  CurrencyCode14 = "ILS"
+	CurrencyCode14INR  CurrencyCode14 = "INR"
+	CurrencyCode14IQD  CurrencyCode14 = "IQD"
+	CurrencyCode14IRR  CurrencyCode14 = "IRR"
+	CurrencyCode14ISK  CurrencyCode14 = "ISK"
+	CurrencyCode14JMD  CurrencyCode14 = "JMD"
+	CurrencyCode14JOD  CurrencyCode14 = "JOD"
+	CurrencyCode14JPY  CurrencyCode14 = "JPY"
+	CurrencyCode14KES  CurrencyCode14 = "KES"
+	CurrencyCode14KGS  CurrencyCode14 = "KGS"
+	CurrencyCode14KHR  CurrencyCode14 = "KHR"
+	CurrencyCode14KMF  CurrencyCode14 = "KMF"
+	CurrencyCode14KPW  CurrencyCode14 = "KPW"
+	CurrencyCode14KRW  CurrencyCode14 = "KRW"
+	CurrencyCode14KWD  CurrencyCode14 = "KWD"
+	CurrencyCode14KYD  CurrencyCode14 = "KYD"
+	CurrencyCode14KZT  CurrencyCode14 = "KZT"
+	CurrencyCode14LAK  CurrencyCode14 = "LAK"
+	CurrencyCode14LBP  CurrencyCode14 = "LBP"
+	CurrencyCode14LKR  CurrencyCode14 = "LKR"
+	CurrencyCode14LRD  CurrencyCode14 = "LRD"
+	CurrencyCode14LSL  CurrencyCode14 = "LSL"
+	CurrencyCode14LYD  CurrencyCode14 = "LYD"
+	CurrencyCode14MAD  CurrencyCode14 = "MAD"
+	CurrencyCode14MDL  CurrencyCode14 = "MDL"
+	CurrencyCode14MGA  CurrencyCode14 = "MGA"
+	CurrencyCode14MKD  CurrencyCode14 = "MKD"
+	CurrencyCode14MMK  CurrencyCode14 = "MMK"
+	CurrencyCode14MNT  CurrencyCode14 = "MNT"
+	CurrencyCode14MOP  CurrencyCode14 = "MOP"
+	CurrencyCode14MRU  CurrencyCode14 = "MRU"
+	CurrencyCode14MUR  CurrencyCode14 = "MUR"
+	CurrencyCode14MVR  CurrencyCode14 = "MVR"
+	CurrencyCode14MWK  CurrencyCode14 = "MWK"
+	CurrencyCode14MXN  CurrencyCode14 = "MXN"
+	CurrencyCode14MXV  CurrencyCode14 = "MXV"
+	CurrencyCode14MYR  CurrencyCode14 = "MYR"
+	CurrencyCode14MZN  CurrencyCode14 = "MZN"
+	CurrencyCode14NAD  CurrencyCode14 = "NAD"
+	CurrencyCode14NGN  CurrencyCode14 = "NGN"
+	CurrencyCode14NIO  CurrencyCode14 = "NIO"
+	CurrencyCode14NOK  CurrencyCode14 = "NOK"
+	CurrencyCode14NPR  CurrencyCode14 = "NPR"
+	CurrencyCode14NZD  CurrencyCode14 = "NZD"
+	CurrencyCode14OMR  CurrencyCode14 = "OMR"
+	CurrencyCode14PAB  CurrencyCode14 = "PAB"
+	CurrencyCode14PEN  CurrencyCode14 = "PEN"
+	CurrencyCode14PGK  CurrencyCode14 = "PGK"
+	CurrencyCode14PHP  CurrencyCode14 = "PHP"
+	CurrencyCode14PKR  CurrencyCode14 = "PKR"
+	CurrencyCode14PLN  CurrencyCode14 = "PLN"
+	CurrencyCode14PYG  CurrencyCode14 = "PYG"
+	CurrencyCode14QAR  CurrencyCode14 = "QAR"
+	CurrencyCode14RON  CurrencyCode14 = "RON"
+	CurrencyCode14RSD  CurrencyCode14 = "RSD"
+	CurrencyCode14RUB  CurrencyCode14 = "RUB"
+	CurrencyCode14RWF  CurrencyCode14 = "RWF"
+	CurrencyCode14SAR  CurrencyCode14 = "SAR"
+	CurrencyCode14SBD  CurrencyCode14 = "SBD"
+	CurrencyCode14SCR  CurrencyCode14 = "SCR"
+	CurrencyCode14SDG  CurrencyCode14 = "SDG"
+	CurrencyCode14SEK  CurrencyCode14 = "SEK"
+	CurrencyCode14SGD  CurrencyCode14 = "SGD"
+	CurrencyCode14SHP  CurrencyCode14 = "SHP"
+	CurrencyCode14SLE  CurrencyCode14 = "SLE"
+	CurrencyCode14SOS  CurrencyCode14 = "SOS"
+	CurrencyCode14SRD  CurrencyCode14 = "SRD"
+	CurrencyCode14SSP  CurrencyCode14 = "SSP"
+	CurrencyCode14STN  CurrencyCode14 = "STN"
+	CurrencyCode14SVC  CurrencyCode14 = "SVC"
+	CurrencyCode14SYP  CurrencyCode14 = "SYP"
+	CurrencyCode14SZL  CurrencyCode14 = "SZL"
+	CurrencyCode14THB  CurrencyCode14 = "THB"
+	CurrencyCode14TJS  CurrencyCode14 = "TJS"
+	CurrencyCode14TMT  CurrencyCode14 = "TMT"
+	CurrencyCode14TND  CurrencyCode14 = "TND"
+	CurrencyCode14TOP  CurrencyCode14 = "TOP"
+	CurrencyCode14TRY  CurrencyCode14 = "TRY"
+	CurrencyCode14TTD  CurrencyCode14 = "TTD"
+	CurrencyCode14TWD  CurrencyCode14 = "TWD"
+	CurrencyCode14TZS  CurrencyCode14 = "TZS"
+	CurrencyCode14UAH  CurrencyCode14 = "UAH"
+	CurrencyCode14UGX  CurrencyCode14 = "UGX"
+	CurrencyCode14USD  CurrencyCode14 = "USD"
+	CurrencyCode14USN  CurrencyCode14 = "USN"
+	CurrencyCode14UYI  CurrencyCode14 = "UYI"
+	CurrencyCode14UYU  CurrencyCode14 = "UYU"
+	CurrencyCode14UYW  CurrencyCode14 = "UYW"
+	CurrencyCode14UZS  CurrencyCode14 = "UZS"
+	CurrencyCode14VED  CurrencyCode14 = "VED"
+	CurrencyCode14VES  CurrencyCode14 = "VES"
+	CurrencyCode14VND  CurrencyCode14 = "VND"
+	CurrencyCode14VUV  CurrencyCode14 = "VUV"
+	CurrencyCode14WST  CurrencyCode14 = "WST"
+	CurrencyCode14XAD  CurrencyCode14 = "XAD"
+	CurrencyCode14XAF  CurrencyCode14 = "XAF"
+	CurrencyCode14XCD  CurrencyCode14 = "XCD"
+	CurrencyCode14XCG  CurrencyCode14 = "XCG"
+	CurrencyCode14XOF  CurrencyCode14 = "XOF"
+	CurrencyCode14XPF  CurrencyCode14 = "XPF"
+	CurrencyCode14YER  CurrencyCode14 = "YER"
+	CurrencyCode14ZAR  CurrencyCode14 = "ZAR"
+	CurrencyCode14ZMW  CurrencyCode14 = "ZMW"
+	CurrencyCode14ZWG  CurrencyCode14 = "ZWG"
+	CurrencyCode14BTC  CurrencyCode14 = "BTC"
+	CurrencyCode14ETH  CurrencyCode14 = "ETH"
+	CurrencyCode14USDC CurrencyCode14 = "USDC"
+	CurrencyCode14USDT CurrencyCode14 = "USDT"
+)
+
+type CurrencyCode15 string
+
+const (
+	CurrencyCode15AED  CurrencyCode15 = "AED"
+	CurrencyCode15AFN  CurrencyCode15 = "AFN"
+	CurrencyCode15ALL  CurrencyCode15 = "ALL"
+	CurrencyCode15AMD  CurrencyCode15 = "AMD"
+	CurrencyCode15AOA  CurrencyCode15 = "AOA"
+	CurrencyCode15ARS  CurrencyCode15 = "ARS"
+	CurrencyCode15AUD  CurrencyCode15 = "AUD"
+	CurrencyCode15AWG  CurrencyCode15 = "AWG"
+	CurrencyCode15AZN  CurrencyCode15 = "AZN"
+	CurrencyCode15BAM  CurrencyCode15 = "BAM"
+	CurrencyCode15BBD  CurrencyCode15 = "BBD"
+	CurrencyCode15BDT  CurrencyCode15 = "BDT"
+	CurrencyCode15BHD  CurrencyCode15 = "BHD"
+	CurrencyCode15BIF  CurrencyCode15 = "BIF"
+	CurrencyCode15BMD  CurrencyCode15 = "BMD"
+	CurrencyCode15BND  CurrencyCode15 = "BND"
+	CurrencyCode15BOB  CurrencyCode15 = "BOB"
+	CurrencyCode15BOV  CurrencyCode15 = "BOV"
+	CurrencyCode15BRL  CurrencyCode15 = "BRL"
+	CurrencyCode15BSD  CurrencyCode15 = "BSD"
+	CurrencyCode15BTN  CurrencyCode15 = "BTN"
+	CurrencyCode15BWP  CurrencyCode15 = "BWP"
+	CurrencyCode15BYN  CurrencyCode15 = "BYN"
+	CurrencyCode15BZD  CurrencyCode15 = "BZD"
+	CurrencyCode15CAD  CurrencyCode15 = "CAD"
+	CurrencyCode15CDF  CurrencyCode15 = "CDF"
+	CurrencyCode15CHE  CurrencyCode15 = "CHE"
+	CurrencyCode15CHF  CurrencyCode15 = "CHF"
+	CurrencyCode15CHW  CurrencyCode15 = "CHW"
+	CurrencyCode15CLF  CurrencyCode15 = "CLF"
+	CurrencyCode15CLP  CurrencyCode15 = "CLP"
+	CurrencyCode15CNY  CurrencyCode15 = "CNY"
+	CurrencyCode15COP  CurrencyCode15 = "COP"
+	CurrencyCode15COU  CurrencyCode15 = "COU"
+	CurrencyCode15CRC  CurrencyCode15 = "CRC"
+	CurrencyCode15CUP  CurrencyCode15 = "CUP"
+	CurrencyCode15CVE  CurrencyCode15 = "CVE"
+	CurrencyCode15CZK  CurrencyCode15 = "CZK"
+	CurrencyCode15DJF  CurrencyCode15 = "DJF"
+	CurrencyCode15DKK  CurrencyCode15 = "DKK"
+	CurrencyCode15DOP  CurrencyCode15 = "DOP"
+	CurrencyCode15DZD  CurrencyCode15 = "DZD"
+	CurrencyCode15EGP  CurrencyCode15 = "EGP"
+	CurrencyCode15ERN  CurrencyCode15 = "ERN"
+	CurrencyCode15ETB  CurrencyCode15 = "ETB"
+	CurrencyCode15EUR  CurrencyCode15 = "EUR"
+	CurrencyCode15FJD  CurrencyCode15 = "FJD"
+	CurrencyCode15FKP  CurrencyCode15 = "FKP"
+	CurrencyCode15GBP  CurrencyCode15 = "GBP"
+	CurrencyCode15GEL  CurrencyCode15 = "GEL"
+	CurrencyCode15GHS  CurrencyCode15 = "GHS"
+	CurrencyCode15GIP  CurrencyCode15 = "GIP"
+	CurrencyCode15GMD  CurrencyCode15 = "GMD"
+	CurrencyCode15GNF  CurrencyCode15 = "GNF"
+	CurrencyCode15GTQ  CurrencyCode15 = "GTQ"
+	CurrencyCode15GYD  CurrencyCode15 = "GYD"
+	CurrencyCode15HKD  CurrencyCode15 = "HKD"
+	CurrencyCode15HNL  CurrencyCode15 = "HNL"
+	CurrencyCode15HTG  CurrencyCode15 = "HTG"
+	CurrencyCode15HUF  CurrencyCode15 = "HUF"
+	CurrencyCode15IDR  CurrencyCode15 = "IDR"
+	CurrencyCode15ILS  CurrencyCode15 = "ILS"
+	CurrencyCode15INR  CurrencyCode15 = "INR"
+	CurrencyCode15IQD  CurrencyCode15 = "IQD"
+	CurrencyCode15IRR  CurrencyCode15 = "IRR"
+	CurrencyCode15ISK  CurrencyCode15 = "ISK"
+	CurrencyCode15JMD  CurrencyCode15 = "JMD"
+	CurrencyCode15JOD  CurrencyCode15 = "JOD"
+	CurrencyCode15JPY  CurrencyCode15 = "JPY"
+	CurrencyCode15KES  CurrencyCode15 = "KES"
+	CurrencyCode15KGS  CurrencyCode15 = "KGS"
+	CurrencyCode15KHR  CurrencyCode15 = "KHR"
+	CurrencyCode15KMF  CurrencyCode15 = "KMF"
+	CurrencyCode15KPW  CurrencyCode15 = "KPW"
+	CurrencyCode15KRW  CurrencyCode15 = "KRW"
+	CurrencyCode15KWD  CurrencyCode15 = "KWD"
+	CurrencyCode15KYD  CurrencyCode15 = "KYD"
+	CurrencyCode15KZT  CurrencyCode15 = "KZT"
+	CurrencyCode15LAK  CurrencyCode15 = "LAK"
+	CurrencyCode15LBP  CurrencyCode15 = "LBP"
+	CurrencyCode15LKR  CurrencyCode15 = "LKR"
+	CurrencyCode15LRD  CurrencyCode15 = "LRD"
+	CurrencyCode15LSL  CurrencyCode15 = "LSL"
+	CurrencyCode15LYD  CurrencyCode15 = "LYD"
+	CurrencyCode15MAD  CurrencyCode15 = "MAD"
+	CurrencyCode15MDL  CurrencyCode15 = "MDL"
+	CurrencyCode15MGA  CurrencyCode15 = "MGA"
+	CurrencyCode15MKD  CurrencyCode15 = "MKD"
+	CurrencyCode15MMK  CurrencyCode15 = "MMK"
+	CurrencyCode15MNT  CurrencyCode15 = "MNT"
+	CurrencyCode15MOP  CurrencyCode15 = "MOP"
+	CurrencyCode15MRU  CurrencyCode15 = "MRU"
+	CurrencyCode15MUR  CurrencyCode15 = "MUR"
+	CurrencyCode15MVR  CurrencyCode15 = "MVR"
+	CurrencyCode15MWK  CurrencyCode15 = "MWK"
+	CurrencyCode15MXN  CurrencyCode15 = "MXN"
+	CurrencyCode15MXV  CurrencyCode15 = "MXV"
+	CurrencyCode15MYR  CurrencyCode15 = "MYR"
+	CurrencyCode15MZN  CurrencyCode15 = "MZN"
+	CurrencyCode15NAD  CurrencyCode15 = "NAD"
+	CurrencyCode15NGN  CurrencyCode15 = "NGN"
+	CurrencyCode15NIO  CurrencyCode15 = "NIO"
+	CurrencyCode15NOK  CurrencyCode15 = "NOK"
+	CurrencyCode15NPR  CurrencyCode15 = "NPR"
+	CurrencyCode15NZD  CurrencyCode15 = "NZD"
+	CurrencyCode15OMR  CurrencyCode15 = "OMR"
+	CurrencyCode15PAB  CurrencyCode15 = "PAB"
+	CurrencyCode15PEN  CurrencyCode15 = "PEN"
+	CurrencyCode15PGK  CurrencyCode15 = "PGK"
+	CurrencyCode15PHP  CurrencyCode15 = "PHP"
+	CurrencyCode15PKR  CurrencyCode15 = "PKR"
+	CurrencyCode15PLN  CurrencyCode15 = "PLN"
+	CurrencyCode15PYG  CurrencyCode15 = "PYG"
+	CurrencyCode15QAR  CurrencyCode15 = "QAR"
+	CurrencyCode15RON  CurrencyCode15 = "RON"
+	CurrencyCode15RSD  CurrencyCode15 = "RSD"
+	CurrencyCode15RUB  CurrencyCode15 = "RUB"
+	CurrencyCode15RWF  CurrencyCode15 = "RWF"
+	CurrencyCode15SAR  CurrencyCode15 = "SAR"
+	CurrencyCode15SBD  CurrencyCode15 = "SBD"
+	CurrencyCode15SCR  CurrencyCode15 = "SCR"
+	CurrencyCode15SDG  CurrencyCode15 = "SDG"
+	CurrencyCode15SEK  CurrencyCode15 = "SEK"
+	CurrencyCode15SGD  CurrencyCode15 = "SGD"
+	CurrencyCode15SHP  CurrencyCode15 = "SHP"
+	CurrencyCode15SLE  CurrencyCode15 = "SLE"
+	CurrencyCode15SOS  CurrencyCode15 = "SOS"
+	CurrencyCode15SRD  CurrencyCode15 = "SRD"
+	CurrencyCode15SSP  CurrencyCode15 = "SSP"
+	CurrencyCode15STN  CurrencyCode15 = "STN"
+	CurrencyCode15SVC  CurrencyCode15 = "SVC"
+	CurrencyCode15SYP  CurrencyCode15 = "SYP"
+	CurrencyCode15SZL  CurrencyCode15 = "SZL"
+	CurrencyCode15THB  CurrencyCode15 = "THB"
+	CurrencyCode15TJS  CurrencyCode15 = "TJS"
+	CurrencyCode15TMT  CurrencyCode15 = "TMT"
+	CurrencyCode15TND  CurrencyCode15 = "TND"
+	CurrencyCode15TOP  CurrencyCode15 = "TOP"
+	CurrencyCode15TRY  CurrencyCode15 = "TRY"
+	CurrencyCode15TTD  CurrencyCode15 = "TTD"
+	CurrencyCode15TWD  CurrencyCode15 = "TWD"
+	CurrencyCode15TZS  CurrencyCode15 = "TZS"
+	CurrencyCode15UAH  CurrencyCode15 = "UAH"
+	CurrencyCode15UGX  CurrencyCode15 = "UGX"
+	CurrencyCode15USD  CurrencyCode15 = "USD"
+	CurrencyCode15USN  CurrencyCode15 = "USN"
+	CurrencyCode15UYI  CurrencyCode15 = "UYI"
+	CurrencyCode15UYU  CurrencyCode15 = "UYU"
+	CurrencyCode15UYW  CurrencyCode15 = "UYW"
+	CurrencyCode15UZS  CurrencyCode15 = "UZS"
+	CurrencyCode15VED  CurrencyCode15 = "VED"
+	CurrencyCode15VES  CurrencyCode15 = "VES"
+	CurrencyCode15VND  CurrencyCode15 = "VND"
+	CurrencyCode15VUV  CurrencyCode15 = "VUV"
+	CurrencyCode15WST  CurrencyCode15 = "WST"
+	CurrencyCode15XAD  CurrencyCode15 = "XAD"
+	CurrencyCode15XAF  CurrencyCode15 = "XAF"
+	CurrencyCode15XCD  CurrencyCode15 = "XCD"
+	CurrencyCode15XCG  CurrencyCode15 = "XCG"
+	CurrencyCode15XOF  CurrencyCode15 = "XOF"
+	CurrencyCode15XPF  CurrencyCode15 = "XPF"
+	CurrencyCode15YER  CurrencyCode15 = "YER"
+	CurrencyCode15ZAR  CurrencyCode15 = "ZAR"
+	CurrencyCode15ZMW  CurrencyCode15 = "ZMW"
+	CurrencyCode15ZWG  CurrencyCode15 = "ZWG"
+	CurrencyCode15BTC  CurrencyCode15 = "BTC"
+	CurrencyCode15ETH  CurrencyCode15 = "ETH"
+	CurrencyCode15USDC CurrencyCode15 = "USDC"
+	CurrencyCode15USDT CurrencyCode15 = "USDT"
+)
+
+type CurrencyCode16 string
+
+const (
+	CurrencyCode16AED  CurrencyCode16 = "AED"
+	CurrencyCode16AFN  CurrencyCode16 = "AFN"
+	CurrencyCode16ALL  CurrencyCode16 = "ALL"
+	CurrencyCode16AMD  CurrencyCode16 = "AMD"
+	CurrencyCode16AOA  CurrencyCode16 = "AOA"
+	CurrencyCode16ARS  CurrencyCode16 = "ARS"
+	CurrencyCode16AUD  CurrencyCode16 = "AUD"
+	CurrencyCode16AWG  CurrencyCode16 = "AWG"
+	CurrencyCode16AZN  CurrencyCode16 = "AZN"
+	CurrencyCode16BAM  CurrencyCode16 = "BAM"
+	CurrencyCode16BBD  CurrencyCode16 = "BBD"
+	CurrencyCode16BDT  CurrencyCode16 = "BDT"
+	CurrencyCode16BHD  CurrencyCode16 = "BHD"
+	CurrencyCode16BIF  CurrencyCode16 = "BIF"
+	CurrencyCode16BMD  CurrencyCode16 = "BMD"
+	CurrencyCode16BND  CurrencyCode16 = "BND"
+	CurrencyCode16BOB  CurrencyCode16 = "BOB"
+	CurrencyCode16BOV  CurrencyCode16 = "BOV"
+	CurrencyCode16BRL  CurrencyCode16 = "BRL"
+	CurrencyCode16BSD  CurrencyCode16 = "BSD"
+	CurrencyCode16BTN  CurrencyCode16 = "BTN"
+	CurrencyCode16BWP  CurrencyCode16 = "BWP"
+	CurrencyCode16BYN  CurrencyCode16 = "BYN"
+	CurrencyCode16BZD  CurrencyCode16 = "BZD"
+	CurrencyCode16CAD  CurrencyCode16 = "CAD"
+	CurrencyCode16CDF  CurrencyCode16 = "CDF"
+	CurrencyCode16CHE  CurrencyCode16 = "CHE"
+	CurrencyCode16CHF  CurrencyCode16 = "CHF"
+	CurrencyCode16CHW  CurrencyCode16 = "CHW"
+	CurrencyCode16CLF  CurrencyCode16 = "CLF"
+	CurrencyCode16CLP  CurrencyCode16 = "CLP"
+	CurrencyCode16CNY  CurrencyCode16 = "CNY"
+	CurrencyCode16COP  CurrencyCode16 = "COP"
+	CurrencyCode16COU  CurrencyCode16 = "COU"
+	CurrencyCode16CRC  CurrencyCode16 = "CRC"
+	CurrencyCode16CUP  CurrencyCode16 = "CUP"
+	CurrencyCode16CVE  CurrencyCode16 = "CVE"
+	CurrencyCode16CZK  CurrencyCode16 = "CZK"
+	CurrencyCode16DJF  CurrencyCode16 = "DJF"
+	CurrencyCode16DKK  CurrencyCode16 = "DKK"
+	CurrencyCode16DOP  CurrencyCode16 = "DOP"
+	CurrencyCode16DZD  CurrencyCode16 = "DZD"
+	CurrencyCode16EGP  CurrencyCode16 = "EGP"
+	CurrencyCode16ERN  CurrencyCode16 = "ERN"
+	CurrencyCode16ETB  CurrencyCode16 = "ETB"
+	CurrencyCode16EUR  CurrencyCode16 = "EUR"
+	CurrencyCode16FJD  CurrencyCode16 = "FJD"
+	CurrencyCode16FKP  CurrencyCode16 = "FKP"
+	CurrencyCode16GBP  CurrencyCode16 = "GBP"
+	CurrencyCode16GEL  CurrencyCode16 = "GEL"
+	CurrencyCode16GHS  CurrencyCode16 = "GHS"
+	CurrencyCode16GIP  CurrencyCode16 = "GIP"
+	CurrencyCode16GMD  CurrencyCode16 = "GMD"
+	CurrencyCode16GNF  CurrencyCode16 = "GNF"
+	CurrencyCode16GTQ  CurrencyCode16 = "GTQ"
+	CurrencyCode16GYD  CurrencyCode16 = "GYD"
+	CurrencyCode16HKD  CurrencyCode16 = "HKD"
+	CurrencyCode16HNL  CurrencyCode16 = "HNL"
+	CurrencyCode16HTG  CurrencyCode16 = "HTG"
+	CurrencyCode16HUF  CurrencyCode16 = "HUF"
+	CurrencyCode16IDR  CurrencyCode16 = "IDR"
+	CurrencyCode16ILS  CurrencyCode16 = "ILS"
+	CurrencyCode16INR  CurrencyCode16 = "INR"
+	CurrencyCode16IQD  CurrencyCode16 = "IQD"
+	CurrencyCode16IRR  CurrencyCode16 = "IRR"
+	CurrencyCode16ISK  CurrencyCode16 = "ISK"
+	CurrencyCode16JMD  CurrencyCode16 = "JMD"
+	CurrencyCode16JOD  CurrencyCode16 = "JOD"
+	CurrencyCode16JPY  CurrencyCode16 = "JPY"
+	CurrencyCode16KES  CurrencyCode16 = "KES"
+	CurrencyCode16KGS  CurrencyCode16 = "KGS"
+	CurrencyCode16KHR  CurrencyCode16 = "KHR"
+	CurrencyCode16KMF  CurrencyCode16 = "KMF"
+	CurrencyCode16KPW  CurrencyCode16 = "KPW"
+	CurrencyCode16KRW  CurrencyCode16 = "KRW"
+	CurrencyCode16KWD  CurrencyCode16 = "KWD"
+	CurrencyCode16KYD  CurrencyCode16 = "KYD"
+	CurrencyCode16KZT  CurrencyCode16 = "KZT"
+	CurrencyCode16LAK  CurrencyCode16 = "LAK"
+	CurrencyCode16LBP  CurrencyCode16 = "LBP"
+	CurrencyCode16LKR  CurrencyCode16 = "LKR"
+	CurrencyCode16LRD  CurrencyCode16 = "LRD"
+	CurrencyCode16LSL  CurrencyCode16 = "LSL"
+	CurrencyCode16LYD  CurrencyCode16 = "LYD"
+	CurrencyCode16MAD  CurrencyCode16 = "MAD"
+	CurrencyCode16MDL  CurrencyCode16 = "MDL"
+	CurrencyCode16MGA  CurrencyCode16 = "MGA"
+	CurrencyCode16MKD  CurrencyCode16 = "MKD"
+	CurrencyCode16MMK  CurrencyCode16 = "MMK"
+	CurrencyCode16MNT  CurrencyCode16 = "MNT"
+	CurrencyCode16MOP  CurrencyCode16 = "MOP"
+	CurrencyCode16MRU  CurrencyCode16 = "MRU"
+	CurrencyCode16MUR  CurrencyCode16 = "MUR"
+	CurrencyCode16MVR  CurrencyCode16 = "MVR"
+	CurrencyCode16MWK  CurrencyCode16 = "MWK"
+	CurrencyCode16MXN  CurrencyCode16 = "MXN"
+	CurrencyCode16MXV  CurrencyCode16 = "MXV"
+	CurrencyCode16MYR  CurrencyCode16 = "MYR"
+	CurrencyCode16MZN  CurrencyCode16 = "MZN"
+	CurrencyCode16NAD  CurrencyCode16 = "NAD"
+	CurrencyCode16NGN  CurrencyCode16 = "NGN"
+	CurrencyCode16NIO  CurrencyCode16 = "NIO"
+	CurrencyCode16NOK  CurrencyCode16 = "NOK"
+	CurrencyCode16NPR  CurrencyCode16 = "NPR"
+	CurrencyCode16NZD  CurrencyCode16 = "NZD"
+	CurrencyCode16OMR  CurrencyCode16 = "OMR"
+	CurrencyCode16PAB  CurrencyCode16 = "PAB"
+	CurrencyCode16PEN  CurrencyCode16 = "PEN"
+	CurrencyCode16PGK  CurrencyCode16 = "PGK"
+	CurrencyCode16PHP  CurrencyCode16 = "PHP"
+	CurrencyCode16PKR  CurrencyCode16 = "PKR"
+	CurrencyCode16PLN  CurrencyCode16 = "PLN"
+	CurrencyCode16PYG  CurrencyCode16 = "PYG"
+	CurrencyCode16QAR  CurrencyCode16 = "QAR"
+	CurrencyCode16RON  CurrencyCode16 = "RON"
+	CurrencyCode16RSD  CurrencyCode16 = "RSD"
+	CurrencyCode16RUB  CurrencyCode16 = "RUB"
+	CurrencyCode16RWF  CurrencyCode16 = "RWF"
+	CurrencyCode16SAR  CurrencyCode16 = "SAR"
+	CurrencyCode16SBD  CurrencyCode16 = "SBD"
+	CurrencyCode16SCR  CurrencyCode16 = "SCR"
+	CurrencyCode16SDG  CurrencyCode16 = "SDG"
+	CurrencyCode16SEK  CurrencyCode16 = "SEK"
+	CurrencyCode16SGD  CurrencyCode16 = "SGD"
+	CurrencyCode16SHP  CurrencyCode16 = "SHP"
+	CurrencyCode16SLE  CurrencyCode16 = "SLE"
+	CurrencyCode16SOS  CurrencyCode16 = "SOS"
+	CurrencyCode16SRD  CurrencyCode16 = "SRD"
+	CurrencyCode16SSP  CurrencyCode16 = "SSP"
+	CurrencyCode16STN  CurrencyCode16 = "STN"
+	CurrencyCode16SVC  CurrencyCode16 = "SVC"
+	CurrencyCode16SYP  CurrencyCode16 = "SYP"
+	CurrencyCode16SZL  CurrencyCode16 = "SZL"
+	CurrencyCode16THB  CurrencyCode16 = "THB"
+	CurrencyCode16TJS  CurrencyCode16 = "TJS"
+	CurrencyCode16TMT  CurrencyCode16 = "TMT"
+	CurrencyCode16TND  CurrencyCode16 = "TND"
+	CurrencyCode16TOP  CurrencyCode16 = "TOP"
+	CurrencyCode16TRY  CurrencyCode16 = "TRY"
+	CurrencyCode16TTD  CurrencyCode16 = "TTD"
+	CurrencyCode16TWD  CurrencyCode16 = "TWD"
+	CurrencyCode16TZS  CurrencyCode16 = "TZS"
+	CurrencyCode16UAH  CurrencyCode16 = "UAH"
+	CurrencyCode16UGX  CurrencyCode16 = "UGX"
+	CurrencyCode16USD  CurrencyCode16 = "USD"
+	CurrencyCode16USN  CurrencyCode16 = "USN"
+	CurrencyCode16UYI  CurrencyCode16 = "UYI"
+	CurrencyCode16UYU  CurrencyCode16 = "UYU"
+	CurrencyCode16UYW  CurrencyCode16 = "UYW"
+	CurrencyCode16UZS  CurrencyCode16 = "UZS"
+	CurrencyCode16VED  CurrencyCode16 = "VED"
+	CurrencyCode16VES  CurrencyCode16 = "VES"
+	CurrencyCode16VND  CurrencyCode16 = "VND"
+	CurrencyCode16VUV  CurrencyCode16 = "VUV"
+	CurrencyCode16WST  CurrencyCode16 = "WST"
+	CurrencyCode16XAD  CurrencyCode16 = "XAD"
+	CurrencyCode16XAF  CurrencyCode16 = "XAF"
+	CurrencyCode16XCD  CurrencyCode16 = "XCD"
+	CurrencyCode16XCG  CurrencyCode16 = "XCG"
+	CurrencyCode16XOF  CurrencyCode16 = "XOF"
+	CurrencyCode16XPF  CurrencyCode16 = "XPF"
+	CurrencyCode16YER  CurrencyCode16 = "YER"
+	CurrencyCode16ZAR  CurrencyCode16 = "ZAR"
+	CurrencyCode16ZMW  CurrencyCode16 = "ZMW"
+	CurrencyCode16ZWG  CurrencyCode16 = "ZWG"
+	CurrencyCode16BTC  CurrencyCode16 = "BTC"
+	CurrencyCode16ETH  CurrencyCode16 = "ETH"
+	CurrencyCode16USDC CurrencyCode16 = "USDC"
+	CurrencyCode16USDT CurrencyCode16 = "USDT"
+)
+
+type CurrencyCode17 string
+
+const (
+	CurrencyCode17AED  CurrencyCode17 = "AED"
+	CurrencyCode17AFN  CurrencyCode17 = "AFN"
+	CurrencyCode17ALL  CurrencyCode17 = "ALL"
+	CurrencyCode17AMD  CurrencyCode17 = "AMD"
+	CurrencyCode17AOA  CurrencyCode17 = "AOA"
+	CurrencyCode17ARS  CurrencyCode17 = "ARS"
+	CurrencyCode17AUD  CurrencyCode17 = "AUD"
+	CurrencyCode17AWG  CurrencyCode17 = "AWG"
+	CurrencyCode17AZN  CurrencyCode17 = "AZN"
+	CurrencyCode17BAM  CurrencyCode17 = "BAM"
+	CurrencyCode17BBD  CurrencyCode17 = "BBD"
+	CurrencyCode17BDT  CurrencyCode17 = "BDT"
+	CurrencyCode17BHD  CurrencyCode17 = "BHD"
+	CurrencyCode17BIF  CurrencyCode17 = "BIF"
+	CurrencyCode17BMD  CurrencyCode17 = "BMD"
+	CurrencyCode17BND  CurrencyCode17 = "BND"
+	CurrencyCode17BOB  CurrencyCode17 = "BOB"
+	CurrencyCode17BOV  CurrencyCode17 = "BOV"
+	CurrencyCode17BRL  CurrencyCode17 = "BRL"
+	CurrencyCode17BSD  CurrencyCode17 = "BSD"
+	CurrencyCode17BTN  CurrencyCode17 = "BTN"
+	CurrencyCode17BWP  CurrencyCode17 = "BWP"
+	CurrencyCode17BYN  CurrencyCode17 = "BYN"
+	CurrencyCode17BZD  CurrencyCode17 = "BZD"
+	CurrencyCode17CAD  CurrencyCode17 = "CAD"
+	CurrencyCode17CDF  CurrencyCode17 = "CDF"
+	CurrencyCode17CHE  CurrencyCode17 = "CHE"
+	CurrencyCode17CHF  CurrencyCode17 = "CHF"
+	CurrencyCode17CHW  CurrencyCode17 = "CHW"
+	CurrencyCode17CLF  CurrencyCode17 = "CLF"
+	CurrencyCode17CLP  CurrencyCode17 = "CLP"
+	CurrencyCode17CNY  CurrencyCode17 = "CNY"
+	CurrencyCode17COP  CurrencyCode17 = "COP"
+	CurrencyCode17COU  CurrencyCode17 = "COU"
+	CurrencyCode17CRC  CurrencyCode17 = "CRC"
+	CurrencyCode17CUP  CurrencyCode17 = "CUP"
+	CurrencyCode17CVE  CurrencyCode17 = "CVE"
+	CurrencyCode17CZK  CurrencyCode17 = "CZK"
+	CurrencyCode17DJF  CurrencyCode17 = "DJF"
+	CurrencyCode17DKK  CurrencyCode17 = "DKK"
+	CurrencyCode17DOP  CurrencyCode17 = "DOP"
+	CurrencyCode17DZD  CurrencyCode17 = "DZD"
+	CurrencyCode17EGP  CurrencyCode17 = "EGP"
+	CurrencyCode17ERN  CurrencyCode17 = "ERN"
+	CurrencyCode17ETB  CurrencyCode17 = "ETB"
+	CurrencyCode17EUR  CurrencyCode17 = "EUR"
+	CurrencyCode17FJD  CurrencyCode17 = "FJD"
+	CurrencyCode17FKP  CurrencyCode17 = "FKP"
+	CurrencyCode17GBP  CurrencyCode17 = "GBP"
+	CurrencyCode17GEL  CurrencyCode17 = "GEL"
+	CurrencyCode17GHS  CurrencyCode17 = "GHS"
+	CurrencyCode17GIP  CurrencyCode17 = "GIP"
+	CurrencyCode17GMD  CurrencyCode17 = "GMD"
+	CurrencyCode17GNF  CurrencyCode17 = "GNF"
+	CurrencyCode17GTQ  CurrencyCode17 = "GTQ"
+	CurrencyCode17GYD  CurrencyCode17 = "GYD"
+	CurrencyCode17HKD  CurrencyCode17 = "HKD"
+	CurrencyCode17HNL  CurrencyCode17 = "HNL"
+	CurrencyCode17HTG  CurrencyCode17 = "HTG"
+	CurrencyCode17HUF  CurrencyCode17 = "HUF"
+	CurrencyCode17IDR  CurrencyCode17 = "IDR"
+	CurrencyCode17ILS  CurrencyCode17 = "ILS"
+	CurrencyCode17INR  CurrencyCode17 = "INR"
+	CurrencyCode17IQD  CurrencyCode17 = "IQD"
+	CurrencyCode17IRR  CurrencyCode17 = "IRR"
+	CurrencyCode17ISK  CurrencyCode17 = "ISK"
+	CurrencyCode17JMD  CurrencyCode17 = "JMD"
+	CurrencyCode17JOD  CurrencyCode17 = "JOD"
+	CurrencyCode17JPY  CurrencyCode17 = "JPY"
+	CurrencyCode17KES  CurrencyCode17 = "KES"
+	CurrencyCode17KGS  CurrencyCode17 = "KGS"
+	CurrencyCode17KHR  CurrencyCode17 = "KHR"
+	CurrencyCode17KMF  CurrencyCode17 = "KMF"
+	CurrencyCode17KPW  CurrencyCode17 = "KPW"
+	CurrencyCode17KRW  CurrencyCode17 = "KRW"
+	CurrencyCode17KWD  CurrencyCode17 = "KWD"
+	CurrencyCode17KYD  CurrencyCode17 = "KYD"
+	CurrencyCode17KZT  CurrencyCode17 = "KZT"
+	CurrencyCode17LAK  CurrencyCode17 = "LAK"
+	CurrencyCode17LBP  CurrencyCode17 = "LBP"
+	CurrencyCode17LKR  CurrencyCode17 = "LKR"
+	CurrencyCode17LRD  CurrencyCode17 = "LRD"
+	CurrencyCode17LSL  CurrencyCode17 = "LSL"
+	CurrencyCode17LYD  CurrencyCode17 = "LYD"
+	CurrencyCode17MAD  CurrencyCode17 = "MAD"
+	CurrencyCode17MDL  CurrencyCode17 = "MDL"
+	CurrencyCode17MGA  CurrencyCode17 = "MGA"
+	CurrencyCode17MKD  CurrencyCode17 = "MKD"
+	CurrencyCode17MMK  CurrencyCode17 = "MMK"
+	CurrencyCode17MNT  CurrencyCode17 = "MNT"
+	CurrencyCode17MOP  CurrencyCode17 = "MOP"
+	CurrencyCode17MRU  CurrencyCode17 = "MRU"
+	CurrencyCode17MUR  CurrencyCode17 = "MUR"
+	CurrencyCode17MVR  CurrencyCode17 = "MVR"
+	CurrencyCode17MWK  CurrencyCode17 = "MWK"
+	CurrencyCode17MXN  CurrencyCode17 = "MXN"
+	CurrencyCode17MXV  CurrencyCode17 = "MXV"
+	CurrencyCode17MYR  CurrencyCode17 = "MYR"
+	CurrencyCode17MZN  CurrencyCode17 = "MZN"
+	CurrencyCode17NAD  CurrencyCode17 = "NAD"
+	CurrencyCode17NGN  CurrencyCode17 = "NGN"
+	CurrencyCode17NIO  CurrencyCode17 = "NIO"
+	CurrencyCode17NOK  CurrencyCode17 = "NOK"
+	CurrencyCode17NPR  CurrencyCode17 = "NPR"
+	CurrencyCode17NZD  CurrencyCode17 = "NZD"
+	CurrencyCode17OMR  CurrencyCode17 = "OMR"
+	CurrencyCode17PAB  CurrencyCode17 = "PAB"
+	CurrencyCode17PEN  CurrencyCode17 = "PEN"
+	CurrencyCode17PGK  CurrencyCode17 = "PGK"
+	CurrencyCode17PHP  CurrencyCode17 = "PHP"
+	CurrencyCode17PKR  CurrencyCode17 = "PKR"
+	CurrencyCode17PLN  CurrencyCode17 = "PLN"
+	CurrencyCode17PYG  CurrencyCode17 = "PYG"
+	CurrencyCode17QAR  CurrencyCode17 = "QAR"
+	CurrencyCode17RON  CurrencyCode17 = "RON"
+	CurrencyCode17RSD  CurrencyCode17 = "RSD"
+	CurrencyCode17RUB  CurrencyCode17 = "RUB"
+	CurrencyCode17RWF  CurrencyCode17 = "RWF"
+	CurrencyCode17SAR  CurrencyCode17 = "SAR"
+	CurrencyCode17SBD  CurrencyCode17 = "SBD"
+	CurrencyCode17SCR  CurrencyCode17 = "SCR"
+	CurrencyCode17SDG  CurrencyCode17 = "SDG"
+	CurrencyCode17SEK  CurrencyCode17 = "SEK"
+	CurrencyCode17SGD  CurrencyCode17 = "SGD"
+	CurrencyCode17SHP  CurrencyCode17 = "SHP"
+	CurrencyCode17SLE  CurrencyCode17 = "SLE"
+	CurrencyCode17SOS  CurrencyCode17 = "SOS"
+	CurrencyCode17SRD  CurrencyCode17 = "SRD"
+	CurrencyCode17SSP  CurrencyCode17 = "SSP"
+	CurrencyCode17STN  CurrencyCode17 = "STN"
+	CurrencyCode17SVC  CurrencyCode17 = "SVC"
+	CurrencyCode17SYP  CurrencyCode17 = "SYP"
+	CurrencyCode17SZL  CurrencyCode17 = "SZL"
+	CurrencyCode17THB  CurrencyCode17 = "THB"
+	CurrencyCode17TJS  CurrencyCode17 = "TJS"
+	CurrencyCode17TMT  CurrencyCode17 = "TMT"
+	CurrencyCode17TND  CurrencyCode17 = "TND"
+	CurrencyCode17TOP  CurrencyCode17 = "TOP"
+	CurrencyCode17TRY  CurrencyCode17 = "TRY"
+	CurrencyCode17TTD  CurrencyCode17 = "TTD"
+	CurrencyCode17TWD  CurrencyCode17 = "TWD"
+	CurrencyCode17TZS  CurrencyCode17 = "TZS"
+	CurrencyCode17UAH  CurrencyCode17 = "UAH"
+	CurrencyCode17UGX  CurrencyCode17 = "UGX"
+	CurrencyCode17USD  CurrencyCode17 = "USD"
+	CurrencyCode17USN  CurrencyCode17 = "USN"
+	CurrencyCode17UYI  CurrencyCode17 = "UYI"
+	CurrencyCode17UYU  CurrencyCode17 = "UYU"
+	CurrencyCode17UYW  CurrencyCode17 = "UYW"
+	CurrencyCode17UZS  CurrencyCode17 = "UZS"
+	CurrencyCode17VED  CurrencyCode17 = "VED"
+	CurrencyCode17VES  CurrencyCode17 = "VES"
+	CurrencyCode17VND  CurrencyCode17 = "VND"
+	CurrencyCode17VUV  CurrencyCode17 = "VUV"
+	CurrencyCode17WST  CurrencyCode17 = "WST"
+	CurrencyCode17XAD  CurrencyCode17 = "XAD"
+	CurrencyCode17XAF  CurrencyCode17 = "XAF"
+	CurrencyCode17XCD  CurrencyCode17 = "XCD"
+	CurrencyCode17XCG  CurrencyCode17 = "XCG"
+	CurrencyCode17XOF  CurrencyCode17 = "XOF"
+	CurrencyCode17XPF  CurrencyCode17 = "XPF"
+	CurrencyCode17YER  CurrencyCode17 = "YER"
+	CurrencyCode17ZAR  CurrencyCode17 = "ZAR"
+	CurrencyCode17ZMW  CurrencyCode17 = "ZMW"
+	CurrencyCode17ZWG  CurrencyCode17 = "ZWG"
+	CurrencyCode17BTC  CurrencyCode17 = "BTC"
+	CurrencyCode17ETH  CurrencyCode17 = "ETH"
+	CurrencyCode17USDC CurrencyCode17 = "USDC"
+	CurrencyCode17USDT CurrencyCode17 = "USDT"
+)
+
+type CurrencyCode18 string
+
+const (
+	CurrencyCode18AED  CurrencyCode18 = "AED"
+	CurrencyCode18AFN  CurrencyCode18 = "AFN"
+	CurrencyCode18ALL  CurrencyCode18 = "ALL"
+	CurrencyCode18AMD  CurrencyCode18 = "AMD"
+	CurrencyCode18AOA  CurrencyCode18 = "AOA"
+	CurrencyCode18ARS  CurrencyCode18 = "ARS"
+	CurrencyCode18AUD  CurrencyCode18 = "AUD"
+	CurrencyCode18AWG  CurrencyCode18 = "AWG"
+	CurrencyCode18AZN  CurrencyCode18 = "AZN"
+	CurrencyCode18BAM  CurrencyCode18 = "BAM"
+	CurrencyCode18BBD  CurrencyCode18 = "BBD"
+	CurrencyCode18BDT  CurrencyCode18 = "BDT"
+	CurrencyCode18BHD  CurrencyCode18 = "BHD"
+	CurrencyCode18BIF  CurrencyCode18 = "BIF"
+	CurrencyCode18BMD  CurrencyCode18 = "BMD"
+	CurrencyCode18BND  CurrencyCode18 = "BND"
+	CurrencyCode18BOB  CurrencyCode18 = "BOB"
+	CurrencyCode18BOV  CurrencyCode18 = "BOV"
+	CurrencyCode18BRL  CurrencyCode18 = "BRL"
+	CurrencyCode18BSD  CurrencyCode18 = "BSD"
+	CurrencyCode18BTN  CurrencyCode18 = "BTN"
+	CurrencyCode18BWP  CurrencyCode18 = "BWP"
+	CurrencyCode18BYN  CurrencyCode18 = "BYN"
+	CurrencyCode18BZD  CurrencyCode18 = "BZD"
+	CurrencyCode18CAD  CurrencyCode18 = "CAD"
+	CurrencyCode18CDF  CurrencyCode18 = "CDF"
+	CurrencyCode18CHE  CurrencyCode18 = "CHE"
+	CurrencyCode18CHF  CurrencyCode18 = "CHF"
+	CurrencyCode18CHW  CurrencyCode18 = "CHW"
+	CurrencyCode18CLF  CurrencyCode18 = "CLF"
+	CurrencyCode18CLP  CurrencyCode18 = "CLP"
+	CurrencyCode18CNY  CurrencyCode18 = "CNY"
+	CurrencyCode18COP  CurrencyCode18 = "COP"
+	CurrencyCode18COU  CurrencyCode18 = "COU"
+	CurrencyCode18CRC  CurrencyCode18 = "CRC"
+	CurrencyCode18CUP  CurrencyCode18 = "CUP"
+	CurrencyCode18CVE  CurrencyCode18 = "CVE"
+	CurrencyCode18CZK  CurrencyCode18 = "CZK"
+	CurrencyCode18DJF  CurrencyCode18 = "DJF"
+	CurrencyCode18DKK  CurrencyCode18 = "DKK"
+	CurrencyCode18DOP  CurrencyCode18 = "DOP"
+	CurrencyCode18DZD  CurrencyCode18 = "DZD"
+	CurrencyCode18EGP  CurrencyCode18 = "EGP"
+	CurrencyCode18ERN  CurrencyCode18 = "ERN"
+	CurrencyCode18ETB  CurrencyCode18 = "ETB"
+	CurrencyCode18EUR  CurrencyCode18 = "EUR"
+	CurrencyCode18FJD  CurrencyCode18 = "FJD"
+	CurrencyCode18FKP  CurrencyCode18 = "FKP"
+	CurrencyCode18GBP  CurrencyCode18 = "GBP"
+	CurrencyCode18GEL  CurrencyCode18 = "GEL"
+	CurrencyCode18GHS  CurrencyCode18 = "GHS"
+	CurrencyCode18GIP  CurrencyCode18 = "GIP"
+	CurrencyCode18GMD  CurrencyCode18 = "GMD"
+	CurrencyCode18GNF  CurrencyCode18 = "GNF"
+	CurrencyCode18GTQ  CurrencyCode18 = "GTQ"
+	CurrencyCode18GYD  CurrencyCode18 = "GYD"
+	CurrencyCode18HKD  CurrencyCode18 = "HKD"
+	CurrencyCode18HNL  CurrencyCode18 = "HNL"
+	CurrencyCode18HTG  CurrencyCode18 = "HTG"
+	CurrencyCode18HUF  CurrencyCode18 = "HUF"
+	CurrencyCode18IDR  CurrencyCode18 = "IDR"
+	CurrencyCode18ILS  CurrencyCode18 = "ILS"
+	CurrencyCode18INR  CurrencyCode18 = "INR"
+	CurrencyCode18IQD  CurrencyCode18 = "IQD"
+	CurrencyCode18IRR  CurrencyCode18 = "IRR"
+	CurrencyCode18ISK  CurrencyCode18 = "ISK"
+	CurrencyCode18JMD  CurrencyCode18 = "JMD"
+	CurrencyCode18JOD  CurrencyCode18 = "JOD"
+	CurrencyCode18JPY  CurrencyCode18 = "JPY"
+	CurrencyCode18KES  CurrencyCode18 = "KES"
+	CurrencyCode18KGS  CurrencyCode18 = "KGS"
+	CurrencyCode18KHR  CurrencyCode18 = "KHR"
+	CurrencyCode18KMF  CurrencyCode18 = "KMF"
+	CurrencyCode18KPW  CurrencyCode18 = "KPW"
+	CurrencyCode18KRW  CurrencyCode18 = "KRW"
+	CurrencyCode18KWD  CurrencyCode18 = "KWD"
+	CurrencyCode18KYD  CurrencyCode18 = "KYD"
+	CurrencyCode18KZT  CurrencyCode18 = "KZT"
+	CurrencyCode18LAK  CurrencyCode18 = "LAK"
+	CurrencyCode18LBP  CurrencyCode18 = "LBP"
+	CurrencyCode18LKR  CurrencyCode18 = "LKR"
+	CurrencyCode18LRD  CurrencyCode18 = "LRD"
+	CurrencyCode18LSL  CurrencyCode18 = "LSL"
+	CurrencyCode18LYD  CurrencyCode18 = "LYD"
+	CurrencyCode18MAD  CurrencyCode18 = "MAD"
+	CurrencyCode18MDL  CurrencyCode18 = "MDL"
+	CurrencyCode18MGA  CurrencyCode18 = "MGA"
+	CurrencyCode18MKD  CurrencyCode18 = "MKD"
+	CurrencyCode18MMK  CurrencyCode18 = "MMK"
+	CurrencyCode18MNT  CurrencyCode18 = "MNT"
+	CurrencyCode18MOP  CurrencyCode18 = "MOP"
+	CurrencyCode18MRU  CurrencyCode18 = "MRU"
+	CurrencyCode18MUR  CurrencyCode18 = "MUR"
+	CurrencyCode18MVR  CurrencyCode18 = "MVR"
+	CurrencyCode18MWK  CurrencyCode18 = "MWK"
+	CurrencyCode18MXN  CurrencyCode18 = "MXN"
+	CurrencyCode18MXV  CurrencyCode18 = "MXV"
+	CurrencyCode18MYR  CurrencyCode18 = "MYR"
+	CurrencyCode18MZN  CurrencyCode18 = "MZN"
+	CurrencyCode18NAD  CurrencyCode18 = "NAD"
+	CurrencyCode18NGN  CurrencyCode18 = "NGN"
+	CurrencyCode18NIO  CurrencyCode18 = "NIO"
+	CurrencyCode18NOK  CurrencyCode18 = "NOK"
+	CurrencyCode18NPR  CurrencyCode18 = "NPR"
+	CurrencyCode18NZD  CurrencyCode18 = "NZD"
+	CurrencyCode18OMR  CurrencyCode18 = "OMR"
+	CurrencyCode18PAB  CurrencyCode18 = "PAB"
+	CurrencyCode18PEN  CurrencyCode18 = "PEN"
+	CurrencyCode18PGK  CurrencyCode18 = "PGK"
+	CurrencyCode18PHP  CurrencyCode18 = "PHP"
+	CurrencyCode18PKR  CurrencyCode18 = "PKR"
+	CurrencyCode18PLN  CurrencyCode18 = "PLN"
+	CurrencyCode18PYG  CurrencyCode18 = "PYG"
+	CurrencyCode18QAR  CurrencyCode18 = "QAR"
+	CurrencyCode18RON  CurrencyCode18 = "RON"
+	CurrencyCode18RSD  CurrencyCode18 = "RSD"
+	CurrencyCode18RUB  CurrencyCode18 = "RUB"
+	CurrencyCode18RWF  CurrencyCode18 = "RWF"
+	CurrencyCode18SAR  CurrencyCode18 = "SAR"
+	CurrencyCode18SBD  CurrencyCode18 = "SBD"
+	CurrencyCode18SCR  CurrencyCode18 = "SCR"
+	CurrencyCode18SDG  CurrencyCode18 = "SDG"
+	CurrencyCode18SEK  CurrencyCode18 = "SEK"
+	CurrencyCode18SGD  CurrencyCode18 = "SGD"
+	CurrencyCode18SHP  CurrencyCode18 = "SHP"
+	CurrencyCode18SLE  CurrencyCode18 = "SLE"
+	CurrencyCode18SOS  CurrencyCode18 = "SOS"
+	CurrencyCode18SRD  CurrencyCode18 = "SRD"
+	CurrencyCode18SSP  CurrencyCode18 = "SSP"
+	CurrencyCode18STN  CurrencyCode18 = "STN"
+	CurrencyCode18SVC  CurrencyCode18 = "SVC"
+	CurrencyCode18SYP  CurrencyCode18 = "SYP"
+	CurrencyCode18SZL  CurrencyCode18 = "SZL"
+	CurrencyCode18THB  CurrencyCode18 = "THB"
+	CurrencyCode18TJS  CurrencyCode18 = "TJS"
+	CurrencyCode18TMT  CurrencyCode18 = "TMT"
+	CurrencyCode18TND  CurrencyCode18 = "TND"
+	CurrencyCode18TOP  CurrencyCode18 = "TOP"
+	CurrencyCode18TRY  CurrencyCode18 = "TRY"
+	CurrencyCode18TTD  CurrencyCode18 = "TTD"
+	CurrencyCode18TWD  CurrencyCode18 = "TWD"
+	CurrencyCode18TZS  CurrencyCode18 = "TZS"
+	CurrencyCode18UAH  CurrencyCode18 = "UAH"
+	CurrencyCode18UGX  CurrencyCode18 = "UGX"
+	CurrencyCode18USD  CurrencyCode18 = "USD"
+	CurrencyCode18USN  CurrencyCode18 = "USN"
+	CurrencyCode18UYI  CurrencyCode18 = "UYI"
+	CurrencyCode18UYU  CurrencyCode18 = "UYU"
+	CurrencyCode18UYW  CurrencyCode18 = "UYW"
+	CurrencyCode18UZS  CurrencyCode18 = "UZS"
+	CurrencyCode18VED  CurrencyCode18 = "VED"
+	CurrencyCode18VES  CurrencyCode18 = "VES"
+	CurrencyCode18VND  CurrencyCode18 = "VND"
+	CurrencyCode18VUV  CurrencyCode18 = "VUV"
+	CurrencyCode18WST  CurrencyCode18 = "WST"
+	CurrencyCode18XAD  CurrencyCode18 = "XAD"
+	CurrencyCode18XAF  CurrencyCode18 = "XAF"
+	CurrencyCode18XCD  CurrencyCode18 = "XCD"
+	CurrencyCode18XCG  CurrencyCode18 = "XCG"
+	CurrencyCode18XOF  CurrencyCode18 = "XOF"
+	CurrencyCode18XPF  CurrencyCode18 = "XPF"
+	CurrencyCode18YER  CurrencyCode18 = "YER"
+	CurrencyCode18ZAR  CurrencyCode18 = "ZAR"
+	CurrencyCode18ZMW  CurrencyCode18 = "ZMW"
+	CurrencyCode18ZWG  CurrencyCode18 = "ZWG"
+	CurrencyCode18BTC  CurrencyCode18 = "BTC"
+	CurrencyCode18ETH  CurrencyCode18 = "ETH"
+	CurrencyCode18USDC CurrencyCode18 = "USDC"
+	CurrencyCode18USDT CurrencyCode18 = "USDT"
+)
+
+type CurrencyCode19 string
+
+const (
+	CurrencyCode19AED  CurrencyCode19 = "AED"
+	CurrencyCode19AFN  CurrencyCode19 = "AFN"
+	CurrencyCode19ALL  CurrencyCode19 = "ALL"
+	CurrencyCode19AMD  CurrencyCode19 = "AMD"
+	CurrencyCode19AOA  CurrencyCode19 = "AOA"
+	CurrencyCode19ARS  CurrencyCode19 = "ARS"
+	CurrencyCode19AUD  CurrencyCode19 = "AUD"
+	CurrencyCode19AWG  CurrencyCode19 = "AWG"
+	CurrencyCode19AZN  CurrencyCode19 = "AZN"
+	CurrencyCode19BAM  CurrencyCode19 = "BAM"
+	CurrencyCode19BBD  CurrencyCode19 = "BBD"
+	CurrencyCode19BDT  CurrencyCode19 = "BDT"
+	CurrencyCode19BHD  CurrencyCode19 = "BHD"
+	CurrencyCode19BIF  CurrencyCode19 = "BIF"
+	CurrencyCode19BMD  CurrencyCode19 = "BMD"
+	CurrencyCode19BND  CurrencyCode19 = "BND"
+	CurrencyCode19BOB  CurrencyCode19 = "BOB"
+	CurrencyCode19BOV  CurrencyCode19 = "BOV"
+	CurrencyCode19BRL  CurrencyCode19 = "BRL"
+	CurrencyCode19BSD  CurrencyCode19 = "BSD"
+	CurrencyCode19BTN  CurrencyCode19 = "BTN"
+	CurrencyCode19BWP  CurrencyCode19 = "BWP"
+	CurrencyCode19BYN  CurrencyCode19 = "BYN"
+	CurrencyCode19BZD  CurrencyCode19 = "BZD"
+	CurrencyCode19CAD  CurrencyCode19 = "CAD"
+	CurrencyCode19CDF  CurrencyCode19 = "CDF"
+	CurrencyCode19CHE  CurrencyCode19 = "CHE"
+	CurrencyCode19CHF  CurrencyCode19 = "CHF"
+	CurrencyCode19CHW  CurrencyCode19 = "CHW"
+	CurrencyCode19CLF  CurrencyCode19 = "CLF"
+	CurrencyCode19CLP  CurrencyCode19 = "CLP"
+	CurrencyCode19CNY  CurrencyCode19 = "CNY"
+	CurrencyCode19COP  CurrencyCode19 = "COP"
+	CurrencyCode19COU  CurrencyCode19 = "COU"
+	CurrencyCode19CRC  CurrencyCode19 = "CRC"
+	CurrencyCode19CUP  CurrencyCode19 = "CUP"
+	CurrencyCode19CVE  CurrencyCode19 = "CVE"
+	CurrencyCode19CZK  CurrencyCode19 = "CZK"
+	CurrencyCode19DJF  CurrencyCode19 = "DJF"
+	CurrencyCode19DKK  CurrencyCode19 = "DKK"
+	CurrencyCode19DOP  CurrencyCode19 = "DOP"
+	CurrencyCode19DZD  CurrencyCode19 = "DZD"
+	CurrencyCode19EGP  CurrencyCode19 = "EGP"
+	CurrencyCode19ERN  CurrencyCode19 = "ERN"
+	CurrencyCode19ETB  CurrencyCode19 = "ETB"
+	CurrencyCode19EUR  CurrencyCode19 = "EUR"
+	CurrencyCode19FJD  CurrencyCode19 = "FJD"
+	CurrencyCode19FKP  CurrencyCode19 = "FKP"
+	CurrencyCode19GBP  CurrencyCode19 = "GBP"
+	CurrencyCode19GEL  CurrencyCode19 = "GEL"
+	CurrencyCode19GHS  CurrencyCode19 = "GHS"
+	CurrencyCode19GIP  CurrencyCode19 = "GIP"
+	CurrencyCode19GMD  CurrencyCode19 = "GMD"
+	CurrencyCode19GNF  CurrencyCode19 = "GNF"
+	CurrencyCode19GTQ  CurrencyCode19 = "GTQ"
+	CurrencyCode19GYD  CurrencyCode19 = "GYD"
+	CurrencyCode19HKD  CurrencyCode19 = "HKD"
+	CurrencyCode19HNL  CurrencyCode19 = "HNL"
+	CurrencyCode19HTG  CurrencyCode19 = "HTG"
+	CurrencyCode19HUF  CurrencyCode19 = "HUF"
+	CurrencyCode19IDR  CurrencyCode19 = "IDR"
+	CurrencyCode19ILS  CurrencyCode19 = "ILS"
+	CurrencyCode19INR  CurrencyCode19 = "INR"
+	CurrencyCode19IQD  CurrencyCode19 = "IQD"
+	CurrencyCode19IRR  CurrencyCode19 = "IRR"
+	CurrencyCode19ISK  CurrencyCode19 = "ISK"
+	CurrencyCode19JMD  CurrencyCode19 = "JMD"
+	CurrencyCode19JOD  CurrencyCode19 = "JOD"
+	CurrencyCode19JPY  CurrencyCode19 = "JPY"
+	CurrencyCode19KES  CurrencyCode19 = "KES"
+	CurrencyCode19KGS  CurrencyCode19 = "KGS"
+	CurrencyCode19KHR  CurrencyCode19 = "KHR"
+	CurrencyCode19KMF  CurrencyCode19 = "KMF"
+	CurrencyCode19KPW  CurrencyCode19 = "KPW"
+	CurrencyCode19KRW  CurrencyCode19 = "KRW"
+	CurrencyCode19KWD  CurrencyCode19 = "KWD"
+	CurrencyCode19KYD  CurrencyCode19 = "KYD"
+	CurrencyCode19KZT  CurrencyCode19 = "KZT"
+	CurrencyCode19LAK  CurrencyCode19 = "LAK"
+	CurrencyCode19LBP  CurrencyCode19 = "LBP"
+	CurrencyCode19LKR  CurrencyCode19 = "LKR"
+	CurrencyCode19LRD  CurrencyCode19 = "LRD"
+	CurrencyCode19LSL  CurrencyCode19 = "LSL"
+	CurrencyCode19LYD  CurrencyCode19 = "LYD"
+	CurrencyCode19MAD  CurrencyCode19 = "MAD"
+	CurrencyCode19MDL  CurrencyCode19 = "MDL"
+	CurrencyCode19MGA  CurrencyCode19 = "MGA"
+	CurrencyCode19MKD  CurrencyCode19 = "MKD"
+	CurrencyCode19MMK  CurrencyCode19 = "MMK"
+	CurrencyCode19MNT  CurrencyCode19 = "MNT"
+	CurrencyCode19MOP  CurrencyCode19 = "MOP"
+	CurrencyCode19MRU  CurrencyCode19 = "MRU"
+	CurrencyCode19MUR  CurrencyCode19 = "MUR"
+	CurrencyCode19MVR  CurrencyCode19 = "MVR"
+	CurrencyCode19MWK  CurrencyCode19 = "MWK"
+	CurrencyCode19MXN  CurrencyCode19 = "MXN"
+	CurrencyCode19MXV  CurrencyCode19 = "MXV"
+	CurrencyCode19MYR  CurrencyCode19 = "MYR"
+	CurrencyCode19MZN  CurrencyCode19 = "MZN"
+	CurrencyCode19NAD  CurrencyCode19 = "NAD"
+	CurrencyCode19NGN  CurrencyCode19 = "NGN"
+	CurrencyCode19NIO  CurrencyCode19 = "NIO"
+	CurrencyCode19NOK  CurrencyCode19 = "NOK"
+	CurrencyCode19NPR  CurrencyCode19 = "NPR"
+	CurrencyCode19NZD  CurrencyCode19 = "NZD"
+	CurrencyCode19OMR  CurrencyCode19 = "OMR"
+	CurrencyCode19PAB  CurrencyCode19 = "PAB"
+	CurrencyCode19PEN  CurrencyCode19 = "PEN"
+	CurrencyCode19PGK  CurrencyCode19 = "PGK"
+	CurrencyCode19PHP  CurrencyCode19 = "PHP"
+	CurrencyCode19PKR  CurrencyCode19 = "PKR"
+	CurrencyCode19PLN  CurrencyCode19 = "PLN"
+	CurrencyCode19PYG  CurrencyCode19 = "PYG"
+	CurrencyCode19QAR  CurrencyCode19 = "QAR"
+	CurrencyCode19RON  CurrencyCode19 = "RON"
+	CurrencyCode19RSD  CurrencyCode19 = "RSD"
+	CurrencyCode19RUB  CurrencyCode19 = "RUB"
+	CurrencyCode19RWF  CurrencyCode19 = "RWF"
+	CurrencyCode19SAR  CurrencyCode19 = "SAR"
+	CurrencyCode19SBD  CurrencyCode19 = "SBD"
+	CurrencyCode19SCR  CurrencyCode19 = "SCR"
+	CurrencyCode19SDG  CurrencyCode19 = "SDG"
+	CurrencyCode19SEK  CurrencyCode19 = "SEK"
+	CurrencyCode19SGD  CurrencyCode19 = "SGD"
+	CurrencyCode19SHP  CurrencyCode19 = "SHP"
+	CurrencyCode19SLE  CurrencyCode19 = "SLE"
+	CurrencyCode19SOS  CurrencyCode19 = "SOS"
+	CurrencyCode19SRD  CurrencyCode19 = "SRD"
+	CurrencyCode19SSP  CurrencyCode19 = "SSP"
+	CurrencyCode19STN  CurrencyCode19 = "STN"
+	CurrencyCode19SVC  CurrencyCode19 = "SVC"
+	CurrencyCode19SYP  CurrencyCode19 = "SYP"
+	CurrencyCode19SZL  CurrencyCode19 = "SZL"
+	CurrencyCode19THB  CurrencyCode19 = "THB"
+	CurrencyCode19TJS  CurrencyCode19 = "TJS"
+	CurrencyCode19TMT  CurrencyCode19 = "TMT"
+	CurrencyCode19TND  CurrencyCode19 = "TND"
+	CurrencyCode19TOP  CurrencyCode19 = "TOP"
+	CurrencyCode19TRY  CurrencyCode19 = "TRY"
+	CurrencyCode19TTD  CurrencyCode19 = "TTD"
+	CurrencyCode19TWD  CurrencyCode19 = "TWD"
+	CurrencyCode19TZS  CurrencyCode19 = "TZS"
+	CurrencyCode19UAH  CurrencyCode19 = "UAH"
+	CurrencyCode19UGX  CurrencyCode19 = "UGX"
+	CurrencyCode19USD  CurrencyCode19 = "USD"
+	CurrencyCode19USN  CurrencyCode19 = "USN"
+	CurrencyCode19UYI  CurrencyCode19 = "UYI"
+	CurrencyCode19UYU  CurrencyCode19 = "UYU"
+	CurrencyCode19UYW  CurrencyCode19 = "UYW"
+	CurrencyCode19UZS  CurrencyCode19 = "UZS"
+	CurrencyCode19VED  CurrencyCode19 = "VED"
+	CurrencyCode19VES  CurrencyCode19 = "VES"
+	CurrencyCode19VND  CurrencyCode19 = "VND"
+	CurrencyCode19VUV  CurrencyCode19 = "VUV"
+	CurrencyCode19WST  CurrencyCode19 = "WST"
+	CurrencyCode19XAD  CurrencyCode19 = "XAD"
+	CurrencyCode19XAF  CurrencyCode19 = "XAF"
+	CurrencyCode19XCD  CurrencyCode19 = "XCD"
+	CurrencyCode19XCG  CurrencyCode19 = "XCG"
+	CurrencyCode19XOF  CurrencyCode19 = "XOF"
+	CurrencyCode19XPF  CurrencyCode19 = "XPF"
+	CurrencyCode19YER  CurrencyCode19 = "YER"
+	CurrencyCode19ZAR  CurrencyCode19 = "ZAR"
+	CurrencyCode19ZMW  CurrencyCode19 = "ZMW"
+	CurrencyCode19ZWG  CurrencyCode19 = "ZWG"
+	CurrencyCode19BTC  CurrencyCode19 = "BTC"
+	CurrencyCode19ETH  CurrencyCode19 = "ETH"
+	CurrencyCode19USDC CurrencyCode19 = "USDC"
+	CurrencyCode19USDT CurrencyCode19 = "USDT"
+)
+
+type CurrencyCode2 string
+
+const (
+	CurrencyCode2AED  CurrencyCode2 = "AED"
+	CurrencyCode2AFN  CurrencyCode2 = "AFN"
+	CurrencyCode2ALL  CurrencyCode2 = "ALL"
+	CurrencyCode2AMD  CurrencyCode2 = "AMD"
+	CurrencyCode2AOA  CurrencyCode2 = "AOA"
+	CurrencyCode2ARS  CurrencyCode2 = "ARS"
+	CurrencyCode2AUD  CurrencyCode2 = "AUD"
+	CurrencyCode2AWG  CurrencyCode2 = "AWG"
+	CurrencyCode2AZN  CurrencyCode2 = "AZN"
+	CurrencyCode2BAM  CurrencyCode2 = "BAM"
+	CurrencyCode2BBD  CurrencyCode2 = "BBD"
+	CurrencyCode2BDT  CurrencyCode2 = "BDT"
+	CurrencyCode2BHD  CurrencyCode2 = "BHD"
+	CurrencyCode2BIF  CurrencyCode2 = "BIF"
+	CurrencyCode2BMD  CurrencyCode2 = "BMD"
+	CurrencyCode2BND  CurrencyCode2 = "BND"
+	CurrencyCode2BOB  CurrencyCode2 = "BOB"
+	CurrencyCode2BOV  CurrencyCode2 = "BOV"
+	CurrencyCode2BRL  CurrencyCode2 = "BRL"
+	CurrencyCode2BSD  CurrencyCode2 = "BSD"
+	CurrencyCode2BTN  CurrencyCode2 = "BTN"
+	CurrencyCode2BWP  CurrencyCode2 = "BWP"
+	CurrencyCode2BYN  CurrencyCode2 = "BYN"
+	CurrencyCode2BZD  CurrencyCode2 = "BZD"
+	CurrencyCode2CAD  CurrencyCode2 = "CAD"
+	CurrencyCode2CDF  CurrencyCode2 = "CDF"
+	CurrencyCode2CHE  CurrencyCode2 = "CHE"
+	CurrencyCode2CHF  CurrencyCode2 = "CHF"
+	CurrencyCode2CHW  CurrencyCode2 = "CHW"
+	CurrencyCode2CLF  CurrencyCode2 = "CLF"
+	CurrencyCode2CLP  CurrencyCode2 = "CLP"
+	CurrencyCode2CNY  CurrencyCode2 = "CNY"
+	CurrencyCode2COP  CurrencyCode2 = "COP"
+	CurrencyCode2COU  CurrencyCode2 = "COU"
+	CurrencyCode2CRC  CurrencyCode2 = "CRC"
+	CurrencyCode2CUP  CurrencyCode2 = "CUP"
+	CurrencyCode2CVE  CurrencyCode2 = "CVE"
+	CurrencyCode2CZK  CurrencyCode2 = "CZK"
+	CurrencyCode2DJF  CurrencyCode2 = "DJF"
+	CurrencyCode2DKK  CurrencyCode2 = "DKK"
+	CurrencyCode2DOP  CurrencyCode2 = "DOP"
+	CurrencyCode2DZD  CurrencyCode2 = "DZD"
+	CurrencyCode2EGP  CurrencyCode2 = "EGP"
+	CurrencyCode2ERN  CurrencyCode2 = "ERN"
+	CurrencyCode2ETB  CurrencyCode2 = "ETB"
+	CurrencyCode2EUR  CurrencyCode2 = "EUR"
+	CurrencyCode2FJD  CurrencyCode2 = "FJD"
+	CurrencyCode2FKP  CurrencyCode2 = "FKP"
+	CurrencyCode2GBP  CurrencyCode2 = "GBP"
+	CurrencyCode2GEL  CurrencyCode2 = "GEL"
+	CurrencyCode2GHS  CurrencyCode2 = "GHS"
+	CurrencyCode2GIP  CurrencyCode2 = "GIP"
+	CurrencyCode2GMD  CurrencyCode2 = "GMD"
+	CurrencyCode2GNF  CurrencyCode2 = "GNF"
+	CurrencyCode2GTQ  CurrencyCode2 = "GTQ"
+	CurrencyCode2GYD  CurrencyCode2 = "GYD"
+	CurrencyCode2HKD  CurrencyCode2 = "HKD"
+	CurrencyCode2HNL  CurrencyCode2 = "HNL"
+	CurrencyCode2HTG  CurrencyCode2 = "HTG"
+	CurrencyCode2HUF  CurrencyCode2 = "HUF"
+	CurrencyCode2IDR  CurrencyCode2 = "IDR"
+	CurrencyCode2ILS  CurrencyCode2 = "ILS"
+	CurrencyCode2INR  CurrencyCode2 = "INR"
+	CurrencyCode2IQD  CurrencyCode2 = "IQD"
+	CurrencyCode2IRR  CurrencyCode2 = "IRR"
+	CurrencyCode2ISK  CurrencyCode2 = "ISK"
+	CurrencyCode2JMD  CurrencyCode2 = "JMD"
+	CurrencyCode2JOD  CurrencyCode2 = "JOD"
+	CurrencyCode2JPY  CurrencyCode2 = "JPY"
+	CurrencyCode2KES  CurrencyCode2 = "KES"
+	CurrencyCode2KGS  CurrencyCode2 = "KGS"
+	CurrencyCode2KHR  CurrencyCode2 = "KHR"
+	CurrencyCode2KMF  CurrencyCode2 = "KMF"
+	CurrencyCode2KPW  CurrencyCode2 = "KPW"
+	CurrencyCode2KRW  CurrencyCode2 = "KRW"
+	CurrencyCode2KWD  CurrencyCode2 = "KWD"
+	CurrencyCode2KYD  CurrencyCode2 = "KYD"
+	CurrencyCode2KZT  CurrencyCode2 = "KZT"
+	CurrencyCode2LAK  CurrencyCode2 = "LAK"
+	CurrencyCode2LBP  CurrencyCode2 = "LBP"
+	CurrencyCode2LKR  CurrencyCode2 = "LKR"
+	CurrencyCode2LRD  CurrencyCode2 = "LRD"
+	CurrencyCode2LSL  CurrencyCode2 = "LSL"
+	CurrencyCode2LYD  CurrencyCode2 = "LYD"
+	CurrencyCode2MAD  CurrencyCode2 = "MAD"
+	CurrencyCode2MDL  CurrencyCode2 = "MDL"
+	CurrencyCode2MGA  CurrencyCode2 = "MGA"
+	CurrencyCode2MKD  CurrencyCode2 = "MKD"
+	CurrencyCode2MMK  CurrencyCode2 = "MMK"
+	CurrencyCode2MNT  CurrencyCode2 = "MNT"
+	CurrencyCode2MOP  CurrencyCode2 = "MOP"
+	CurrencyCode2MRU  CurrencyCode2 = "MRU"
+	CurrencyCode2MUR  CurrencyCode2 = "MUR"
+	CurrencyCode2MVR  CurrencyCode2 = "MVR"
+	CurrencyCode2MWK  CurrencyCode2 = "MWK"
+	CurrencyCode2MXN  CurrencyCode2 = "MXN"
+	CurrencyCode2MXV  CurrencyCode2 = "MXV"
+	CurrencyCode2MYR  CurrencyCode2 = "MYR"
+	CurrencyCode2MZN  CurrencyCode2 = "MZN"
+	CurrencyCode2NAD  CurrencyCode2 = "NAD"
+	CurrencyCode2NGN  CurrencyCode2 = "NGN"
+	CurrencyCode2NIO  CurrencyCode2 = "NIO"
+	CurrencyCode2NOK  CurrencyCode2 = "NOK"
+	CurrencyCode2NPR  CurrencyCode2 = "NPR"
+	CurrencyCode2NZD  CurrencyCode2 = "NZD"
+	CurrencyCode2OMR  CurrencyCode2 = "OMR"
+	CurrencyCode2PAB  CurrencyCode2 = "PAB"
+	CurrencyCode2PEN  CurrencyCode2 = "PEN"
+	CurrencyCode2PGK  CurrencyCode2 = "PGK"
+	CurrencyCode2PHP  CurrencyCode2 = "PHP"
+	CurrencyCode2PKR  CurrencyCode2 = "PKR"
+	CurrencyCode2PLN  CurrencyCode2 = "PLN"
+	CurrencyCode2PYG  CurrencyCode2 = "PYG"
+	CurrencyCode2QAR  CurrencyCode2 = "QAR"
+	CurrencyCode2RON  CurrencyCode2 = "RON"
+	CurrencyCode2RSD  CurrencyCode2 = "RSD"
+	CurrencyCode2RUB  CurrencyCode2 = "RUB"
+	CurrencyCode2RWF  CurrencyCode2 = "RWF"
+	CurrencyCode2SAR  CurrencyCode2 = "SAR"
+	CurrencyCode2SBD  CurrencyCode2 = "SBD"
+	CurrencyCode2SCR  CurrencyCode2 = "SCR"
+	CurrencyCode2SDG  CurrencyCode2 = "SDG"
+	CurrencyCode2SEK  CurrencyCode2 = "SEK"
+	CurrencyCode2SGD  CurrencyCode2 = "SGD"
+	CurrencyCode2SHP  CurrencyCode2 = "SHP"
+	CurrencyCode2SLE  CurrencyCode2 = "SLE"
+	CurrencyCode2SOS  CurrencyCode2 = "SOS"
+	CurrencyCode2SRD  CurrencyCode2 = "SRD"
+	CurrencyCode2SSP  CurrencyCode2 = "SSP"
+	CurrencyCode2STN  CurrencyCode2 = "STN"
+	CurrencyCode2SVC  CurrencyCode2 = "SVC"
+	CurrencyCode2SYP  CurrencyCode2 = "SYP"
+	CurrencyCode2SZL  CurrencyCode2 = "SZL"
+	CurrencyCode2THB  CurrencyCode2 = "THB"
+	CurrencyCode2TJS  CurrencyCode2 = "TJS"
+	CurrencyCode2TMT  CurrencyCode2 = "TMT"
+	CurrencyCode2TND  CurrencyCode2 = "TND"
+	CurrencyCode2TOP  CurrencyCode2 = "TOP"
+	CurrencyCode2TRY  CurrencyCode2 = "TRY"
+	CurrencyCode2TTD  CurrencyCode2 = "TTD"
+	CurrencyCode2TWD  CurrencyCode2 = "TWD"
+	CurrencyCode2TZS  CurrencyCode2 = "TZS"
+	CurrencyCode2UAH  CurrencyCode2 = "UAH"
+	CurrencyCode2UGX  CurrencyCode2 = "UGX"
+	CurrencyCode2USD  CurrencyCode2 = "USD"
+	CurrencyCode2USN  CurrencyCode2 = "USN"
+	CurrencyCode2UYI  CurrencyCode2 = "UYI"
+	CurrencyCode2UYU  CurrencyCode2 = "UYU"
+	CurrencyCode2UYW  CurrencyCode2 = "UYW"
+	CurrencyCode2UZS  CurrencyCode2 = "UZS"
+	CurrencyCode2VED  CurrencyCode2 = "VED"
+	CurrencyCode2VES  CurrencyCode2 = "VES"
+	CurrencyCode2VND  CurrencyCode2 = "VND"
+	CurrencyCode2VUV  CurrencyCode2 = "VUV"
+	CurrencyCode2WST  CurrencyCode2 = "WST"
+	CurrencyCode2XAD  CurrencyCode2 = "XAD"
+	CurrencyCode2XAF  CurrencyCode2 = "XAF"
+	CurrencyCode2XCD  CurrencyCode2 = "XCD"
+	CurrencyCode2XCG  CurrencyCode2 = "XCG"
+	CurrencyCode2XOF  CurrencyCode2 = "XOF"
+	CurrencyCode2XPF  CurrencyCode2 = "XPF"
+	CurrencyCode2YER  CurrencyCode2 = "YER"
+	CurrencyCode2ZAR  CurrencyCode2 = "ZAR"
+	CurrencyCode2ZMW  CurrencyCode2 = "ZMW"
+	CurrencyCode2ZWG  CurrencyCode2 = "ZWG"
+	CurrencyCode2BTC  CurrencyCode2 = "BTC"
+	CurrencyCode2ETH  CurrencyCode2 = "ETH"
+	CurrencyCode2USDC CurrencyCode2 = "USDC"
+	CurrencyCode2USDT CurrencyCode2 = "USDT"
+)
+
+type CurrencyCode20 string
+
+const (
+	CurrencyCode20AED  CurrencyCode20 = "AED"
+	CurrencyCode20AFN  CurrencyCode20 = "AFN"
+	CurrencyCode20ALL  CurrencyCode20 = "ALL"
+	CurrencyCode20AMD  CurrencyCode20 = "AMD"
+	CurrencyCode20AOA  CurrencyCode20 = "AOA"
+	CurrencyCode20ARS  CurrencyCode20 = "ARS"
+	CurrencyCode20AUD  CurrencyCode20 = "AUD"
+	CurrencyCode20AWG  CurrencyCode20 = "AWG"
+	CurrencyCode20AZN  CurrencyCode20 = "AZN"
+	CurrencyCode20BAM  CurrencyCode20 = "BAM"
+	CurrencyCode20BBD  CurrencyCode20 = "BBD"
+	CurrencyCode20BDT  CurrencyCode20 = "BDT"
+	CurrencyCode20BHD  CurrencyCode20 = "BHD"
+	CurrencyCode20BIF  CurrencyCode20 = "BIF"
+	CurrencyCode20BMD  CurrencyCode20 = "BMD"
+	CurrencyCode20BND  CurrencyCode20 = "BND"
+	CurrencyCode20BOB  CurrencyCode20 = "BOB"
+	CurrencyCode20BOV  CurrencyCode20 = "BOV"
+	CurrencyCode20BRL  CurrencyCode20 = "BRL"
+	CurrencyCode20BSD  CurrencyCode20 = "BSD"
+	CurrencyCode20BTN  CurrencyCode20 = "BTN"
+	CurrencyCode20BWP  CurrencyCode20 = "BWP"
+	CurrencyCode20BYN  CurrencyCode20 = "BYN"
+	CurrencyCode20BZD  CurrencyCode20 = "BZD"
+	CurrencyCode20CAD  CurrencyCode20 = "CAD"
+	CurrencyCode20CDF  CurrencyCode20 = "CDF"
+	CurrencyCode20CHE  CurrencyCode20 = "CHE"
+	CurrencyCode20CHF  CurrencyCode20 = "CHF"
+	CurrencyCode20CHW  CurrencyCode20 = "CHW"
+	CurrencyCode20CLF  CurrencyCode20 = "CLF"
+	CurrencyCode20CLP  CurrencyCode20 = "CLP"
+	CurrencyCode20CNY  CurrencyCode20 = "CNY"
+	CurrencyCode20COP  CurrencyCode20 = "COP"
+	CurrencyCode20COU  CurrencyCode20 = "COU"
+	CurrencyCode20CRC  CurrencyCode20 = "CRC"
+	CurrencyCode20CUP  CurrencyCode20 = "CUP"
+	CurrencyCode20CVE  CurrencyCode20 = "CVE"
+	CurrencyCode20CZK  CurrencyCode20 = "CZK"
+	CurrencyCode20DJF  CurrencyCode20 = "DJF"
+	CurrencyCode20DKK  CurrencyCode20 = "DKK"
+	CurrencyCode20DOP  CurrencyCode20 = "DOP"
+	CurrencyCode20DZD  CurrencyCode20 = "DZD"
+	CurrencyCode20EGP  CurrencyCode20 = "EGP"
+	CurrencyCode20ERN  CurrencyCode20 = "ERN"
+	CurrencyCode20ETB  CurrencyCode20 = "ETB"
+	CurrencyCode20EUR  CurrencyCode20 = "EUR"
+	CurrencyCode20FJD  CurrencyCode20 = "FJD"
+	CurrencyCode20FKP  CurrencyCode20 = "FKP"
+	CurrencyCode20GBP  CurrencyCode20 = "GBP"
+	CurrencyCode20GEL  CurrencyCode20 = "GEL"
+	CurrencyCode20GHS  CurrencyCode20 = "GHS"
+	CurrencyCode20GIP  CurrencyCode20 = "GIP"
+	CurrencyCode20GMD  CurrencyCode20 = "GMD"
+	CurrencyCode20GNF  CurrencyCode20 = "GNF"
+	CurrencyCode20GTQ  CurrencyCode20 = "GTQ"
+	CurrencyCode20GYD  CurrencyCode20 = "GYD"
+	CurrencyCode20HKD  CurrencyCode20 = "HKD"
+	CurrencyCode20HNL  CurrencyCode20 = "HNL"
+	CurrencyCode20HTG  CurrencyCode20 = "HTG"
+	CurrencyCode20HUF  CurrencyCode20 = "HUF"
+	CurrencyCode20IDR  CurrencyCode20 = "IDR"
+	CurrencyCode20ILS  CurrencyCode20 = "ILS"
+	CurrencyCode20INR  CurrencyCode20 = "INR"
+	CurrencyCode20IQD  CurrencyCode20 = "IQD"
+	CurrencyCode20IRR  CurrencyCode20 = "IRR"
+	CurrencyCode20ISK  CurrencyCode20 = "ISK"
+	CurrencyCode20JMD  CurrencyCode20 = "JMD"
+	CurrencyCode20JOD  CurrencyCode20 = "JOD"
+	CurrencyCode20JPY  CurrencyCode20 = "JPY"
+	CurrencyCode20KES  CurrencyCode20 = "KES"
+	CurrencyCode20KGS  CurrencyCode20 = "KGS"
+	CurrencyCode20KHR  CurrencyCode20 = "KHR"
+	CurrencyCode20KMF  CurrencyCode20 = "KMF"
+	CurrencyCode20KPW  CurrencyCode20 = "KPW"
+	CurrencyCode20KRW  CurrencyCode20 = "KRW"
+	CurrencyCode20KWD  CurrencyCode20 = "KWD"
+	CurrencyCode20KYD  CurrencyCode20 = "KYD"
+	CurrencyCode20KZT  CurrencyCode20 = "KZT"
+	CurrencyCode20LAK  CurrencyCode20 = "LAK"
+	CurrencyCode20LBP  CurrencyCode20 = "LBP"
+	CurrencyCode20LKR  CurrencyCode20 = "LKR"
+	CurrencyCode20LRD  CurrencyCode20 = "LRD"
+	CurrencyCode20LSL  CurrencyCode20 = "LSL"
+	CurrencyCode20LYD  CurrencyCode20 = "LYD"
+	CurrencyCode20MAD  CurrencyCode20 = "MAD"
+	CurrencyCode20MDL  CurrencyCode20 = "MDL"
+	CurrencyCode20MGA  CurrencyCode20 = "MGA"
+	CurrencyCode20MKD  CurrencyCode20 = "MKD"
+	CurrencyCode20MMK  CurrencyCode20 = "MMK"
+	CurrencyCode20MNT  CurrencyCode20 = "MNT"
+	CurrencyCode20MOP  CurrencyCode20 = "MOP"
+	CurrencyCode20MRU  CurrencyCode20 = "MRU"
+	CurrencyCode20MUR  CurrencyCode20 = "MUR"
+	CurrencyCode20MVR  CurrencyCode20 = "MVR"
+	CurrencyCode20MWK  CurrencyCode20 = "MWK"
+	CurrencyCode20MXN  CurrencyCode20 = "MXN"
+	CurrencyCode20MXV  CurrencyCode20 = "MXV"
+	CurrencyCode20MYR  CurrencyCode20 = "MYR"
+	CurrencyCode20MZN  CurrencyCode20 = "MZN"
+	CurrencyCode20NAD  CurrencyCode20 = "NAD"
+	CurrencyCode20NGN  CurrencyCode20 = "NGN"
+	CurrencyCode20NIO  CurrencyCode20 = "NIO"
+	CurrencyCode20NOK  CurrencyCode20 = "NOK"
+	CurrencyCode20NPR  CurrencyCode20 = "NPR"
+	CurrencyCode20NZD  CurrencyCode20 = "NZD"
+	CurrencyCode20OMR  CurrencyCode20 = "OMR"
+	CurrencyCode20PAB  CurrencyCode20 = "PAB"
+	CurrencyCode20PEN  CurrencyCode20 = "PEN"
+	CurrencyCode20PGK  CurrencyCode20 = "PGK"
+	CurrencyCode20PHP  CurrencyCode20 = "PHP"
+	CurrencyCode20PKR  CurrencyCode20 = "PKR"
+	CurrencyCode20PLN  CurrencyCode20 = "PLN"
+	CurrencyCode20PYG  CurrencyCode20 = "PYG"
+	CurrencyCode20QAR  CurrencyCode20 = "QAR"
+	CurrencyCode20RON  CurrencyCode20 = "RON"
+	CurrencyCode20RSD  CurrencyCode20 = "RSD"
+	CurrencyCode20RUB  CurrencyCode20 = "RUB"
+	CurrencyCode20RWF  CurrencyCode20 = "RWF"
+	CurrencyCode20SAR  CurrencyCode20 = "SAR"
+	CurrencyCode20SBD  CurrencyCode20 = "SBD"
+	CurrencyCode20SCR  CurrencyCode20 = "SCR"
+	CurrencyCode20SDG  CurrencyCode20 = "SDG"
+	CurrencyCode20SEK  CurrencyCode20 = "SEK"
+	CurrencyCode20SGD  CurrencyCode20 = "SGD"
+	CurrencyCode20SHP  CurrencyCode20 = "SHP"
+	CurrencyCode20SLE  CurrencyCode20 = "SLE"
+	CurrencyCode20SOS  CurrencyCode20 = "SOS"
+	CurrencyCode20SRD  CurrencyCode20 = "SRD"
+	CurrencyCode20SSP  CurrencyCode20 = "SSP"
+	CurrencyCode20STN  CurrencyCode20 = "STN"
+	CurrencyCode20SVC  CurrencyCode20 = "SVC"
+	CurrencyCode20SYP  CurrencyCode20 = "SYP"
+	CurrencyCode20SZL  CurrencyCode20 = "SZL"
+	CurrencyCode20THB  CurrencyCode20 = "THB"
+	CurrencyCode20TJS  CurrencyCode20 = "TJS"
+	CurrencyCode20TMT  CurrencyCode20 = "TMT"
+	CurrencyCode20TND  CurrencyCode20 = "TND"
+	CurrencyCode20TOP  CurrencyCode20 = "TOP"
+	CurrencyCode20TRY  CurrencyCode20 = "TRY"
+	CurrencyCode20TTD  CurrencyCode20 = "TTD"
+	CurrencyCode20TWD  CurrencyCode20 = "TWD"
+	CurrencyCode20TZS  CurrencyCode20 = "TZS"
+	CurrencyCode20UAH  CurrencyCode20 = "UAH"
+	CurrencyCode20UGX  CurrencyCode20 = "UGX"
+	CurrencyCode20USD  CurrencyCode20 = "USD"
+	CurrencyCode20USN  CurrencyCode20 = "USN"
+	CurrencyCode20UYI  CurrencyCode20 = "UYI"
+	CurrencyCode20UYU  CurrencyCode20 = "UYU"
+	CurrencyCode20UYW  CurrencyCode20 = "UYW"
+	CurrencyCode20UZS  CurrencyCode20 = "UZS"
+	CurrencyCode20VED  CurrencyCode20 = "VED"
+	CurrencyCode20VES  CurrencyCode20 = "VES"
+	CurrencyCode20VND  CurrencyCode20 = "VND"
+	CurrencyCode20VUV  CurrencyCode20 = "VUV"
+	CurrencyCode20WST  CurrencyCode20 = "WST"
+	CurrencyCode20XAD  CurrencyCode20 = "XAD"
+	CurrencyCode20XAF  CurrencyCode20 = "XAF"
+	CurrencyCode20XCD  CurrencyCode20 = "XCD"
+	CurrencyCode20XCG  CurrencyCode20 = "XCG"
+	CurrencyCode20XOF  CurrencyCode20 = "XOF"
+	CurrencyCode20XPF  CurrencyCode20 = "XPF"
+	CurrencyCode20YER  CurrencyCode20 = "YER"
+	CurrencyCode20ZAR  CurrencyCode20 = "ZAR"
+	CurrencyCode20ZMW  CurrencyCode20 = "ZMW"
+	CurrencyCode20ZWG  CurrencyCode20 = "ZWG"
+	CurrencyCode20BTC  CurrencyCode20 = "BTC"
+	CurrencyCode20ETH  CurrencyCode20 = "ETH"
+	CurrencyCode20USDC CurrencyCode20 = "USDC"
+	CurrencyCode20USDT CurrencyCode20 = "USDT"
+)
+
+type CurrencyCode3 string
+
+const (
+	CurrencyCode3AED  CurrencyCode3 = "AED"
+	CurrencyCode3AFN  CurrencyCode3 = "AFN"
+	CurrencyCode3ALL  CurrencyCode3 = "ALL"
+	CurrencyCode3AMD  CurrencyCode3 = "AMD"
+	CurrencyCode3AOA  CurrencyCode3 = "AOA"
+	CurrencyCode3ARS  CurrencyCode3 = "ARS"
+	CurrencyCode3AUD  CurrencyCode3 = "AUD"
+	CurrencyCode3AWG  CurrencyCode3 = "AWG"
+	CurrencyCode3AZN  CurrencyCode3 = "AZN"
+	CurrencyCode3BAM  CurrencyCode3 = "BAM"
+	CurrencyCode3BBD  CurrencyCode3 = "BBD"
+	CurrencyCode3BDT  CurrencyCode3 = "BDT"
+	CurrencyCode3BHD  CurrencyCode3 = "BHD"
+	CurrencyCode3BIF  CurrencyCode3 = "BIF"
+	CurrencyCode3BMD  CurrencyCode3 = "BMD"
+	CurrencyCode3BND  CurrencyCode3 = "BND"
+	CurrencyCode3BOB  CurrencyCode3 = "BOB"
+	CurrencyCode3BOV  CurrencyCode3 = "BOV"
+	CurrencyCode3BRL  CurrencyCode3 = "BRL"
+	CurrencyCode3BSD  CurrencyCode3 = "BSD"
+	CurrencyCode3BTN  CurrencyCode3 = "BTN"
+	CurrencyCode3BWP  CurrencyCode3 = "BWP"
+	CurrencyCode3BYN  CurrencyCode3 = "BYN"
+	CurrencyCode3BZD  CurrencyCode3 = "BZD"
+	CurrencyCode3CAD  CurrencyCode3 = "CAD"
+	CurrencyCode3CDF  CurrencyCode3 = "CDF"
+	CurrencyCode3CHE  CurrencyCode3 = "CHE"
+	CurrencyCode3CHF  CurrencyCode3 = "CHF"
+	CurrencyCode3CHW  CurrencyCode3 = "CHW"
+	CurrencyCode3CLF  CurrencyCode3 = "CLF"
+	CurrencyCode3CLP  CurrencyCode3 = "CLP"
+	CurrencyCode3CNY  CurrencyCode3 = "CNY"
+	CurrencyCode3COP  CurrencyCode3 = "COP"
+	CurrencyCode3COU  CurrencyCode3 = "COU"
+	CurrencyCode3CRC  CurrencyCode3 = "CRC"
+	CurrencyCode3CUP  CurrencyCode3 = "CUP"
+	CurrencyCode3CVE  CurrencyCode3 = "CVE"
+	CurrencyCode3CZK  CurrencyCode3 = "CZK"
+	CurrencyCode3DJF  CurrencyCode3 = "DJF"
+	CurrencyCode3DKK  CurrencyCode3 = "DKK"
+	CurrencyCode3DOP  CurrencyCode3 = "DOP"
+	CurrencyCode3DZD  CurrencyCode3 = "DZD"
+	CurrencyCode3EGP  CurrencyCode3 = "EGP"
+	CurrencyCode3ERN  CurrencyCode3 = "ERN"
+	CurrencyCode3ETB  CurrencyCode3 = "ETB"
+	CurrencyCode3EUR  CurrencyCode3 = "EUR"
+	CurrencyCode3FJD  CurrencyCode3 = "FJD"
+	CurrencyCode3FKP  CurrencyCode3 = "FKP"
+	CurrencyCode3GBP  CurrencyCode3 = "GBP"
+	CurrencyCode3GEL  CurrencyCode3 = "GEL"
+	CurrencyCode3GHS  CurrencyCode3 = "GHS"
+	CurrencyCode3GIP  CurrencyCode3 = "GIP"
+	CurrencyCode3GMD  CurrencyCode3 = "GMD"
+	CurrencyCode3GNF  CurrencyCode3 = "GNF"
+	CurrencyCode3GTQ  CurrencyCode3 = "GTQ"
+	CurrencyCode3GYD  CurrencyCode3 = "GYD"
+	CurrencyCode3HKD  CurrencyCode3 = "HKD"
+	CurrencyCode3HNL  CurrencyCode3 = "HNL"
+	CurrencyCode3HTG  CurrencyCode3 = "HTG"
+	CurrencyCode3HUF  CurrencyCode3 = "HUF"
+	CurrencyCode3IDR  CurrencyCode3 = "IDR"
+	CurrencyCode3ILS  CurrencyCode3 = "ILS"
+	CurrencyCode3INR  CurrencyCode3 = "INR"
+	CurrencyCode3IQD  CurrencyCode3 = "IQD"
+	CurrencyCode3IRR  CurrencyCode3 = "IRR"
+	CurrencyCode3ISK  CurrencyCode3 = "ISK"
+	CurrencyCode3JMD  CurrencyCode3 = "JMD"
+	CurrencyCode3JOD  CurrencyCode3 = "JOD"
+	CurrencyCode3JPY  CurrencyCode3 = "JPY"
+	CurrencyCode3KES  CurrencyCode3 = "KES"
+	CurrencyCode3KGS  CurrencyCode3 = "KGS"
+	CurrencyCode3KHR  CurrencyCode3 = "KHR"
+	CurrencyCode3KMF  CurrencyCode3 = "KMF"
+	CurrencyCode3KPW  CurrencyCode3 = "KPW"
+	CurrencyCode3KRW  CurrencyCode3 = "KRW"
+	CurrencyCode3KWD  CurrencyCode3 = "KWD"
+	CurrencyCode3KYD  CurrencyCode3 = "KYD"
+	CurrencyCode3KZT  CurrencyCode3 = "KZT"
+	CurrencyCode3LAK  CurrencyCode3 = "LAK"
+	CurrencyCode3LBP  CurrencyCode3 = "LBP"
+	CurrencyCode3LKR  CurrencyCode3 = "LKR"
+	CurrencyCode3LRD  CurrencyCode3 = "LRD"
+	CurrencyCode3LSL  CurrencyCode3 = "LSL"
+	CurrencyCode3LYD  CurrencyCode3 = "LYD"
+	CurrencyCode3MAD  CurrencyCode3 = "MAD"
+	CurrencyCode3MDL  CurrencyCode3 = "MDL"
+	CurrencyCode3MGA  CurrencyCode3 = "MGA"
+	CurrencyCode3MKD  CurrencyCode3 = "MKD"
+	CurrencyCode3MMK  CurrencyCode3 = "MMK"
+	CurrencyCode3MNT  CurrencyCode3 = "MNT"
+	CurrencyCode3MOP  CurrencyCode3 = "MOP"
+	CurrencyCode3MRU  CurrencyCode3 = "MRU"
+	CurrencyCode3MUR  CurrencyCode3 = "MUR"
+	CurrencyCode3MVR  CurrencyCode3 = "MVR"
+	CurrencyCode3MWK  CurrencyCode3 = "MWK"
+	CurrencyCode3MXN  CurrencyCode3 = "MXN"
+	CurrencyCode3MXV  CurrencyCode3 = "MXV"
+	CurrencyCode3MYR  CurrencyCode3 = "MYR"
+	CurrencyCode3MZN  CurrencyCode3 = "MZN"
+	CurrencyCode3NAD  CurrencyCode3 = "NAD"
+	CurrencyCode3NGN  CurrencyCode3 = "NGN"
+	CurrencyCode3NIO  CurrencyCode3 = "NIO"
+	CurrencyCode3NOK  CurrencyCode3 = "NOK"
+	CurrencyCode3NPR  CurrencyCode3 = "NPR"
+	CurrencyCode3NZD  CurrencyCode3 = "NZD"
+	CurrencyCode3OMR  CurrencyCode3 = "OMR"
+	CurrencyCode3PAB  CurrencyCode3 = "PAB"
+	CurrencyCode3PEN  CurrencyCode3 = "PEN"
+	CurrencyCode3PGK  CurrencyCode3 = "PGK"
+	CurrencyCode3PHP  CurrencyCode3 = "PHP"
+	CurrencyCode3PKR  CurrencyCode3 = "PKR"
+	CurrencyCode3PLN  CurrencyCode3 = "PLN"
+	CurrencyCode3PYG  CurrencyCode3 = "PYG"
+	CurrencyCode3QAR  CurrencyCode3 = "QAR"
+	CurrencyCode3RON  CurrencyCode3 = "RON"
+	CurrencyCode3RSD  CurrencyCode3 = "RSD"
+	CurrencyCode3RUB  CurrencyCode3 = "RUB"
+	CurrencyCode3RWF  CurrencyCode3 = "RWF"
+	CurrencyCode3SAR  CurrencyCode3 = "SAR"
+	CurrencyCode3SBD  CurrencyCode3 = "SBD"
+	CurrencyCode3SCR  CurrencyCode3 = "SCR"
+	CurrencyCode3SDG  CurrencyCode3 = "SDG"
+	CurrencyCode3SEK  CurrencyCode3 = "SEK"
+	CurrencyCode3SGD  CurrencyCode3 = "SGD"
+	CurrencyCode3SHP  CurrencyCode3 = "SHP"
+	CurrencyCode3SLE  CurrencyCode3 = "SLE"
+	CurrencyCode3SOS  CurrencyCode3 = "SOS"
+	CurrencyCode3SRD  CurrencyCode3 = "SRD"
+	CurrencyCode3SSP  CurrencyCode3 = "SSP"
+	CurrencyCode3STN  CurrencyCode3 = "STN"
+	CurrencyCode3SVC  CurrencyCode3 = "SVC"
+	CurrencyCode3SYP  CurrencyCode3 = "SYP"
+	CurrencyCode3SZL  CurrencyCode3 = "SZL"
+	CurrencyCode3THB  CurrencyCode3 = "THB"
+	CurrencyCode3TJS  CurrencyCode3 = "TJS"
+	CurrencyCode3TMT  CurrencyCode3 = "TMT"
+	CurrencyCode3TND  CurrencyCode3 = "TND"
+	CurrencyCode3TOP  CurrencyCode3 = "TOP"
+	CurrencyCode3TRY  CurrencyCode3 = "TRY"
+	CurrencyCode3TTD  CurrencyCode3 = "TTD"
+	CurrencyCode3TWD  CurrencyCode3 = "TWD"
+	CurrencyCode3TZS  CurrencyCode3 = "TZS"
+	CurrencyCode3UAH  CurrencyCode3 = "UAH"
+	CurrencyCode3UGX  CurrencyCode3 = "UGX"
+	CurrencyCode3USD  CurrencyCode3 = "USD"
+	CurrencyCode3USN  CurrencyCode3 = "USN"
+	CurrencyCode3UYI  CurrencyCode3 = "UYI"
+	CurrencyCode3UYU  CurrencyCode3 = "UYU"
+	CurrencyCode3UYW  CurrencyCode3 = "UYW"
+	CurrencyCode3UZS  CurrencyCode3 = "UZS"
+	CurrencyCode3VED  CurrencyCode3 = "VED"
+	CurrencyCode3VES  CurrencyCode3 = "VES"
+	CurrencyCode3VND  CurrencyCode3 = "VND"
+	CurrencyCode3VUV  CurrencyCode3 = "VUV"
+	CurrencyCode3WST  CurrencyCode3 = "WST"
+	CurrencyCode3XAD  CurrencyCode3 = "XAD"
+	CurrencyCode3XAF  CurrencyCode3 = "XAF"
+	CurrencyCode3XCD  CurrencyCode3 = "XCD"
+	CurrencyCode3XCG  CurrencyCode3 = "XCG"
+	CurrencyCode3XOF  CurrencyCode3 = "XOF"
+	CurrencyCode3XPF  CurrencyCode3 = "XPF"
+	CurrencyCode3YER  CurrencyCode3 = "YER"
+	CurrencyCode3ZAR  CurrencyCode3 = "ZAR"
+	CurrencyCode3ZMW  CurrencyCode3 = "ZMW"
+	CurrencyCode3ZWG  CurrencyCode3 = "ZWG"
+	CurrencyCode3BTC  CurrencyCode3 = "BTC"
+	CurrencyCode3ETH  CurrencyCode3 = "ETH"
+	CurrencyCode3USDC CurrencyCode3 = "USDC"
+	CurrencyCode3USDT CurrencyCode3 = "USDT"
+)
+
+type CurrencyCode4 string
+
+const (
+	CurrencyCode4AED  CurrencyCode4 = "AED"
+	CurrencyCode4AFN  CurrencyCode4 = "AFN"
+	CurrencyCode4ALL  CurrencyCode4 = "ALL"
+	CurrencyCode4AMD  CurrencyCode4 = "AMD"
+	CurrencyCode4AOA  CurrencyCode4 = "AOA"
+	CurrencyCode4ARS  CurrencyCode4 = "ARS"
+	CurrencyCode4AUD  CurrencyCode4 = "AUD"
+	CurrencyCode4AWG  CurrencyCode4 = "AWG"
+	CurrencyCode4AZN  CurrencyCode4 = "AZN"
+	CurrencyCode4BAM  CurrencyCode4 = "BAM"
+	CurrencyCode4BBD  CurrencyCode4 = "BBD"
+	CurrencyCode4BDT  CurrencyCode4 = "BDT"
+	CurrencyCode4BHD  CurrencyCode4 = "BHD"
+	CurrencyCode4BIF  CurrencyCode4 = "BIF"
+	CurrencyCode4BMD  CurrencyCode4 = "BMD"
+	CurrencyCode4BND  CurrencyCode4 = "BND"
+	CurrencyCode4BOB  CurrencyCode4 = "BOB"
+	CurrencyCode4BOV  CurrencyCode4 = "BOV"
+	CurrencyCode4BRL  CurrencyCode4 = "BRL"
+	CurrencyCode4BSD  CurrencyCode4 = "BSD"
+	CurrencyCode4BTN  CurrencyCode4 = "BTN"
+	CurrencyCode4BWP  CurrencyCode4 = "BWP"
+	CurrencyCode4BYN  CurrencyCode4 = "BYN"
+	CurrencyCode4BZD  CurrencyCode4 = "BZD"
+	CurrencyCode4CAD  CurrencyCode4 = "CAD"
+	CurrencyCode4CDF  CurrencyCode4 = "CDF"
+	CurrencyCode4CHE  CurrencyCode4 = "CHE"
+	CurrencyCode4CHF  CurrencyCode4 = "CHF"
+	CurrencyCode4CHW  CurrencyCode4 = "CHW"
+	CurrencyCode4CLF  CurrencyCode4 = "CLF"
+	CurrencyCode4CLP  CurrencyCode4 = "CLP"
+	CurrencyCode4CNY  CurrencyCode4 = "CNY"
+	CurrencyCode4COP  CurrencyCode4 = "COP"
+	CurrencyCode4COU  CurrencyCode4 = "COU"
+	CurrencyCode4CRC  CurrencyCode4 = "CRC"
+	CurrencyCode4CUP  CurrencyCode4 = "CUP"
+	CurrencyCode4CVE  CurrencyCode4 = "CVE"
+	CurrencyCode4CZK  CurrencyCode4 = "CZK"
+	CurrencyCode4DJF  CurrencyCode4 = "DJF"
+	CurrencyCode4DKK  CurrencyCode4 = "DKK"
+	CurrencyCode4DOP  CurrencyCode4 = "DOP"
+	CurrencyCode4DZD  CurrencyCode4 = "DZD"
+	CurrencyCode4EGP  CurrencyCode4 = "EGP"
+	CurrencyCode4ERN  CurrencyCode4 = "ERN"
+	CurrencyCode4ETB  CurrencyCode4 = "ETB"
+	CurrencyCode4EUR  CurrencyCode4 = "EUR"
+	CurrencyCode4FJD  CurrencyCode4 = "FJD"
+	CurrencyCode4FKP  CurrencyCode4 = "FKP"
+	CurrencyCode4GBP  CurrencyCode4 = "GBP"
+	CurrencyCode4GEL  CurrencyCode4 = "GEL"
+	CurrencyCode4GHS  CurrencyCode4 = "GHS"
+	CurrencyCode4GIP  CurrencyCode4 = "GIP"
+	CurrencyCode4GMD  CurrencyCode4 = "GMD"
+	CurrencyCode4GNF  CurrencyCode4 = "GNF"
+	CurrencyCode4GTQ  CurrencyCode4 = "GTQ"
+	CurrencyCode4GYD  CurrencyCode4 = "GYD"
+	CurrencyCode4HKD  CurrencyCode4 = "HKD"
+	CurrencyCode4HNL  CurrencyCode4 = "HNL"
+	CurrencyCode4HTG  CurrencyCode4 = "HTG"
+	CurrencyCode4HUF  CurrencyCode4 = "HUF"
+	CurrencyCode4IDR  CurrencyCode4 = "IDR"
+	CurrencyCode4ILS  CurrencyCode4 = "ILS"
+	CurrencyCode4INR  CurrencyCode4 = "INR"
+	CurrencyCode4IQD  CurrencyCode4 = "IQD"
+	CurrencyCode4IRR  CurrencyCode4 = "IRR"
+	CurrencyCode4ISK  CurrencyCode4 = "ISK"
+	CurrencyCode4JMD  CurrencyCode4 = "JMD"
+	CurrencyCode4JOD  CurrencyCode4 = "JOD"
+	CurrencyCode4JPY  CurrencyCode4 = "JPY"
+	CurrencyCode4KES  CurrencyCode4 = "KES"
+	CurrencyCode4KGS  CurrencyCode4 = "KGS"
+	CurrencyCode4KHR  CurrencyCode4 = "KHR"
+	CurrencyCode4KMF  CurrencyCode4 = "KMF"
+	CurrencyCode4KPW  CurrencyCode4 = "KPW"
+	CurrencyCode4KRW  CurrencyCode4 = "KRW"
+	CurrencyCode4KWD  CurrencyCode4 = "KWD"
+	CurrencyCode4KYD  CurrencyCode4 = "KYD"
+	CurrencyCode4KZT  CurrencyCode4 = "KZT"
+	CurrencyCode4LAK  CurrencyCode4 = "LAK"
+	CurrencyCode4LBP  CurrencyCode4 = "LBP"
+	CurrencyCode4LKR  CurrencyCode4 = "LKR"
+	CurrencyCode4LRD  CurrencyCode4 = "LRD"
+	CurrencyCode4LSL  CurrencyCode4 = "LSL"
+	CurrencyCode4LYD  CurrencyCode4 = "LYD"
+	CurrencyCode4MAD  CurrencyCode4 = "MAD"
+	CurrencyCode4MDL  CurrencyCode4 = "MDL"
+	CurrencyCode4MGA  CurrencyCode4 = "MGA"
+	CurrencyCode4MKD  CurrencyCode4 = "MKD"
+	CurrencyCode4MMK  CurrencyCode4 = "MMK"
+	CurrencyCode4MNT  CurrencyCode4 = "MNT"
+	CurrencyCode4MOP  CurrencyCode4 = "MOP"
+	CurrencyCode4MRU  CurrencyCode4 = "MRU"
+	CurrencyCode4MUR  CurrencyCode4 = "MUR"
+	CurrencyCode4MVR  CurrencyCode4 = "MVR"
+	CurrencyCode4MWK  CurrencyCode4 = "MWK"
+	CurrencyCode4MXN  CurrencyCode4 = "MXN"
+	CurrencyCode4MXV  CurrencyCode4 = "MXV"
+	CurrencyCode4MYR  CurrencyCode4 = "MYR"
+	CurrencyCode4MZN  CurrencyCode4 = "MZN"
+	CurrencyCode4NAD  CurrencyCode4 = "NAD"
+	CurrencyCode4NGN  CurrencyCode4 = "NGN"
+	CurrencyCode4NIO  CurrencyCode4 = "NIO"
+	CurrencyCode4NOK  CurrencyCode4 = "NOK"
+	CurrencyCode4NPR  CurrencyCode4 = "NPR"
+	CurrencyCode4NZD  CurrencyCode4 = "NZD"
+	CurrencyCode4OMR  CurrencyCode4 = "OMR"
+	CurrencyCode4PAB  CurrencyCode4 = "PAB"
+	CurrencyCode4PEN  CurrencyCode4 = "PEN"
+	CurrencyCode4PGK  CurrencyCode4 = "PGK"
+	CurrencyCode4PHP  CurrencyCode4 = "PHP"
+	CurrencyCode4PKR  CurrencyCode4 = "PKR"
+	CurrencyCode4PLN  CurrencyCode4 = "PLN"
+	CurrencyCode4PYG  CurrencyCode4 = "PYG"
+	CurrencyCode4QAR  CurrencyCode4 = "QAR"
+	CurrencyCode4RON  CurrencyCode4 = "RON"
+	CurrencyCode4RSD  CurrencyCode4 = "RSD"
+	CurrencyCode4RUB  CurrencyCode4 = "RUB"
+	CurrencyCode4RWF  CurrencyCode4 = "RWF"
+	CurrencyCode4SAR  CurrencyCode4 = "SAR"
+	CurrencyCode4SBD  CurrencyCode4 = "SBD"
+	CurrencyCode4SCR  CurrencyCode4 = "SCR"
+	CurrencyCode4SDG  CurrencyCode4 = "SDG"
+	CurrencyCode4SEK  CurrencyCode4 = "SEK"
+	CurrencyCode4SGD  CurrencyCode4 = "SGD"
+	CurrencyCode4SHP  CurrencyCode4 = "SHP"
+	CurrencyCode4SLE  CurrencyCode4 = "SLE"
+	CurrencyCode4SOS  CurrencyCode4 = "SOS"
+	CurrencyCode4SRD  CurrencyCode4 = "SRD"
+	CurrencyCode4SSP  CurrencyCode4 = "SSP"
+	CurrencyCode4STN  CurrencyCode4 = "STN"
+	CurrencyCode4SVC  CurrencyCode4 = "SVC"
+	CurrencyCode4SYP  CurrencyCode4 = "SYP"
+	CurrencyCode4SZL  CurrencyCode4 = "SZL"
+	CurrencyCode4THB  CurrencyCode4 = "THB"
+	CurrencyCode4TJS  CurrencyCode4 = "TJS"
+	CurrencyCode4TMT  CurrencyCode4 = "TMT"
+	CurrencyCode4TND  CurrencyCode4 = "TND"
+	CurrencyCode4TOP  CurrencyCode4 = "TOP"
+	CurrencyCode4TRY  CurrencyCode4 = "TRY"
+	CurrencyCode4TTD  CurrencyCode4 = "TTD"
+	CurrencyCode4TWD  CurrencyCode4 = "TWD"
+	CurrencyCode4TZS  CurrencyCode4 = "TZS"
+	CurrencyCode4UAH  CurrencyCode4 = "UAH"
+	CurrencyCode4UGX  CurrencyCode4 = "UGX"
+	CurrencyCode4USD  CurrencyCode4 = "USD"
+	CurrencyCode4USN  CurrencyCode4 = "USN"
+	CurrencyCode4UYI  CurrencyCode4 = "UYI"
+	CurrencyCode4UYU  CurrencyCode4 = "UYU"
+	CurrencyCode4UYW  CurrencyCode4 = "UYW"
+	CurrencyCode4UZS  CurrencyCode4 = "UZS"
+	CurrencyCode4VED  CurrencyCode4 = "VED"
+	CurrencyCode4VES  CurrencyCode4 = "VES"
+	CurrencyCode4VND  CurrencyCode4 = "VND"
+	CurrencyCode4VUV  CurrencyCode4 = "VUV"
+	CurrencyCode4WST  CurrencyCode4 = "WST"
+	CurrencyCode4XAD  CurrencyCode4 = "XAD"
+	CurrencyCode4XAF  CurrencyCode4 = "XAF"
+	CurrencyCode4XCD  CurrencyCode4 = "XCD"
+	CurrencyCode4XCG  CurrencyCode4 = "XCG"
+	CurrencyCode4XOF  CurrencyCode4 = "XOF"
+	CurrencyCode4XPF  CurrencyCode4 = "XPF"
+	CurrencyCode4YER  CurrencyCode4 = "YER"
+	CurrencyCode4ZAR  CurrencyCode4 = "ZAR"
+	CurrencyCode4ZMW  CurrencyCode4 = "ZMW"
+	CurrencyCode4ZWG  CurrencyCode4 = "ZWG"
+	CurrencyCode4BTC  CurrencyCode4 = "BTC"
+	CurrencyCode4ETH  CurrencyCode4 = "ETH"
+	CurrencyCode4USDC CurrencyCode4 = "USDC"
+	CurrencyCode4USDT CurrencyCode4 = "USDT"
+)
+
+type CurrencyCode5 string
+
+const (
+	CurrencyCode5AED  CurrencyCode5 = "AED"
+	CurrencyCode5AFN  CurrencyCode5 = "AFN"
+	CurrencyCode5ALL  CurrencyCode5 = "ALL"
+	CurrencyCode5AMD  CurrencyCode5 = "AMD"
+	CurrencyCode5AOA  CurrencyCode5 = "AOA"
+	CurrencyCode5ARS  CurrencyCode5 = "ARS"
+	CurrencyCode5AUD  CurrencyCode5 = "AUD"
+	CurrencyCode5AWG  CurrencyCode5 = "AWG"
+	CurrencyCode5AZN  CurrencyCode5 = "AZN"
+	CurrencyCode5BAM  CurrencyCode5 = "BAM"
+	CurrencyCode5BBD  CurrencyCode5 = "BBD"
+	CurrencyCode5BDT  CurrencyCode5 = "BDT"
+	CurrencyCode5BHD  CurrencyCode5 = "BHD"
+	CurrencyCode5BIF  CurrencyCode5 = "BIF"
+	CurrencyCode5BMD  CurrencyCode5 = "BMD"
+	CurrencyCode5BND  CurrencyCode5 = "BND"
+	CurrencyCode5BOB  CurrencyCode5 = "BOB"
+	CurrencyCode5BOV  CurrencyCode5 = "BOV"
+	CurrencyCode5BRL  CurrencyCode5 = "BRL"
+	CurrencyCode5BSD  CurrencyCode5 = "BSD"
+	CurrencyCode5BTN  CurrencyCode5 = "BTN"
+	CurrencyCode5BWP  CurrencyCode5 = "BWP"
+	CurrencyCode5BYN  CurrencyCode5 = "BYN"
+	CurrencyCode5BZD  CurrencyCode5 = "BZD"
+	CurrencyCode5CAD  CurrencyCode5 = "CAD"
+	CurrencyCode5CDF  CurrencyCode5 = "CDF"
+	CurrencyCode5CHE  CurrencyCode5 = "CHE"
+	CurrencyCode5CHF  CurrencyCode5 = "CHF"
+	CurrencyCode5CHW  CurrencyCode5 = "CHW"
+	CurrencyCode5CLF  CurrencyCode5 = "CLF"
+	CurrencyCode5CLP  CurrencyCode5 = "CLP"
+	CurrencyCode5CNY  CurrencyCode5 = "CNY"
+	CurrencyCode5COP  CurrencyCode5 = "COP"
+	CurrencyCode5COU  CurrencyCode5 = "COU"
+	CurrencyCode5CRC  CurrencyCode5 = "CRC"
+	CurrencyCode5CUP  CurrencyCode5 = "CUP"
+	CurrencyCode5CVE  CurrencyCode5 = "CVE"
+	CurrencyCode5CZK  CurrencyCode5 = "CZK"
+	CurrencyCode5DJF  CurrencyCode5 = "DJF"
+	CurrencyCode5DKK  CurrencyCode5 = "DKK"
+	CurrencyCode5DOP  CurrencyCode5 = "DOP"
+	CurrencyCode5DZD  CurrencyCode5 = "DZD"
+	CurrencyCode5EGP  CurrencyCode5 = "EGP"
+	CurrencyCode5ERN  CurrencyCode5 = "ERN"
+	CurrencyCode5ETB  CurrencyCode5 = "ETB"
+	CurrencyCode5EUR  CurrencyCode5 = "EUR"
+	CurrencyCode5FJD  CurrencyCode5 = "FJD"
+	CurrencyCode5FKP  CurrencyCode5 = "FKP"
+	CurrencyCode5GBP  CurrencyCode5 = "GBP"
+	CurrencyCode5GEL  CurrencyCode5 = "GEL"
+	CurrencyCode5GHS  CurrencyCode5 = "GHS"
+	CurrencyCode5GIP  CurrencyCode5 = "GIP"
+	CurrencyCode5GMD  CurrencyCode5 = "GMD"
+	CurrencyCode5GNF  CurrencyCode5 = "GNF"
+	CurrencyCode5GTQ  CurrencyCode5 = "GTQ"
+	CurrencyCode5GYD  CurrencyCode5 = "GYD"
+	CurrencyCode5HKD  CurrencyCode5 = "HKD"
+	CurrencyCode5HNL  CurrencyCode5 = "HNL"
+	CurrencyCode5HTG  CurrencyCode5 = "HTG"
+	CurrencyCode5HUF  CurrencyCode5 = "HUF"
+	CurrencyCode5IDR  CurrencyCode5 = "IDR"
+	CurrencyCode5ILS  CurrencyCode5 = "ILS"
+	CurrencyCode5INR  CurrencyCode5 = "INR"
+	CurrencyCode5IQD  CurrencyCode5 = "IQD"
+	CurrencyCode5IRR  CurrencyCode5 = "IRR"
+	CurrencyCode5ISK  CurrencyCode5 = "ISK"
+	CurrencyCode5JMD  CurrencyCode5 = "JMD"
+	CurrencyCode5JOD  CurrencyCode5 = "JOD"
+	CurrencyCode5JPY  CurrencyCode5 = "JPY"
+	CurrencyCode5KES  CurrencyCode5 = "KES"
+	CurrencyCode5KGS  CurrencyCode5 = "KGS"
+	CurrencyCode5KHR  CurrencyCode5 = "KHR"
+	CurrencyCode5KMF  CurrencyCode5 = "KMF"
+	CurrencyCode5KPW  CurrencyCode5 = "KPW"
+	CurrencyCode5KRW  CurrencyCode5 = "KRW"
+	CurrencyCode5KWD  CurrencyCode5 = "KWD"
+	CurrencyCode5KYD  CurrencyCode5 = "KYD"
+	CurrencyCode5KZT  CurrencyCode5 = "KZT"
+	CurrencyCode5LAK  CurrencyCode5 = "LAK"
+	CurrencyCode5LBP  CurrencyCode5 = "LBP"
+	CurrencyCode5LKR  CurrencyCode5 = "LKR"
+	CurrencyCode5LRD  CurrencyCode5 = "LRD"
+	CurrencyCode5LSL  CurrencyCode5 = "LSL"
+	CurrencyCode5LYD  CurrencyCode5 = "LYD"
+	CurrencyCode5MAD  CurrencyCode5 = "MAD"
+	CurrencyCode5MDL  CurrencyCode5 = "MDL"
+	CurrencyCode5MGA  CurrencyCode5 = "MGA"
+	CurrencyCode5MKD  CurrencyCode5 = "MKD"
+	CurrencyCode5MMK  CurrencyCode5 = "MMK"
+	CurrencyCode5MNT  CurrencyCode5 = "MNT"
+	CurrencyCode5MOP  CurrencyCode5 = "MOP"
+	CurrencyCode5MRU  CurrencyCode5 = "MRU"
+	CurrencyCode5MUR  CurrencyCode5 = "MUR"
+	CurrencyCode5MVR  CurrencyCode5 = "MVR"
+	CurrencyCode5MWK  CurrencyCode5 = "MWK"
+	CurrencyCode5MXN  CurrencyCode5 = "MXN"
+	CurrencyCode5MXV  CurrencyCode5 = "MXV"
+	CurrencyCode5MYR  CurrencyCode5 = "MYR"
+	CurrencyCode5MZN  CurrencyCode5 = "MZN"
+	CurrencyCode5NAD  CurrencyCode5 = "NAD"
+	CurrencyCode5NGN  CurrencyCode5 = "NGN"
+	CurrencyCode5NIO  CurrencyCode5 = "NIO"
+	CurrencyCode5NOK  CurrencyCode5 = "NOK"
+	CurrencyCode5NPR  CurrencyCode5 = "NPR"
+	CurrencyCode5NZD  CurrencyCode5 = "NZD"
+	CurrencyCode5OMR  CurrencyCode5 = "OMR"
+	CurrencyCode5PAB  CurrencyCode5 = "PAB"
+	CurrencyCode5PEN  CurrencyCode5 = "PEN"
+	CurrencyCode5PGK  CurrencyCode5 = "PGK"
+	CurrencyCode5PHP  CurrencyCode5 = "PHP"
+	CurrencyCode5PKR  CurrencyCode5 = "PKR"
+	CurrencyCode5PLN  CurrencyCode5 = "PLN"
+	CurrencyCode5PYG  CurrencyCode5 = "PYG"
+	CurrencyCode5QAR  CurrencyCode5 = "QAR"
+	CurrencyCode5RON  CurrencyCode5 = "RON"
+	CurrencyCode5RSD  CurrencyCode5 = "RSD"
+	CurrencyCode5RUB  CurrencyCode5 = "RUB"
+	CurrencyCode5RWF  CurrencyCode5 = "RWF"
+	CurrencyCode5SAR  CurrencyCode5 = "SAR"
+	CurrencyCode5SBD  CurrencyCode5 = "SBD"
+	CurrencyCode5SCR  CurrencyCode5 = "SCR"
+	CurrencyCode5SDG  CurrencyCode5 = "SDG"
+	CurrencyCode5SEK  CurrencyCode5 = "SEK"
+	CurrencyCode5SGD  CurrencyCode5 = "SGD"
+	CurrencyCode5SHP  CurrencyCode5 = "SHP"
+	CurrencyCode5SLE  CurrencyCode5 = "SLE"
+	CurrencyCode5SOS  CurrencyCode5 = "SOS"
+	CurrencyCode5SRD  CurrencyCode5 = "SRD"
+	CurrencyCode5SSP  CurrencyCode5 = "SSP"
+	CurrencyCode5STN  CurrencyCode5 = "STN"
+	CurrencyCode5SVC  CurrencyCode5 = "SVC"
+	CurrencyCode5SYP  CurrencyCode5 = "SYP"
+	CurrencyCode5SZL  CurrencyCode5 = "SZL"
+	CurrencyCode5THB  CurrencyCode5 = "THB"
+	CurrencyCode5TJS  CurrencyCode5 = "TJS"
+	CurrencyCode5TMT  CurrencyCode5 = "TMT"
+	CurrencyCode5TND  CurrencyCode5 = "TND"
+	CurrencyCode5TOP  CurrencyCode5 = "TOP"
+	CurrencyCode5TRY  CurrencyCode5 = "TRY"
+	CurrencyCode5TTD  CurrencyCode5 = "TTD"
+	CurrencyCode5TWD  CurrencyCode5 = "TWD"
+	CurrencyCode5TZS  CurrencyCode5 = "TZS"
+	CurrencyCode5UAH  CurrencyCode5 = "UAH"
+	CurrencyCode5UGX  CurrencyCode5 = "UGX"
+	CurrencyCode5USD  CurrencyCode5 = "USD"
+	CurrencyCode5USN  CurrencyCode5 = "USN"
+	CurrencyCode5UYI  CurrencyCode5 = "UYI"
+	CurrencyCode5UYU  CurrencyCode5 = "UYU"
+	CurrencyCode5UYW  CurrencyCode5 = "UYW"
+	CurrencyCode5UZS  CurrencyCode5 = "UZS"
+	CurrencyCode5VED  CurrencyCode5 = "VED"
+	CurrencyCode5VES  CurrencyCode5 = "VES"
+	CurrencyCode5VND  CurrencyCode5 = "VND"
+	CurrencyCode5VUV  CurrencyCode5 = "VUV"
+	CurrencyCode5WST  CurrencyCode5 = "WST"
+	CurrencyCode5XAD  CurrencyCode5 = "XAD"
+	CurrencyCode5XAF  CurrencyCode5 = "XAF"
+	CurrencyCode5XCD  CurrencyCode5 = "XCD"
+	CurrencyCode5XCG  CurrencyCode5 = "XCG"
+	CurrencyCode5XOF  CurrencyCode5 = "XOF"
+	CurrencyCode5XPF  CurrencyCode5 = "XPF"
+	CurrencyCode5YER  CurrencyCode5 = "YER"
+	CurrencyCode5ZAR  CurrencyCode5 = "ZAR"
+	CurrencyCode5ZMW  CurrencyCode5 = "ZMW"
+	CurrencyCode5ZWG  CurrencyCode5 = "ZWG"
+	CurrencyCode5BTC  CurrencyCode5 = "BTC"
+	CurrencyCode5ETH  CurrencyCode5 = "ETH"
+	CurrencyCode5USDC CurrencyCode5 = "USDC"
+	CurrencyCode5USDT CurrencyCode5 = "USDT"
+)
+
+type CurrencyCode6 string
+
+const (
+	CurrencyCode6AED  CurrencyCode6 = "AED"
+	CurrencyCode6AFN  CurrencyCode6 = "AFN"
+	CurrencyCode6ALL  CurrencyCode6 = "ALL"
+	CurrencyCode6AMD  CurrencyCode6 = "AMD"
+	CurrencyCode6AOA  CurrencyCode6 = "AOA"
+	CurrencyCode6ARS  CurrencyCode6 = "ARS"
+	CurrencyCode6AUD  CurrencyCode6 = "AUD"
+	CurrencyCode6AWG  CurrencyCode6 = "AWG"
+	CurrencyCode6AZN  CurrencyCode6 = "AZN"
+	CurrencyCode6BAM  CurrencyCode6 = "BAM"
+	CurrencyCode6BBD  CurrencyCode6 = "BBD"
+	CurrencyCode6BDT  CurrencyCode6 = "BDT"
+	CurrencyCode6BHD  CurrencyCode6 = "BHD"
+	CurrencyCode6BIF  CurrencyCode6 = "BIF"
+	CurrencyCode6BMD  CurrencyCode6 = "BMD"
+	CurrencyCode6BND  CurrencyCode6 = "BND"
+	CurrencyCode6BOB  CurrencyCode6 = "BOB"
+	CurrencyCode6BOV  CurrencyCode6 = "BOV"
+	CurrencyCode6BRL  CurrencyCode6 = "BRL"
+	CurrencyCode6BSD  CurrencyCode6 = "BSD"
+	CurrencyCode6BTN  CurrencyCode6 = "BTN"
+	CurrencyCode6BWP  CurrencyCode6 = "BWP"
+	CurrencyCode6BYN  CurrencyCode6 = "BYN"
+	CurrencyCode6BZD  CurrencyCode6 = "BZD"
+	CurrencyCode6CAD  CurrencyCode6 = "CAD"
+	CurrencyCode6CDF  CurrencyCode6 = "CDF"
+	CurrencyCode6CHE  CurrencyCode6 = "CHE"
+	CurrencyCode6CHF  CurrencyCode6 = "CHF"
+	CurrencyCode6CHW  CurrencyCode6 = "CHW"
+	CurrencyCode6CLF  CurrencyCode6 = "CLF"
+	CurrencyCode6CLP  CurrencyCode6 = "CLP"
+	CurrencyCode6CNY  CurrencyCode6 = "CNY"
+	CurrencyCode6COP  CurrencyCode6 = "COP"
+	CurrencyCode6COU  CurrencyCode6 = "COU"
+	CurrencyCode6CRC  CurrencyCode6 = "CRC"
+	CurrencyCode6CUP  CurrencyCode6 = "CUP"
+	CurrencyCode6CVE  CurrencyCode6 = "CVE"
+	CurrencyCode6CZK  CurrencyCode6 = "CZK"
+	CurrencyCode6DJF  CurrencyCode6 = "DJF"
+	CurrencyCode6DKK  CurrencyCode6 = "DKK"
+	CurrencyCode6DOP  CurrencyCode6 = "DOP"
+	CurrencyCode6DZD  CurrencyCode6 = "DZD"
+	CurrencyCode6EGP  CurrencyCode6 = "EGP"
+	CurrencyCode6ERN  CurrencyCode6 = "ERN"
+	CurrencyCode6ETB  CurrencyCode6 = "ETB"
+	CurrencyCode6EUR  CurrencyCode6 = "EUR"
+	CurrencyCode6FJD  CurrencyCode6 = "FJD"
+	CurrencyCode6FKP  CurrencyCode6 = "FKP"
+	CurrencyCode6GBP  CurrencyCode6 = "GBP"
+	CurrencyCode6GEL  CurrencyCode6 = "GEL"
+	CurrencyCode6GHS  CurrencyCode6 = "GHS"
+	CurrencyCode6GIP  CurrencyCode6 = "GIP"
+	CurrencyCode6GMD  CurrencyCode6 = "GMD"
+	CurrencyCode6GNF  CurrencyCode6 = "GNF"
+	CurrencyCode6GTQ  CurrencyCode6 = "GTQ"
+	CurrencyCode6GYD  CurrencyCode6 = "GYD"
+	CurrencyCode6HKD  CurrencyCode6 = "HKD"
+	CurrencyCode6HNL  CurrencyCode6 = "HNL"
+	CurrencyCode6HTG  CurrencyCode6 = "HTG"
+	CurrencyCode6HUF  CurrencyCode6 = "HUF"
+	CurrencyCode6IDR  CurrencyCode6 = "IDR"
+	CurrencyCode6ILS  CurrencyCode6 = "ILS"
+	CurrencyCode6INR  CurrencyCode6 = "INR"
+	CurrencyCode6IQD  CurrencyCode6 = "IQD"
+	CurrencyCode6IRR  CurrencyCode6 = "IRR"
+	CurrencyCode6ISK  CurrencyCode6 = "ISK"
+	CurrencyCode6JMD  CurrencyCode6 = "JMD"
+	CurrencyCode6JOD  CurrencyCode6 = "JOD"
+	CurrencyCode6JPY  CurrencyCode6 = "JPY"
+	CurrencyCode6KES  CurrencyCode6 = "KES"
+	CurrencyCode6KGS  CurrencyCode6 = "KGS"
+	CurrencyCode6KHR  CurrencyCode6 = "KHR"
+	CurrencyCode6KMF  CurrencyCode6 = "KMF"
+	CurrencyCode6KPW  CurrencyCode6 = "KPW"
+	CurrencyCode6KRW  CurrencyCode6 = "KRW"
+	CurrencyCode6KWD  CurrencyCode6 = "KWD"
+	CurrencyCode6KYD  CurrencyCode6 = "KYD"
+	CurrencyCode6KZT  CurrencyCode6 = "KZT"
+	CurrencyCode6LAK  CurrencyCode6 = "LAK"
+	CurrencyCode6LBP  CurrencyCode6 = "LBP"
+	CurrencyCode6LKR  CurrencyCode6 = "LKR"
+	CurrencyCode6LRD  CurrencyCode6 = "LRD"
+	CurrencyCode6LSL  CurrencyCode6 = "LSL"
+	CurrencyCode6LYD  CurrencyCode6 = "LYD"
+	CurrencyCode6MAD  CurrencyCode6 = "MAD"
+	CurrencyCode6MDL  CurrencyCode6 = "MDL"
+	CurrencyCode6MGA  CurrencyCode6 = "MGA"
+	CurrencyCode6MKD  CurrencyCode6 = "MKD"
+	CurrencyCode6MMK  CurrencyCode6 = "MMK"
+	CurrencyCode6MNT  CurrencyCode6 = "MNT"
+	CurrencyCode6MOP  CurrencyCode6 = "MOP"
+	CurrencyCode6MRU  CurrencyCode6 = "MRU"
+	CurrencyCode6MUR  CurrencyCode6 = "MUR"
+	CurrencyCode6MVR  CurrencyCode6 = "MVR"
+	CurrencyCode6MWK  CurrencyCode6 = "MWK"
+	CurrencyCode6MXN  CurrencyCode6 = "MXN"
+	CurrencyCode6MXV  CurrencyCode6 = "MXV"
+	CurrencyCode6MYR  CurrencyCode6 = "MYR"
+	CurrencyCode6MZN  CurrencyCode6 = "MZN"
+	CurrencyCode6NAD  CurrencyCode6 = "NAD"
+	CurrencyCode6NGN  CurrencyCode6 = "NGN"
+	CurrencyCode6NIO  CurrencyCode6 = "NIO"
+	CurrencyCode6NOK  CurrencyCode6 = "NOK"
+	CurrencyCode6NPR  CurrencyCode6 = "NPR"
+	CurrencyCode6NZD  CurrencyCode6 = "NZD"
+	CurrencyCode6OMR  CurrencyCode6 = "OMR"
+	CurrencyCode6PAB  CurrencyCode6 = "PAB"
+	CurrencyCode6PEN  CurrencyCode6 = "PEN"
+	CurrencyCode6PGK  CurrencyCode6 = "PGK"
+	CurrencyCode6PHP  CurrencyCode6 = "PHP"
+	CurrencyCode6PKR  CurrencyCode6 = "PKR"
+	CurrencyCode6PLN  CurrencyCode6 = "PLN"
+	CurrencyCode6PYG  CurrencyCode6 = "PYG"
+	CurrencyCode6QAR  CurrencyCode6 = "QAR"
+	CurrencyCode6RON  CurrencyCode6 = "RON"
+	CurrencyCode6RSD  CurrencyCode6 = "RSD"
+	CurrencyCode6RUB  CurrencyCode6 = "RUB"
+	CurrencyCode6RWF  CurrencyCode6 = "RWF"
+	CurrencyCode6SAR  CurrencyCode6 = "SAR"
+	CurrencyCode6SBD  CurrencyCode6 = "SBD"
+	CurrencyCode6SCR  CurrencyCode6 = "SCR"
+	CurrencyCode6SDG  CurrencyCode6 = "SDG"
+	CurrencyCode6SEK  CurrencyCode6 = "SEK"
+	CurrencyCode6SGD  CurrencyCode6 = "SGD"
+	CurrencyCode6SHP  CurrencyCode6 = "SHP"
+	CurrencyCode6SLE  CurrencyCode6 = "SLE"
+	CurrencyCode6SOS  CurrencyCode6 = "SOS"
+	CurrencyCode6SRD  CurrencyCode6 = "SRD"
+	CurrencyCode6SSP  CurrencyCode6 = "SSP"
+	CurrencyCode6STN  CurrencyCode6 = "STN"
+	CurrencyCode6SVC  CurrencyCode6 = "SVC"
+	CurrencyCode6SYP  CurrencyCode6 = "SYP"
+	CurrencyCode6SZL  CurrencyCode6 = "SZL"
+	CurrencyCode6THB  CurrencyCode6 = "THB"
+	CurrencyCode6TJS  CurrencyCode6 = "TJS"
+	CurrencyCode6TMT  CurrencyCode6 = "TMT"
+	CurrencyCode6TND  CurrencyCode6 = "TND"
+	CurrencyCode6TOP  CurrencyCode6 = "TOP"
+	CurrencyCode6TRY  CurrencyCode6 = "TRY"
+	CurrencyCode6TTD  CurrencyCode6 = "TTD"
+	CurrencyCode6TWD  CurrencyCode6 = "TWD"
+	CurrencyCode6TZS  CurrencyCode6 = "TZS"
+	CurrencyCode6UAH  CurrencyCode6 = "UAH"
+	CurrencyCode6UGX  CurrencyCode6 = "UGX"
+	CurrencyCode6USD  CurrencyCode6 = "USD"
+	CurrencyCode6USN  CurrencyCode6 = "USN"
+	CurrencyCode6UYI  CurrencyCode6 = "UYI"
+	CurrencyCode6UYU  CurrencyCode6 = "UYU"
+	CurrencyCode6UYW  CurrencyCode6 = "UYW"
+	CurrencyCode6UZS  CurrencyCode6 = "UZS"
+	CurrencyCode6VED  CurrencyCode6 = "VED"
+	CurrencyCode6VES  CurrencyCode6 = "VES"
+	CurrencyCode6VND  CurrencyCode6 = "VND"
+	CurrencyCode6VUV  CurrencyCode6 = "VUV"
+	CurrencyCode6WST  CurrencyCode6 = "WST"
+	CurrencyCode6XAD  CurrencyCode6 = "XAD"
+	CurrencyCode6XAF  CurrencyCode6 = "XAF"
+	CurrencyCode6XCD  CurrencyCode6 = "XCD"
+	CurrencyCode6XCG  CurrencyCode6 = "XCG"
+	CurrencyCode6XOF  CurrencyCode6 = "XOF"
+	CurrencyCode6XPF  CurrencyCode6 = "XPF"
+	CurrencyCode6YER  CurrencyCode6 = "YER"
+	CurrencyCode6ZAR  CurrencyCode6 = "ZAR"
+	CurrencyCode6ZMW  CurrencyCode6 = "ZMW"
+	CurrencyCode6ZWG  CurrencyCode6 = "ZWG"
+	CurrencyCode6BTC  CurrencyCode6 = "BTC"
+	CurrencyCode6ETH  CurrencyCode6 = "ETH"
+	CurrencyCode6USDC CurrencyCode6 = "USDC"
+	CurrencyCode6USDT CurrencyCode6 = "USDT"
+)
+
+type CurrencyCode7 string
+
+const (
+	CurrencyCode7AED  CurrencyCode7 = "AED"
+	CurrencyCode7AFN  CurrencyCode7 = "AFN"
+	CurrencyCode7ALL  CurrencyCode7 = "ALL"
+	CurrencyCode7AMD  CurrencyCode7 = "AMD"
+	CurrencyCode7AOA  CurrencyCode7 = "AOA"
+	CurrencyCode7ARS  CurrencyCode7 = "ARS"
+	CurrencyCode7AUD  CurrencyCode7 = "AUD"
+	CurrencyCode7AWG  CurrencyCode7 = "AWG"
+	CurrencyCode7AZN  CurrencyCode7 = "AZN"
+	CurrencyCode7BAM  CurrencyCode7 = "BAM"
+	CurrencyCode7BBD  CurrencyCode7 = "BBD"
+	CurrencyCode7BDT  CurrencyCode7 = "BDT"
+	CurrencyCode7BHD  CurrencyCode7 = "BHD"
+	CurrencyCode7BIF  CurrencyCode7 = "BIF"
+	CurrencyCode7BMD  CurrencyCode7 = "BMD"
+	CurrencyCode7BND  CurrencyCode7 = "BND"
+	CurrencyCode7BOB  CurrencyCode7 = "BOB"
+	CurrencyCode7BOV  CurrencyCode7 = "BOV"
+	CurrencyCode7BRL  CurrencyCode7 = "BRL"
+	CurrencyCode7BSD  CurrencyCode7 = "BSD"
+	CurrencyCode7BTN  CurrencyCode7 = "BTN"
+	CurrencyCode7BWP  CurrencyCode7 = "BWP"
+	CurrencyCode7BYN  CurrencyCode7 = "BYN"
+	CurrencyCode7BZD  CurrencyCode7 = "BZD"
+	CurrencyCode7CAD  CurrencyCode7 = "CAD"
+	CurrencyCode7CDF  CurrencyCode7 = "CDF"
+	CurrencyCode7CHE  CurrencyCode7 = "CHE"
+	CurrencyCode7CHF  CurrencyCode7 = "CHF"
+	CurrencyCode7CHW  CurrencyCode7 = "CHW"
+	CurrencyCode7CLF  CurrencyCode7 = "CLF"
+	CurrencyCode7CLP  CurrencyCode7 = "CLP"
+	CurrencyCode7CNY  CurrencyCode7 = "CNY"
+	CurrencyCode7COP  CurrencyCode7 = "COP"
+	CurrencyCode7COU  CurrencyCode7 = "COU"
+	CurrencyCode7CRC  CurrencyCode7 = "CRC"
+	CurrencyCode7CUP  CurrencyCode7 = "CUP"
+	CurrencyCode7CVE  CurrencyCode7 = "CVE"
+	CurrencyCode7CZK  CurrencyCode7 = "CZK"
+	CurrencyCode7DJF  CurrencyCode7 = "DJF"
+	CurrencyCode7DKK  CurrencyCode7 = "DKK"
+	CurrencyCode7DOP  CurrencyCode7 = "DOP"
+	CurrencyCode7DZD  CurrencyCode7 = "DZD"
+	CurrencyCode7EGP  CurrencyCode7 = "EGP"
+	CurrencyCode7ERN  CurrencyCode7 = "ERN"
+	CurrencyCode7ETB  CurrencyCode7 = "ETB"
+	CurrencyCode7EUR  CurrencyCode7 = "EUR"
+	CurrencyCode7FJD  CurrencyCode7 = "FJD"
+	CurrencyCode7FKP  CurrencyCode7 = "FKP"
+	CurrencyCode7GBP  CurrencyCode7 = "GBP"
+	CurrencyCode7GEL  CurrencyCode7 = "GEL"
+	CurrencyCode7GHS  CurrencyCode7 = "GHS"
+	CurrencyCode7GIP  CurrencyCode7 = "GIP"
+	CurrencyCode7GMD  CurrencyCode7 = "GMD"
+	CurrencyCode7GNF  CurrencyCode7 = "GNF"
+	CurrencyCode7GTQ  CurrencyCode7 = "GTQ"
+	CurrencyCode7GYD  CurrencyCode7 = "GYD"
+	CurrencyCode7HKD  CurrencyCode7 = "HKD"
+	CurrencyCode7HNL  CurrencyCode7 = "HNL"
+	CurrencyCode7HTG  CurrencyCode7 = "HTG"
+	CurrencyCode7HUF  CurrencyCode7 = "HUF"
+	CurrencyCode7IDR  CurrencyCode7 = "IDR"
+	CurrencyCode7ILS  CurrencyCode7 = "ILS"
+	CurrencyCode7INR  CurrencyCode7 = "INR"
+	CurrencyCode7IQD  CurrencyCode7 = "IQD"
+	CurrencyCode7IRR  CurrencyCode7 = "IRR"
+	CurrencyCode7ISK  CurrencyCode7 = "ISK"
+	CurrencyCode7JMD  CurrencyCode7 = "JMD"
+	CurrencyCode7JOD  CurrencyCode7 = "JOD"
+	CurrencyCode7JPY  CurrencyCode7 = "JPY"
+	CurrencyCode7KES  CurrencyCode7 = "KES"
+	CurrencyCode7KGS  CurrencyCode7 = "KGS"
+	CurrencyCode7KHR  CurrencyCode7 = "KHR"
+	CurrencyCode7KMF  CurrencyCode7 = "KMF"
+	CurrencyCode7KPW  CurrencyCode7 = "KPW"
+	CurrencyCode7KRW  CurrencyCode7 = "KRW"
+	CurrencyCode7KWD  CurrencyCode7 = "KWD"
+	CurrencyCode7KYD  CurrencyCode7 = "KYD"
+	CurrencyCode7KZT  CurrencyCode7 = "KZT"
+	CurrencyCode7LAK  CurrencyCode7 = "LAK"
+	CurrencyCode7LBP  CurrencyCode7 = "LBP"
+	CurrencyCode7LKR  CurrencyCode7 = "LKR"
+	CurrencyCode7LRD  CurrencyCode7 = "LRD"
+	CurrencyCode7LSL  CurrencyCode7 = "LSL"
+	CurrencyCode7LYD  CurrencyCode7 = "LYD"
+	CurrencyCode7MAD  CurrencyCode7 = "MAD"
+	CurrencyCode7MDL  CurrencyCode7 = "MDL"
+	CurrencyCode7MGA  CurrencyCode7 = "MGA"
+	CurrencyCode7MKD  CurrencyCode7 = "MKD"
+	CurrencyCode7MMK  CurrencyCode7 = "MMK"
+	CurrencyCode7MNT  CurrencyCode7 = "MNT"
+	CurrencyCode7MOP  CurrencyCode7 = "MOP"
+	CurrencyCode7MRU  CurrencyCode7 = "MRU"
+	CurrencyCode7MUR  CurrencyCode7 = "MUR"
+	CurrencyCode7MVR  CurrencyCode7 = "MVR"
+	CurrencyCode7MWK  CurrencyCode7 = "MWK"
+	CurrencyCode7MXN  CurrencyCode7 = "MXN"
+	CurrencyCode7MXV  CurrencyCode7 = "MXV"
+	CurrencyCode7MYR  CurrencyCode7 = "MYR"
+	CurrencyCode7MZN  CurrencyCode7 = "MZN"
+	CurrencyCode7NAD  CurrencyCode7 = "NAD"
+	CurrencyCode7NGN  CurrencyCode7 = "NGN"
+	CurrencyCode7NIO  CurrencyCode7 = "NIO"
+	CurrencyCode7NOK  CurrencyCode7 = "NOK"
+	CurrencyCode7NPR  CurrencyCode7 = "NPR"
+	CurrencyCode7NZD  CurrencyCode7 = "NZD"
+	CurrencyCode7OMR  CurrencyCode7 = "OMR"
+	CurrencyCode7PAB  CurrencyCode7 = "PAB"
+	CurrencyCode7PEN  CurrencyCode7 = "PEN"
+	CurrencyCode7PGK  CurrencyCode7 = "PGK"
+	CurrencyCode7PHP  CurrencyCode7 = "PHP"
+	CurrencyCode7PKR  CurrencyCode7 = "PKR"
+	CurrencyCode7PLN  CurrencyCode7 = "PLN"
+	CurrencyCode7PYG  CurrencyCode7 = "PYG"
+	CurrencyCode7QAR  CurrencyCode7 = "QAR"
+	CurrencyCode7RON  CurrencyCode7 = "RON"
+	CurrencyCode7RSD  CurrencyCode7 = "RSD"
+	CurrencyCode7RUB  CurrencyCode7 = "RUB"
+	CurrencyCode7RWF  CurrencyCode7 = "RWF"
+	CurrencyCode7SAR  CurrencyCode7 = "SAR"
+	CurrencyCode7SBD  CurrencyCode7 = "SBD"
+	CurrencyCode7SCR  CurrencyCode7 = "SCR"
+	CurrencyCode7SDG  CurrencyCode7 = "SDG"
+	CurrencyCode7SEK  CurrencyCode7 = "SEK"
+	CurrencyCode7SGD  CurrencyCode7 = "SGD"
+	CurrencyCode7SHP  CurrencyCode7 = "SHP"
+	CurrencyCode7SLE  CurrencyCode7 = "SLE"
+	CurrencyCode7SOS  CurrencyCode7 = "SOS"
+	CurrencyCode7SRD  CurrencyCode7 = "SRD"
+	CurrencyCode7SSP  CurrencyCode7 = "SSP"
+	CurrencyCode7STN  CurrencyCode7 = "STN"
+	CurrencyCode7SVC  CurrencyCode7 = "SVC"
+	CurrencyCode7SYP  CurrencyCode7 = "SYP"
+	CurrencyCode7SZL  CurrencyCode7 = "SZL"
+	CurrencyCode7THB  CurrencyCode7 = "THB"
+	CurrencyCode7TJS  CurrencyCode7 = "TJS"
+	CurrencyCode7TMT  CurrencyCode7 = "TMT"
+	CurrencyCode7TND  CurrencyCode7 = "TND"
+	CurrencyCode7TOP  CurrencyCode7 = "TOP"
+	CurrencyCode7TRY  CurrencyCode7 = "TRY"
+	CurrencyCode7TTD  CurrencyCode7 = "TTD"
+	CurrencyCode7TWD  CurrencyCode7 = "TWD"
+	CurrencyCode7TZS  CurrencyCode7 = "TZS"
+	CurrencyCode7UAH  CurrencyCode7 = "UAH"
+	CurrencyCode7UGX  CurrencyCode7 = "UGX"
+	CurrencyCode7USD  CurrencyCode7 = "USD"
+	CurrencyCode7USN  CurrencyCode7 = "USN"
+	CurrencyCode7UYI  CurrencyCode7 = "UYI"
+	CurrencyCode7UYU  CurrencyCode7 = "UYU"
+	CurrencyCode7UYW  CurrencyCode7 = "UYW"
+	CurrencyCode7UZS  CurrencyCode7 = "UZS"
+	CurrencyCode7VED  CurrencyCode7 = "VED"
+	CurrencyCode7VES  CurrencyCode7 = "VES"
+	CurrencyCode7VND  CurrencyCode7 = "VND"
+	CurrencyCode7VUV  CurrencyCode7 = "VUV"
+	CurrencyCode7WST  CurrencyCode7 = "WST"
+	CurrencyCode7XAD  CurrencyCode7 = "XAD"
+	CurrencyCode7XAF  CurrencyCode7 = "XAF"
+	CurrencyCode7XCD  CurrencyCode7 = "XCD"
+	CurrencyCode7XCG  CurrencyCode7 = "XCG"
+	CurrencyCode7XOF  CurrencyCode7 = "XOF"
+	CurrencyCode7XPF  CurrencyCode7 = "XPF"
+	CurrencyCode7YER  CurrencyCode7 = "YER"
+	CurrencyCode7ZAR  CurrencyCode7 = "ZAR"
+	CurrencyCode7ZMW  CurrencyCode7 = "ZMW"
+	CurrencyCode7ZWG  CurrencyCode7 = "ZWG"
+	CurrencyCode7BTC  CurrencyCode7 = "BTC"
+	CurrencyCode7ETH  CurrencyCode7 = "ETH"
+	CurrencyCode7USDC CurrencyCode7 = "USDC"
+	CurrencyCode7USDT CurrencyCode7 = "USDT"
+)
+
+type CurrencyCode8 string
+
+const (
+	CurrencyCode8AED  CurrencyCode8 = "AED"
+	CurrencyCode8AFN  CurrencyCode8 = "AFN"
+	CurrencyCode8ALL  CurrencyCode8 = "ALL"
+	CurrencyCode8AMD  CurrencyCode8 = "AMD"
+	CurrencyCode8AOA  CurrencyCode8 = "AOA"
+	CurrencyCode8ARS  CurrencyCode8 = "ARS"
+	CurrencyCode8AUD  CurrencyCode8 = "AUD"
+	CurrencyCode8AWG  CurrencyCode8 = "AWG"
+	CurrencyCode8AZN  CurrencyCode8 = "AZN"
+	CurrencyCode8BAM  CurrencyCode8 = "BAM"
+	CurrencyCode8BBD  CurrencyCode8 = "BBD"
+	CurrencyCode8BDT  CurrencyCode8 = "BDT"
+	CurrencyCode8BHD  CurrencyCode8 = "BHD"
+	CurrencyCode8BIF  CurrencyCode8 = "BIF"
+	CurrencyCode8BMD  CurrencyCode8 = "BMD"
+	CurrencyCode8BND  CurrencyCode8 = "BND"
+	CurrencyCode8BOB  CurrencyCode8 = "BOB"
+	CurrencyCode8BOV  CurrencyCode8 = "BOV"
+	CurrencyCode8BRL  CurrencyCode8 = "BRL"
+	CurrencyCode8BSD  CurrencyCode8 = "BSD"
+	CurrencyCode8BTN  CurrencyCode8 = "BTN"
+	CurrencyCode8BWP  CurrencyCode8 = "BWP"
+	CurrencyCode8BYN  CurrencyCode8 = "BYN"
+	CurrencyCode8BZD  CurrencyCode8 = "BZD"
+	CurrencyCode8CAD  CurrencyCode8 = "CAD"
+	CurrencyCode8CDF  CurrencyCode8 = "CDF"
+	CurrencyCode8CHE  CurrencyCode8 = "CHE"
+	CurrencyCode8CHF  CurrencyCode8 = "CHF"
+	CurrencyCode8CHW  CurrencyCode8 = "CHW"
+	CurrencyCode8CLF  CurrencyCode8 = "CLF"
+	CurrencyCode8CLP  CurrencyCode8 = "CLP"
+	CurrencyCode8CNY  CurrencyCode8 = "CNY"
+	CurrencyCode8COP  CurrencyCode8 = "COP"
+	CurrencyCode8COU  CurrencyCode8 = "COU"
+	CurrencyCode8CRC  CurrencyCode8 = "CRC"
+	CurrencyCode8CUP  CurrencyCode8 = "CUP"
+	CurrencyCode8CVE  CurrencyCode8 = "CVE"
+	CurrencyCode8CZK  CurrencyCode8 = "CZK"
+	CurrencyCode8DJF  CurrencyCode8 = "DJF"
+	CurrencyCode8DKK  CurrencyCode8 = "DKK"
+	CurrencyCode8DOP  CurrencyCode8 = "DOP"
+	CurrencyCode8DZD  CurrencyCode8 = "DZD"
+	CurrencyCode8EGP  CurrencyCode8 = "EGP"
+	CurrencyCode8ERN  CurrencyCode8 = "ERN"
+	CurrencyCode8ETB  CurrencyCode8 = "ETB"
+	CurrencyCode8EUR  CurrencyCode8 = "EUR"
+	CurrencyCode8FJD  CurrencyCode8 = "FJD"
+	CurrencyCode8FKP  CurrencyCode8 = "FKP"
+	CurrencyCode8GBP  CurrencyCode8 = "GBP"
+	CurrencyCode8GEL  CurrencyCode8 = "GEL"
+	CurrencyCode8GHS  CurrencyCode8 = "GHS"
+	CurrencyCode8GIP  CurrencyCode8 = "GIP"
+	CurrencyCode8GMD  CurrencyCode8 = "GMD"
+	CurrencyCode8GNF  CurrencyCode8 = "GNF"
+	CurrencyCode8GTQ  CurrencyCode8 = "GTQ"
+	CurrencyCode8GYD  CurrencyCode8 = "GYD"
+	CurrencyCode8HKD  CurrencyCode8 = "HKD"
+	CurrencyCode8HNL  CurrencyCode8 = "HNL"
+	CurrencyCode8HTG  CurrencyCode8 = "HTG"
+	CurrencyCode8HUF  CurrencyCode8 = "HUF"
+	CurrencyCode8IDR  CurrencyCode8 = "IDR"
+	CurrencyCode8ILS  CurrencyCode8 = "ILS"
+	CurrencyCode8INR  CurrencyCode8 = "INR"
+	CurrencyCode8IQD  CurrencyCode8 = "IQD"
+	CurrencyCode8IRR  CurrencyCode8 = "IRR"
+	CurrencyCode8ISK  CurrencyCode8 = "ISK"
+	CurrencyCode8JMD  CurrencyCode8 = "JMD"
+	CurrencyCode8JOD  CurrencyCode8 = "JOD"
+	CurrencyCode8JPY  CurrencyCode8 = "JPY"
+	CurrencyCode8KES  CurrencyCode8 = "KES"
+	CurrencyCode8KGS  CurrencyCode8 = "KGS"
+	CurrencyCode8KHR  CurrencyCode8 = "KHR"
+	CurrencyCode8KMF  CurrencyCode8 = "KMF"
+	CurrencyCode8KPW  CurrencyCode8 = "KPW"
+	CurrencyCode8KRW  CurrencyCode8 = "KRW"
+	CurrencyCode8KWD  CurrencyCode8 = "KWD"
+	CurrencyCode8KYD  CurrencyCode8 = "KYD"
+	CurrencyCode8KZT  CurrencyCode8 = "KZT"
+	CurrencyCode8LAK  CurrencyCode8 = "LAK"
+	CurrencyCode8LBP  CurrencyCode8 = "LBP"
+	CurrencyCode8LKR  CurrencyCode8 = "LKR"
+	CurrencyCode8LRD  CurrencyCode8 = "LRD"
+	CurrencyCode8LSL  CurrencyCode8 = "LSL"
+	CurrencyCode8LYD  CurrencyCode8 = "LYD"
+	CurrencyCode8MAD  CurrencyCode8 = "MAD"
+	CurrencyCode8MDL  CurrencyCode8 = "MDL"
+	CurrencyCode8MGA  CurrencyCode8 = "MGA"
+	CurrencyCode8MKD  CurrencyCode8 = "MKD"
+	CurrencyCode8MMK  CurrencyCode8 = "MMK"
+	CurrencyCode8MNT  CurrencyCode8 = "MNT"
+	CurrencyCode8MOP  CurrencyCode8 = "MOP"
+	CurrencyCode8MRU  CurrencyCode8 = "MRU"
+	CurrencyCode8MUR  CurrencyCode8 = "MUR"
+	CurrencyCode8MVR  CurrencyCode8 = "MVR"
+	CurrencyCode8MWK  CurrencyCode8 = "MWK"
+	CurrencyCode8MXN  CurrencyCode8 = "MXN"
+	CurrencyCode8MXV  CurrencyCode8 = "MXV"
+	CurrencyCode8MYR  CurrencyCode8 = "MYR"
+	CurrencyCode8MZN  CurrencyCode8 = "MZN"
+	CurrencyCode8NAD  CurrencyCode8 = "NAD"
+	CurrencyCode8NGN  CurrencyCode8 = "NGN"
+	CurrencyCode8NIO  CurrencyCode8 = "NIO"
+	CurrencyCode8NOK  CurrencyCode8 = "NOK"
+	CurrencyCode8NPR  CurrencyCode8 = "NPR"
+	CurrencyCode8NZD  CurrencyCode8 = "NZD"
+	CurrencyCode8OMR  CurrencyCode8 = "OMR"
+	CurrencyCode8PAB  CurrencyCode8 = "PAB"
+	CurrencyCode8PEN  CurrencyCode8 = "PEN"
+	CurrencyCode8PGK  CurrencyCode8 = "PGK"
+	CurrencyCode8PHP  CurrencyCode8 = "PHP"
+	CurrencyCode8PKR  CurrencyCode8 = "PKR"
+	CurrencyCode8PLN  CurrencyCode8 = "PLN"
+	CurrencyCode8PYG  CurrencyCode8 = "PYG"
+	CurrencyCode8QAR  CurrencyCode8 = "QAR"
+	CurrencyCode8RON  CurrencyCode8 = "RON"
+	CurrencyCode8RSD  CurrencyCode8 = "RSD"
+	CurrencyCode8RUB  CurrencyCode8 = "RUB"
+	CurrencyCode8RWF  CurrencyCode8 = "RWF"
+	CurrencyCode8SAR  CurrencyCode8 = "SAR"
+	CurrencyCode8SBD  CurrencyCode8 = "SBD"
+	CurrencyCode8SCR  CurrencyCode8 = "SCR"
+	CurrencyCode8SDG  CurrencyCode8 = "SDG"
+	CurrencyCode8SEK  CurrencyCode8 = "SEK"
+	CurrencyCode8SGD  CurrencyCode8 = "SGD"
+	CurrencyCode8SHP  CurrencyCode8 = "SHP"
+	CurrencyCode8SLE  CurrencyCode8 = "SLE"
+	CurrencyCode8SOS  CurrencyCode8 = "SOS"
+	CurrencyCode8SRD  CurrencyCode8 = "SRD"
+	CurrencyCode8SSP  CurrencyCode8 = "SSP"
+	CurrencyCode8STN  CurrencyCode8 = "STN"
+	CurrencyCode8SVC  CurrencyCode8 = "SVC"
+	CurrencyCode8SYP  CurrencyCode8 = "SYP"
+	CurrencyCode8SZL  CurrencyCode8 = "SZL"
+	CurrencyCode8THB  CurrencyCode8 = "THB"
+	CurrencyCode8TJS  CurrencyCode8 = "TJS"
+	CurrencyCode8TMT  CurrencyCode8 = "TMT"
+	CurrencyCode8TND  CurrencyCode8 = "TND"
+	CurrencyCode8TOP  CurrencyCode8 = "TOP"
+	CurrencyCode8TRY  CurrencyCode8 = "TRY"
+	CurrencyCode8TTD  CurrencyCode8 = "TTD"
+	CurrencyCode8TWD  CurrencyCode8 = "TWD"
+	CurrencyCode8TZS  CurrencyCode8 = "TZS"
+	CurrencyCode8UAH  CurrencyCode8 = "UAH"
+	CurrencyCode8UGX  CurrencyCode8 = "UGX"
+	CurrencyCode8USD  CurrencyCode8 = "USD"
+	CurrencyCode8USN  CurrencyCode8 = "USN"
+	CurrencyCode8UYI  CurrencyCode8 = "UYI"
+	CurrencyCode8UYU  CurrencyCode8 = "UYU"
+	CurrencyCode8UYW  CurrencyCode8 = "UYW"
+	CurrencyCode8UZS  CurrencyCode8 = "UZS"
+	CurrencyCode8VED  CurrencyCode8 = "VED"
+	CurrencyCode8VES  CurrencyCode8 = "VES"
+	CurrencyCode8VND  CurrencyCode8 = "VND"
+	CurrencyCode8VUV  CurrencyCode8 = "VUV"
+	CurrencyCode8WST  CurrencyCode8 = "WST"
+	CurrencyCode8XAD  CurrencyCode8 = "XAD"
+	CurrencyCode8XAF  CurrencyCode8 = "XAF"
+	CurrencyCode8XCD  CurrencyCode8 = "XCD"
+	CurrencyCode8XCG  CurrencyCode8 = "XCG"
+	CurrencyCode8XOF  CurrencyCode8 = "XOF"
+	CurrencyCode8XPF  CurrencyCode8 = "XPF"
+	CurrencyCode8YER  CurrencyCode8 = "YER"
+	CurrencyCode8ZAR  CurrencyCode8 = "ZAR"
+	CurrencyCode8ZMW  CurrencyCode8 = "ZMW"
+	CurrencyCode8ZWG  CurrencyCode8 = "ZWG"
+	CurrencyCode8BTC  CurrencyCode8 = "BTC"
+	CurrencyCode8ETH  CurrencyCode8 = "ETH"
+	CurrencyCode8USDC CurrencyCode8 = "USDC"
+	CurrencyCode8USDT CurrencyCode8 = "USDT"
+)
+
+type CurrencyCode9 string
+
+const (
+	CurrencyCode9AED  CurrencyCode9 = "AED"
+	CurrencyCode9AFN  CurrencyCode9 = "AFN"
+	CurrencyCode9ALL  CurrencyCode9 = "ALL"
+	CurrencyCode9AMD  CurrencyCode9 = "AMD"
+	CurrencyCode9AOA  CurrencyCode9 = "AOA"
+	CurrencyCode9ARS  CurrencyCode9 = "ARS"
+	CurrencyCode9AUD  CurrencyCode9 = "AUD"
+	CurrencyCode9AWG  CurrencyCode9 = "AWG"
+	CurrencyCode9AZN  CurrencyCode9 = "AZN"
+	CurrencyCode9BAM  CurrencyCode9 = "BAM"
+	CurrencyCode9BBD  CurrencyCode9 = "BBD"
+	CurrencyCode9BDT  CurrencyCode9 = "BDT"
+	CurrencyCode9BHD  CurrencyCode9 = "BHD"
+	CurrencyCode9BIF  CurrencyCode9 = "BIF"
+	CurrencyCode9BMD  CurrencyCode9 = "BMD"
+	CurrencyCode9BND  CurrencyCode9 = "BND"
+	CurrencyCode9BOB  CurrencyCode9 = "BOB"
+	CurrencyCode9BOV  CurrencyCode9 = "BOV"
+	CurrencyCode9BRL  CurrencyCode9 = "BRL"
+	CurrencyCode9BSD  CurrencyCode9 = "BSD"
+	CurrencyCode9BTN  CurrencyCode9 = "BTN"
+	CurrencyCode9BWP  CurrencyCode9 = "BWP"
+	CurrencyCode9BYN  CurrencyCode9 = "BYN"
+	CurrencyCode9BZD  CurrencyCode9 = "BZD"
+	CurrencyCode9CAD  CurrencyCode9 = "CAD"
+	CurrencyCode9CDF  CurrencyCode9 = "CDF"
+	CurrencyCode9CHE  CurrencyCode9 = "CHE"
+	CurrencyCode9CHF  CurrencyCode9 = "CHF"
+	CurrencyCode9CHW  CurrencyCode9 = "CHW"
+	CurrencyCode9CLF  CurrencyCode9 = "CLF"
+	CurrencyCode9CLP  CurrencyCode9 = "CLP"
+	CurrencyCode9CNY  CurrencyCode9 = "CNY"
+	CurrencyCode9COP  CurrencyCode9 = "COP"
+	CurrencyCode9COU  CurrencyCode9 = "COU"
+	CurrencyCode9CRC  CurrencyCode9 = "CRC"
+	CurrencyCode9CUP  CurrencyCode9 = "CUP"
+	CurrencyCode9CVE  CurrencyCode9 = "CVE"
+	CurrencyCode9CZK  CurrencyCode9 = "CZK"
+	CurrencyCode9DJF  CurrencyCode9 = "DJF"
+	CurrencyCode9DKK  CurrencyCode9 = "DKK"
+	CurrencyCode9DOP  CurrencyCode9 = "DOP"
+	CurrencyCode9DZD  CurrencyCode9 = "DZD"
+	CurrencyCode9EGP  CurrencyCode9 = "EGP"
+	CurrencyCode9ERN  CurrencyCode9 = "ERN"
+	CurrencyCode9ETB  CurrencyCode9 = "ETB"
+	CurrencyCode9EUR  CurrencyCode9 = "EUR"
+	CurrencyCode9FJD  CurrencyCode9 = "FJD"
+	CurrencyCode9FKP  CurrencyCode9 = "FKP"
+	CurrencyCode9GBP  CurrencyCode9 = "GBP"
+	CurrencyCode9GEL  CurrencyCode9 = "GEL"
+	CurrencyCode9GHS  CurrencyCode9 = "GHS"
+	CurrencyCode9GIP  CurrencyCode9 = "GIP"
+	CurrencyCode9GMD  CurrencyCode9 = "GMD"
+	CurrencyCode9GNF  CurrencyCode9 = "GNF"
+	CurrencyCode9GTQ  CurrencyCode9 = "GTQ"
+	CurrencyCode9GYD  CurrencyCode9 = "GYD"
+	CurrencyCode9HKD  CurrencyCode9 = "HKD"
+	CurrencyCode9HNL  CurrencyCode9 = "HNL"
+	CurrencyCode9HTG  CurrencyCode9 = "HTG"
+	CurrencyCode9HUF  CurrencyCode9 = "HUF"
+	CurrencyCode9IDR  CurrencyCode9 = "IDR"
+	CurrencyCode9ILS  CurrencyCode9 = "ILS"
+	CurrencyCode9INR  CurrencyCode9 = "INR"
+	CurrencyCode9IQD  CurrencyCode9 = "IQD"
+	CurrencyCode9IRR  CurrencyCode9 = "IRR"
+	CurrencyCode9ISK  CurrencyCode9 = "ISK"
+	CurrencyCode9JMD  CurrencyCode9 = "JMD"
+	CurrencyCode9JOD  CurrencyCode9 = "JOD"
+	CurrencyCode9JPY  CurrencyCode9 = "JPY"
+	CurrencyCode9KES  CurrencyCode9 = "KES"
+	CurrencyCode9KGS  CurrencyCode9 = "KGS"
+	CurrencyCode9KHR  CurrencyCode9 = "KHR"
+	CurrencyCode9KMF  CurrencyCode9 = "KMF"
+	CurrencyCode9KPW  CurrencyCode9 = "KPW"
+	CurrencyCode9KRW  CurrencyCode9 = "KRW"
+	CurrencyCode9KWD  CurrencyCode9 = "KWD"
+	CurrencyCode9KYD  CurrencyCode9 = "KYD"
+	CurrencyCode9KZT  CurrencyCode9 = "KZT"
+	CurrencyCode9LAK  CurrencyCode9 = "LAK"
+	CurrencyCode9LBP  CurrencyCode9 = "LBP"
+	CurrencyCode9LKR  CurrencyCode9 = "LKR"
+	CurrencyCode9LRD  CurrencyCode9 = "LRD"
+	CurrencyCode9LSL  CurrencyCode9 = "LSL"
+	CurrencyCode9LYD  CurrencyCode9 = "LYD"
+	CurrencyCode9MAD  CurrencyCode9 = "MAD"
+	CurrencyCode9MDL  CurrencyCode9 = "MDL"
+	CurrencyCode9MGA  CurrencyCode9 = "MGA"
+	CurrencyCode9MKD  CurrencyCode9 = "MKD"
+	CurrencyCode9MMK  CurrencyCode9 = "MMK"
+	CurrencyCode9MNT  CurrencyCode9 = "MNT"
+	CurrencyCode9MOP  CurrencyCode9 = "MOP"
+	CurrencyCode9MRU  CurrencyCode9 = "MRU"
+	CurrencyCode9MUR  CurrencyCode9 = "MUR"
+	CurrencyCode9MVR  CurrencyCode9 = "MVR"
+	CurrencyCode9MWK  CurrencyCode9 = "MWK"
+	CurrencyCode9MXN  CurrencyCode9 = "MXN"
+	CurrencyCode9MXV  CurrencyCode9 = "MXV"
+	CurrencyCode9MYR  CurrencyCode9 = "MYR"
+	CurrencyCode9MZN  CurrencyCode9 = "MZN"
+	CurrencyCode9NAD  CurrencyCode9 = "NAD"
+	CurrencyCode9NGN  CurrencyCode9 = "NGN"
+	CurrencyCode9NIO  CurrencyCode9 = "NIO"
+	CurrencyCode9NOK  CurrencyCode9 = "NOK"
+	CurrencyCode9NPR  CurrencyCode9 = "NPR"
+	CurrencyCode9NZD  CurrencyCode9 = "NZD"
+	CurrencyCode9OMR  CurrencyCode9 = "OMR"
+	CurrencyCode9PAB  CurrencyCode9 = "PAB"
+	CurrencyCode9PEN  CurrencyCode9 = "PEN"
+	CurrencyCode9PGK  CurrencyCode9 = "PGK"
+	CurrencyCode9PHP  CurrencyCode9 = "PHP"
+	CurrencyCode9PKR  CurrencyCode9 = "PKR"
+	CurrencyCode9PLN  CurrencyCode9 = "PLN"
+	CurrencyCode9PYG  CurrencyCode9 = "PYG"
+	CurrencyCode9QAR  CurrencyCode9 = "QAR"
+	CurrencyCode9RON  CurrencyCode9 = "RON"
+	CurrencyCode9RSD  CurrencyCode9 = "RSD"
+	CurrencyCode9RUB  CurrencyCode9 = "RUB"
+	CurrencyCode9RWF  CurrencyCode9 = "RWF"
+	CurrencyCode9SAR  CurrencyCode9 = "SAR"
+	CurrencyCode9SBD  CurrencyCode9 = "SBD"
+	CurrencyCode9SCR  CurrencyCode9 = "SCR"
+	CurrencyCode9SDG  CurrencyCode9 = "SDG"
+	CurrencyCode9SEK  CurrencyCode9 = "SEK"
+	CurrencyCode9SGD  CurrencyCode9 = "SGD"
+	CurrencyCode9SHP  CurrencyCode9 = "SHP"
+	CurrencyCode9SLE  CurrencyCode9 = "SLE"
+	CurrencyCode9SOS  CurrencyCode9 = "SOS"
+	CurrencyCode9SRD  CurrencyCode9 = "SRD"
+	CurrencyCode9SSP  CurrencyCode9 = "SSP"
+	CurrencyCode9STN  CurrencyCode9 = "STN"
+	CurrencyCode9SVC  CurrencyCode9 = "SVC"
+	CurrencyCode9SYP  CurrencyCode9 = "SYP"
+	CurrencyCode9SZL  CurrencyCode9 = "SZL"
+	CurrencyCode9THB  CurrencyCode9 = "THB"
+	CurrencyCode9TJS  CurrencyCode9 = "TJS"
+	CurrencyCode9TMT  CurrencyCode9 = "TMT"
+	CurrencyCode9TND  CurrencyCode9 = "TND"
+	CurrencyCode9TOP  CurrencyCode9 = "TOP"
+	CurrencyCode9TRY  CurrencyCode9 = "TRY"
+	CurrencyCode9TTD  CurrencyCode9 = "TTD"
+	CurrencyCode9TWD  CurrencyCode9 = "TWD"
+	CurrencyCode9TZS  CurrencyCode9 = "TZS"
+	CurrencyCode9UAH  CurrencyCode9 = "UAH"
+	CurrencyCode9UGX  CurrencyCode9 = "UGX"
+	CurrencyCode9USD  CurrencyCode9 = "USD"
+	CurrencyCode9USN  CurrencyCode9 = "USN"
+	CurrencyCode9UYI  CurrencyCode9 = "UYI"
+	CurrencyCode9UYU  CurrencyCode9 = "UYU"
+	CurrencyCode9UYW  CurrencyCode9 = "UYW"
+	CurrencyCode9UZS  CurrencyCode9 = "UZS"
+	CurrencyCode9VED  CurrencyCode9 = "VED"
+	CurrencyCode9VES  CurrencyCode9 = "VES"
+	CurrencyCode9VND  CurrencyCode9 = "VND"
+	CurrencyCode9VUV  CurrencyCode9 = "VUV"
+	CurrencyCode9WST  CurrencyCode9 = "WST"
+	CurrencyCode9XAD  CurrencyCode9 = "XAD"
+	CurrencyCode9XAF  CurrencyCode9 = "XAF"
+	CurrencyCode9XCD  CurrencyCode9 = "XCD"
+	CurrencyCode9XCG  CurrencyCode9 = "XCG"
+	CurrencyCode9XOF  CurrencyCode9 = "XOF"
+	CurrencyCode9XPF  CurrencyCode9 = "XPF"
+	CurrencyCode9YER  CurrencyCode9 = "YER"
+	CurrencyCode9ZAR  CurrencyCode9 = "ZAR"
+	CurrencyCode9ZMW  CurrencyCode9 = "ZMW"
+	CurrencyCode9ZWG  CurrencyCode9 = "ZWG"
+	CurrencyCode9BTC  CurrencyCode9 = "BTC"
+	CurrencyCode9ETH  CurrencyCode9 = "ETH"
+	CurrencyCode9USDC CurrencyCode9 = "USDC"
+	CurrencyCode9USDT CurrencyCode9 = "USDT"
+)
+
+type DeleteProjectsTableResponse200 struct {
 	Id string `json:"id"`
+}
+
+type DeleteProjectsTablesColumnResponse200 struct {
+	ColumnsJson      []DeleteProjectsTablesColumnResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                                  `json:"created_at"`
+	DataVersion      int64                                                  `json:"data_version"`
+	DefaultSort      *string                                                `json:"default_sort"`
+	DeletedAt        *int64                                                 `json:"deleted_at"`
+	FtsVersion       int64                                                  `json:"fts_version"`
+	Id               string                                                 `json:"id"`
+	InsertMode       DeleteProjectsTablesColumnResponse200InsertMode        `json:"insert_mode"`
+	Instruction      *string                                                `json:"instruction"`
+	LastUsedAt       *int64                                                 `json:"last_used_at"`
+	MergeColumnsJson []string                                               `json:"merge_columns_json"`
+	Name             string                                                 `json:"name"`
+	ProjectId        string                                                 `json:"project_id"`
+	RowCount         int64                                                  `json:"row_count"`
+	Slug             string                                                 `json:"slug"`
+	Strictness       DeleteProjectsTablesColumnResponse200Strictness        `json:"strictness"`
+	UpdatedAt        int64                                                  `json:"updated_at"`
+	UsageCount       int64                                                  `json:"usage_count"`
+}
+
+func (s DeleteProjectsTablesColumnResponse200) MarshalJSON() ([]byte, error) {
+	type plain DeleteProjectsTablesColumnResponse200
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []DeleteProjectsTablesColumnResponse200ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
 }
 
 type DeleteProjectsTablesColumnResponse400 struct {
@@ -674,40 +4283,40 @@ func (s Err402ApiRequestLimitExceededFeatureNotAvailableRowPlanLimit) MarshalJSO
 	return json.Marshal(p)
 }
 
-type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspended struct {
-	ErrorKey  Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey                `json:"error_key"`
-	Fields    map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedFieldsItem `json:"fields"`
-	Message   string                                                                                   `json:"message"`
-	Status    Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus                  `json:"status"`
-	StatusKey string                                                                                   `json:"status_key"`
-	Success   bool                                                                                     `json:"success"`
-	Vars      map[string]json.RawMessage                                                               `json:"vars,omitempty"`
+type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatch struct {
+	ErrorKey  Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKey                `json:"error_key"`
+	Fields    map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchFieldsItem `json:"fields"`
+	Message   string                                                                                                                             `json:"message"`
+	Status    Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchStatus                  `json:"status"`
+	StatusKey string                                                                                                                             `json:"status_key"`
+	Success   bool                                                                                                                               `json:"success"`
+	Vars      map[string]json.RawMessage                                                                                                         `json:"vars,omitempty"`
 }
 
-func (s Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspended) MarshalJSON() ([]byte, error) {
-	type plain Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspended
+func (s Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatch) MarshalJSON() ([]byte, error) {
+	type plain Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatch
 	p := plain(s)
 	if p.Fields == nil {
-		p.Fields = map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedFieldsItem{}
+		p.Fields = map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchFieldsItem{}
 	}
 	return json.Marshal(p)
 }
 
-type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbidden struct {
-	ErrorKey  Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey                `json:"error_key"`
-	Fields    map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenFieldsItem `json:"fields"`
-	Message   string                                                                                                         `json:"message"`
-	Status    Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus                  `json:"status"`
-	StatusKey string                                                                                                         `json:"status_key"`
-	Success   bool                                                                                                           `json:"success"`
-	Vars      map[string]json.RawMessage                                                                                     `json:"vars,omitempty"`
+type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatch struct {
+	ErrorKey  Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKey                `json:"error_key"`
+	Fields    map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchFieldsItem `json:"fields"`
+	Message   string                                                                                                       `json:"message"`
+	Status    Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchStatus                  `json:"status"`
+	StatusKey string                                                                                                       `json:"status_key"`
+	Success   bool                                                                                                         `json:"success"`
+	Vars      map[string]json.RawMessage                                                                                   `json:"vars,omitempty"`
 }
 
-func (s Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbidden) MarshalJSON() ([]byte, error) {
-	type plain Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbidden
+func (s Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatch) MarshalJSON() ([]byte, error) {
+	type plain Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatch
 	p := plain(s)
 	if p.Fields == nil {
-		p.Fields = map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenFieldsItem{}
+		p.Fields = map[string][]Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchFieldsItem{}
 	}
 	return json.Marshal(p)
 }
@@ -822,25 +4431,6 @@ func (s Err404NotFoundTableTemplateNotFound) MarshalJSON() ([]byte, error) {
 	p := plain(s)
 	if p.Fields == nil {
 		p.Fields = map[string][]Err404NotFoundTableTemplateNotFoundFieldsItem{}
-	}
-	return json.Marshal(p)
-}
-
-type Err404NotFoundWebhookNotFound struct {
-	ErrorKey  Err404NotFoundWebhookNotFoundErrorKey                `json:"error_key"`
-	Fields    map[string][]Err404NotFoundWebhookNotFoundFieldsItem `json:"fields"`
-	Message   string                                               `json:"message"`
-	Status    Err404NotFoundWebhookNotFoundStatus                  `json:"status"`
-	StatusKey string                                               `json:"status_key"`
-	Success   bool                                                 `json:"success"`
-	Vars      map[string]json.RawMessage                           `json:"vars,omitempty"`
-}
-
-func (s Err404NotFoundWebhookNotFound) MarshalJSON() ([]byte, error) {
-	type plain Err404NotFoundWebhookNotFound
-	p := plain(s)
-	if p.Fields == nil {
-		p.Fields = map[string][]Err404NotFoundWebhookNotFoundFieldsItem{}
 	}
 	return json.Marshal(p)
 }
@@ -1092,25 +4682,6 @@ func (s Err500CaptchaUnavailableInternalServerErrorTableCreateFailed) MarshalJSO
 	return json.Marshal(p)
 }
 
-type Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailed struct {
-	ErrorKey  Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey                `json:"error_key"`
-	Fields    map[string][]Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedFieldsItem `json:"fields"`
-	Message   string                                                                                `json:"message"`
-	Status    Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus                  `json:"status"`
-	StatusKey string                                                                                `json:"status_key"`
-	Success   bool                                                                                  `json:"success"`
-	Vars      map[string]json.RawMessage                                                            `json:"vars,omitempty"`
-}
-
-func (s Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailed) MarshalJSON() ([]byte, error) {
-	type plain Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailed
-	p := plain(s)
-	if p.Fields == nil {
-		p.Fields = map[string][]Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedFieldsItem{}
-	}
-	return json.Marshal(p)
-}
-
 type Err502BadGateway struct {
 	ErrorKey  Err502BadGatewayErrorKey                `json:"error_key"`
 	Fields    map[string][]Err502BadGatewayFieldsItem `json:"fields"`
@@ -1206,25 +4777,38 @@ func (s Err504GatewayTimeout) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p)
 }
 
-type GetOrganizationsWebhookResponse200 struct {
-	Active          bool                                           `json:"active"`
-	CreatedAt       int64                                          `json:"created_at"`
-	Events          []GetOrganizationsWebhookResponse200EventsItem `json:"events"`
-	FailureCount    int64                                          `json:"failure_count"`
-	Id              string                                         `json:"id"`
-	LastTriggeredAt *int64                                         `json:"last_triggered_at"`
-	Name            *string                                        `json:"name"`
-	OrganizationId  string                                         `json:"organization_id"`
-	SecretRotatedAt *int64                                         `json:"secret_rotated_at"`
-	UpdatedAt       int64                                          `json:"updated_at"`
-	Url             string                                         `json:"url"`
+type GetOrganizationsProjectResponse200 struct {
+	CreatedAt           int64                                                `json:"created_at"`
+	Currency            string                                               `json:"currency"`
+	DefaultInsertMode   *GetOrganizationsProjectResponse200DefaultInsertMode `json:"default_insert_mode"`
+	DefaultStrictness   *GetOrganizationsProjectResponse200DefaultStrictness `json:"default_strictness"`
+	DeletedAt           *int64                                               `json:"deleted_at"`
+	Id                  string                                               `json:"id"`
+	Name                string                                               `json:"name"`
+	OrganizationId      string                                               `json:"organization_id"`
+	RetentionPolicyDays *int64                                               `json:"retention_policy_days"`
+	Slug                string                                               `json:"slug"`
+	Status              GetOrganizationsProjectResponse200Status             `json:"status"`
+	Timezone            string                                               `json:"timezone"`
+	UpdatedAt           int64                                                `json:"updated_at"`
+	Viewer              GetOrganizationsProjectResponse200Viewer             `json:"viewer"`
 }
 
-func (s GetOrganizationsWebhookResponse200) MarshalJSON() ([]byte, error) {
-	type plain GetOrganizationsWebhookResponse200
+type GetOrganizationsProjectResponse404 struct {
+	ErrorKey  GetOrganizationsProjectResponse404ErrorKey                `json:"error_key"`
+	Fields    map[string][]GetOrganizationsProjectResponse404FieldsItem `json:"fields"`
+	Message   string                                                    `json:"message"`
+	Status    GetOrganizationsProjectResponse404Status                  `json:"status"`
+	StatusKey string                                                    `json:"status_key"`
+	Success   bool                                                      `json:"success"`
+	Vars      map[string]json.RawMessage                                `json:"vars,omitempty"`
+}
+
+func (s GetOrganizationsProjectResponse404) MarshalJSON() ([]byte, error) {
+	type plain GetOrganizationsProjectResponse404
 	p := plain(s)
-	if p.Events == nil {
-		p.Events = []GetOrganizationsWebhookResponse200EventsItem{}
+	if p.Fields == nil {
+		p.Fields = map[string][]GetOrganizationsProjectResponse404FieldsItem{}
 	}
 	return json.Marshal(p)
 }
@@ -1309,6 +4893,39 @@ func (s GetProjectsExportResponse404) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p)
 }
 
+type GetProjectsTableResponse200 struct {
+	ColumnsJson      []GetProjectsTableResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                        `json:"created_at"`
+	DataVersion      int64                                        `json:"data_version"`
+	DefaultSort      *string                                      `json:"default_sort"`
+	DeletedAt        *int64                                       `json:"deleted_at"`
+	FtsVersion       int64                                        `json:"fts_version"`
+	Id               string                                       `json:"id"`
+	InsertMode       GetProjectsTableResponse200InsertMode        `json:"insert_mode"`
+	Instruction      *string                                      `json:"instruction"`
+	LastUsedAt       *int64                                       `json:"last_used_at"`
+	MergeColumnsJson []string                                     `json:"merge_columns_json"`
+	Name             string                                       `json:"name"`
+	ProjectId        string                                       `json:"project_id"`
+	RowCount         int64                                        `json:"row_count"`
+	Slug             string                                       `json:"slug"`
+	Strictness       GetProjectsTableResponse200Strictness        `json:"strictness"`
+	UpdatedAt        int64                                        `json:"updated_at"`
+	UsageCount       int64                                        `json:"usage_count"`
+}
+
+func (s GetProjectsTableResponse200) MarshalJSON() ([]byte, error) {
+	type plain GetProjectsTableResponse200
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []GetProjectsTableResponse200ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
+}
+
 type GetProjectsTableTemplateResponse200 struct {
 	Category           string                                               `json:"category"`
 	ColumnsJson        []GetProjectsTableTemplateResponse200ColumnsJsonItem `json:"columns_json"`
@@ -1334,42 +4951,6 @@ func (s GetProjectsTableTemplateResponse200) MarshalJSON() ([]byte, error) {
 	}
 	if p.MergeColumnsJson == nil {
 		p.MergeColumnsJson = []string{}
-	}
-	return json.Marshal(p)
-}
-
-type ListOrganizationsWebhooksDeliveriesResponse200 struct {
-	Count      *int64                                                         `json:"count"`
-	Deliveries []ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItem `json:"deliveries"`
-	HasMore    bool                                                           `json:"hasMore"`
-	Limit      int64                                                          `json:"limit"`
-	NextCursor *string                                                        `json:"nextCursor"`
-	Page       *int64                                                         `json:"page"`
-}
-
-func (s ListOrganizationsWebhooksDeliveriesResponse200) MarshalJSON() ([]byte, error) {
-	type plain ListOrganizationsWebhooksDeliveriesResponse200
-	p := plain(s)
-	if p.Deliveries == nil {
-		p.Deliveries = []ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItem{}
-	}
-	return json.Marshal(p)
-}
-
-type ListOrganizationsWebhooksResponse200 struct {
-	Count      *int64                                             `json:"count"`
-	HasMore    bool                                               `json:"hasMore"`
-	Limit      int64                                              `json:"limit"`
-	NextCursor *string                                            `json:"nextCursor"`
-	Page       *int64                                             `json:"page"`
-	Webhooks   []ListOrganizationsWebhooksResponse200WebhooksItem `json:"webhooks"`
-}
-
-func (s ListOrganizationsWebhooksResponse200) MarshalJSON() ([]byte, error) {
-	type plain ListOrganizationsWebhooksResponse200
-	p := plain(s)
-	if p.Webhooks == nil {
-		p.Webhooks = []ListOrganizationsWebhooksResponse200WebhooksItem{}
 	}
 	return json.Marshal(p)
 }
@@ -1561,6 +5142,24 @@ func (s ListProjectsTablesRowsSourceResponse404) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p)
 }
 
+type ListTableTemplatesResponse200 struct {
+	Count      *int64                                       `json:"count"`
+	HasMore    bool                                         `json:"hasMore"`
+	Limit      int64                                        `json:"limit"`
+	NextCursor *string                                      `json:"nextCursor"`
+	Page       *int64                                       `json:"page"`
+	Templates  []ListTableTemplatesResponse200TemplatesItem `json:"templates"`
+}
+
+func (s ListTableTemplatesResponse200) MarshalJSON() ([]byte, error) {
+	type plain ListTableTemplatesResponse200
+	p := plain(s)
+	if p.Templates == nil {
+		p.Templates = []ListTableTemplatesResponse200TemplatesItem{}
+	}
+	return json.Marshal(p)
+}
+
 type ReplaceProjectsTablesColumnRequest struct {
 	Order []string `json:"order"`
 }
@@ -1570,6 +5169,39 @@ func (s ReplaceProjectsTablesColumnRequest) MarshalJSON() ([]byte, error) {
 	p := plain(s)
 	if p.Order == nil {
 		p.Order = []string{}
+	}
+	return json.Marshal(p)
+}
+
+type ReplaceProjectsTablesColumnResponse200 struct {
+	ColumnsJson      []ReplaceProjectsTablesColumnResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                                   `json:"created_at"`
+	DataVersion      int64                                                   `json:"data_version"`
+	DefaultSort      *string                                                 `json:"default_sort"`
+	DeletedAt        *int64                                                  `json:"deleted_at"`
+	FtsVersion       int64                                                   `json:"fts_version"`
+	Id               string                                                  `json:"id"`
+	InsertMode       ReplaceProjectsTablesColumnResponse200InsertMode        `json:"insert_mode"`
+	Instruction      *string                                                 `json:"instruction"`
+	LastUsedAt       *int64                                                  `json:"last_used_at"`
+	MergeColumnsJson []string                                                `json:"merge_columns_json"`
+	Name             string                                                  `json:"name"`
+	ProjectId        string                                                  `json:"project_id"`
+	RowCount         int64                                                   `json:"row_count"`
+	Slug             string                                                  `json:"slug"`
+	Strictness       ReplaceProjectsTablesColumnResponse200Strictness        `json:"strictness"`
+	UpdatedAt        int64                                                   `json:"updated_at"`
+	UsageCount       int64                                                   `json:"usage_count"`
+}
+
+func (s ReplaceProjectsTablesColumnResponse200) MarshalJSON() ([]byte, error) {
+	type plain ReplaceProjectsTablesColumnResponse200
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []ReplaceProjectsTablesColumnResponse200ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
 	}
 	return json.Marshal(p)
 }
@@ -1612,13 +5244,6 @@ func (s ReplaceProjectsTablesColumnResponse409) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p)
 }
 
-type UpdateOrganizationsWebhookRequest struct {
-	Active *bool                                         `json:"active,omitempty"`
-	Events []UpdateOrganizationsWebhookRequestEventsItem `json:"events,omitempty"`
-	Name   *string                                       `json:"name,omitempty"`
-	Url    *string                                       `json:"url,omitempty"`
-}
-
 type UpdateProjectsTableRequest struct {
 	DefaultSort      Nullable[string]                      `json:"default_sort,omitzero"`
 	InsertMode       *UpdateProjectsTableRequestInsertMode `json:"insert_mode,omitempty"`
@@ -1627,6 +5252,39 @@ type UpdateProjectsTableRequest struct {
 	Name             *string                               `json:"name,omitempty"`
 	Slug             *string                               `json:"slug,omitempty"`
 	Strictness       *UpdateProjectsTableRequestStrictness `json:"strictness,omitempty"`
+}
+
+type UpdateProjectsTableResponse200 struct {
+	ColumnsJson      []UpdateProjectsTableResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                           `json:"created_at"`
+	DataVersion      int64                                           `json:"data_version"`
+	DefaultSort      *string                                         `json:"default_sort"`
+	DeletedAt        *int64                                          `json:"deleted_at"`
+	FtsVersion       int64                                           `json:"fts_version"`
+	Id               string                                          `json:"id"`
+	InsertMode       UpdateProjectsTableResponse200InsertMode        `json:"insert_mode"`
+	Instruction      *string                                         `json:"instruction"`
+	LastUsedAt       *int64                                          `json:"last_used_at"`
+	MergeColumnsJson []string                                        `json:"merge_columns_json"`
+	Name             string                                          `json:"name"`
+	ProjectId        string                                          `json:"project_id"`
+	RowCount         int64                                           `json:"row_count"`
+	Slug             string                                          `json:"slug"`
+	Strictness       UpdateProjectsTableResponse200Strictness        `json:"strictness"`
+	UpdatedAt        int64                                           `json:"updated_at"`
+	UsageCount       int64                                           `json:"usage_count"`
+}
+
+func (s UpdateProjectsTableResponse200) MarshalJSON() ([]byte, error) {
+	type plain UpdateProjectsTableResponse200
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []UpdateProjectsTableResponse200ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
 }
 
 type UpdateProjectsTableResponse500 struct {
@@ -1656,6 +5314,39 @@ type UpdateProjectsTablesColumnRequest struct {
 	Required    *bool                                  `json:"required,omitempty"`
 	Searchable  *bool                                  `json:"searchable,omitempty"`
 	Type        *UpdateProjectsTablesColumnRequestType `json:"type,omitempty"`
+}
+
+type UpdateProjectsTablesColumnResponse200 struct {
+	ColumnsJson      []UpdateProjectsTablesColumnResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt        int64                                                  `json:"created_at"`
+	DataVersion      int64                                                  `json:"data_version"`
+	DefaultSort      *string                                                `json:"default_sort"`
+	DeletedAt        *int64                                                 `json:"deleted_at"`
+	FtsVersion       int64                                                  `json:"fts_version"`
+	Id               string                                                 `json:"id"`
+	InsertMode       UpdateProjectsTablesColumnResponse200InsertMode        `json:"insert_mode"`
+	Instruction      *string                                                `json:"instruction"`
+	LastUsedAt       *int64                                                 `json:"last_used_at"`
+	MergeColumnsJson []string                                               `json:"merge_columns_json"`
+	Name             string                                                 `json:"name"`
+	ProjectId        string                                                 `json:"project_id"`
+	RowCount         int64                                                  `json:"row_count"`
+	Slug             string                                                 `json:"slug"`
+	Strictness       UpdateProjectsTablesColumnResponse200Strictness        `json:"strictness"`
+	UpdatedAt        int64                                                  `json:"updated_at"`
+	UsageCount       int64                                                  `json:"usage_count"`
+}
+
+func (s UpdateProjectsTablesColumnResponse200) MarshalJSON() ([]byte, error) {
+	type plain UpdateProjectsTablesColumnResponse200
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []UpdateProjectsTablesColumnResponse200ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
 }
 
 type UpdateProjectsTablesColumnResponse422 struct {
@@ -1716,14 +5407,43 @@ func (s UpdateProjectsTablesRowResponse500) MarshalJSON() ([]byte, error) {
 }
 
 type UpdateTableTemplateRequest struct {
-	Category         *string                               `json:"category,omitempty"`
-	ColumnsJson      json.RawMessage                       `json:"columns_json,omitempty"`
-	Description      Nullable[string]                      `json:"description,omitzero"`
-	InsertMode       *UpdateTableTemplateRequestInsertMode `json:"insert_mode,omitempty"`
-	Instruction      Nullable[string]                      `json:"instruction,omitzero"`
-	MergeColumnsJson Nullable[[]string]                    `json:"merge_columns_json,omitzero"`
-	Name             *string                               `json:"name,omitempty"`
-	Strictness       *UpdateTableTemplateRequestStrictness `json:"strictness,omitempty"`
+	Category         *string                                     `json:"category,omitempty"`
+	ColumnsJson      []UpdateTableTemplateRequestColumnsJsonItem `json:"columns_json,omitempty"`
+	Description      Nullable[string]                            `json:"description,omitzero"`
+	InsertMode       *UpdateTableTemplateRequestInsertMode       `json:"insert_mode,omitempty"`
+	Instruction      Nullable[string]                            `json:"instruction,omitzero"`
+	MergeColumnsJson Nullable[[]string]                          `json:"merge_columns_json,omitzero"`
+	Name             *string                                     `json:"name,omitempty"`
+	Strictness       *UpdateTableTemplateRequestStrictness       `json:"strictness,omitempty"`
+}
+
+type UpdateTableTemplateResponse200 struct {
+	Category           string                                          `json:"category"`
+	ColumnsJson        []UpdateTableTemplateResponse200ColumnsJsonItem `json:"columns_json"`
+	CreatedAt          int64                                           `json:"created_at"`
+	CreatorDisplayName *string                                         `json:"creator_display_name"`
+	CreatorUserId      *string                                         `json:"creator_user_id"`
+	Description        *string                                         `json:"description"`
+	Id                 string                                          `json:"id"`
+	InsertMode         UpdateTableTemplateResponse200InsertMode        `json:"insert_mode"`
+	Instruction        *string                                         `json:"instruction"`
+	MergeColumnsJson   []string                                        `json:"merge_columns_json"`
+	Name               string                                          `json:"name"`
+	Strictness         UpdateTableTemplateResponse200Strictness        `json:"strictness"`
+	UpdatedAt          int64                                           `json:"updated_at"`
+	UsageCount         int64                                           `json:"usage_count"`
+}
+
+func (s UpdateTableTemplateResponse200) MarshalJSON() ([]byte, error) {
+	type plain UpdateTableTemplateResponse200
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []UpdateTableTemplateResponse200ColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
 }
 
 type UpdateTableTemplateResponse500 struct {
@@ -1754,72 +5474,6 @@ const (
 	BatchListOptsStatusComplete   BatchListOptsStatus = "complete"
 	BatchListOptsStatusPartial    BatchListOptsStatus = "partial"
 	BatchListOptsStatusFailed     BatchListOptsStatus = "failed"
-)
-
-type CreateOrganizationsWebhookRequestEventsItem string
-
-const (
-	CreateOrganizationsWebhookRequestEventsItemBatchComplete CreateOrganizationsWebhookRequestEventsItem = "batch.complete"
-	CreateOrganizationsWebhookRequestEventsItemBatchFailed   CreateOrganizationsWebhookRequestEventsItem = "batch.failed"
-	CreateOrganizationsWebhookRequestEventsItemBatchPartial  CreateOrganizationsWebhookRequestEventsItem = "batch.partial"
-	CreateOrganizationsWebhookRequestEventsItemPing          CreateOrganizationsWebhookRequestEventsItem = "ping"
-)
-
-type CreateOrganizationsWebhookResponse201EventsItem string
-
-const (
-	CreateOrganizationsWebhookResponse201EventsItemBatchComplete CreateOrganizationsWebhookResponse201EventsItem = "batch.complete"
-	CreateOrganizationsWebhookResponse201EventsItemBatchFailed   CreateOrganizationsWebhookResponse201EventsItem = "batch.failed"
-	CreateOrganizationsWebhookResponse201EventsItemBatchPartial  CreateOrganizationsWebhookResponse201EventsItem = "batch.partial"
-	CreateOrganizationsWebhookResponse201EventsItemPing          CreateOrganizationsWebhookResponse201EventsItem = "ping"
-)
-
-type CreateOrganizationsWebhookResponse500ErrorKey string
-
-const (
-	CreateOrganizationsWebhookResponse500ErrorKeyCaptchaUnavailable  CreateOrganizationsWebhookResponse500ErrorKey = "captcha_unavailable"
-	CreateOrganizationsWebhookResponse500ErrorKeyInternalServerError CreateOrganizationsWebhookResponse500ErrorKey = "internal_server_error"
-	CreateOrganizationsWebhookResponse500ErrorKeyWebhookCreateFailed CreateOrganizationsWebhookResponse500ErrorKey = "webhook_create_failed"
-)
-
-type CreateOrganizationsWebhookResponse500FieldsItem struct {
-	ErrorKey string `json:"error_key"`
-	Message  string `json:"message"`
-	Path     string `json:"path"`
-}
-
-type CreateOrganizationsWebhookResponse500Status int
-
-const (
-	CreateOrganizationsWebhookResponse500Status500 CreateOrganizationsWebhookResponse500Status = 500
-)
-
-type CreateOrganizationsWebhooksTestResponse200Status string
-
-const (
-	CreateOrganizationsWebhooksTestResponse200StatusError   CreateOrganizationsWebhooksTestResponse200Status = "error"
-	CreateOrganizationsWebhooksTestResponse200StatusSuccess CreateOrganizationsWebhooksTestResponse200Status = "success"
-	CreateOrganizationsWebhooksTestResponse200StatusTimeout CreateOrganizationsWebhooksTestResponse200Status = "timeout"
-)
-
-type CreateOrganizationsWebhooksTestResponse500ErrorKey string
-
-const (
-	CreateOrganizationsWebhooksTestResponse500ErrorKeyCaptchaUnavailable  CreateOrganizationsWebhooksTestResponse500ErrorKey = "captcha_unavailable"
-	CreateOrganizationsWebhooksTestResponse500ErrorKeyInternalServerError CreateOrganizationsWebhooksTestResponse500ErrorKey = "internal_server_error"
-	CreateOrganizationsWebhooksTestResponse500ErrorKeyWebhookTestFailed   CreateOrganizationsWebhooksTestResponse500ErrorKey = "webhook_test_failed"
-)
-
-type CreateOrganizationsWebhooksTestResponse500FieldsItem struct {
-	ErrorKey string `json:"error_key"`
-	Message  string `json:"message"`
-	Path     string `json:"path"`
-}
-
-type CreateOrganizationsWebhooksTestResponse500Status int
-
-const (
-	CreateOrganizationsWebhooksTestResponse500Status500 CreateOrganizationsWebhooksTestResponse500Status = 500
 )
 
 type CreateProjectsExtractRequestStrictness string
@@ -1855,6 +5509,35 @@ type CreateProjectsSuggestSchemaResponse200ColumnsItem struct {
 	Type        string  `json:"type"`
 }
 
+type CreateProjectsTableRequestColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode2                                 `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                `json:"default,omitempty"`
+	Description  Nullable[string]                               `json:"description,omitzero"`
+	Id           string                                         `json:"id"`
+	Instruction  Nullable[string]                               `json:"instruction,omitzero"`
+	Name         string                                         `json:"name"`
+	Options      []string                                       `json:"options,omitempty"`
+	Required     *bool                                          `json:"required,omitempty"`
+	Searchable   *bool                                          `json:"searchable,omitempty"`
+	Type         *CreateProjectsTableRequestColumnsJsonItemType `json:"type,omitempty"`
+}
+
+type CreateProjectsTableRequestColumnsJsonItemType string
+
+const (
+	CreateProjectsTableRequestColumnsJsonItemTypeArray       CreateProjectsTableRequestColumnsJsonItemType = "array"
+	CreateProjectsTableRequestColumnsJsonItemTypeBoolean     CreateProjectsTableRequestColumnsJsonItemType = "boolean"
+	CreateProjectsTableRequestColumnsJsonItemTypeCurrency    CreateProjectsTableRequestColumnsJsonItemType = "currency"
+	CreateProjectsTableRequestColumnsJsonItemTypeDate        CreateProjectsTableRequestColumnsJsonItemType = "date"
+	CreateProjectsTableRequestColumnsJsonItemTypeEmail       CreateProjectsTableRequestColumnsJsonItemType = "email"
+	CreateProjectsTableRequestColumnsJsonItemTypeEnum        CreateProjectsTableRequestColumnsJsonItemType = "enum"
+	CreateProjectsTableRequestColumnsJsonItemTypeMultiSelect CreateProjectsTableRequestColumnsJsonItemType = "multi_select"
+	CreateProjectsTableRequestColumnsJsonItemTypeNumber      CreateProjectsTableRequestColumnsJsonItemType = "number"
+	CreateProjectsTableRequestColumnsJsonItemTypeString      CreateProjectsTableRequestColumnsJsonItemType = "string"
+	CreateProjectsTableRequestColumnsJsonItemTypeText        CreateProjectsTableRequestColumnsJsonItemType = "text"
+	CreateProjectsTableRequestColumnsJsonItemTypeUrl         CreateProjectsTableRequestColumnsJsonItemType = "url"
+)
+
 type CreateProjectsTableRequestInsertMode string
 
 const (
@@ -1870,6 +5553,52 @@ const (
 	CreateProjectsTableRequestStrictnessStrict   CreateProjectsTableRequestStrictness = "strict"
 	CreateProjectsTableRequestStrictnessBalanced CreateProjectsTableRequestStrictness = "balanced"
 	CreateProjectsTableRequestStrictnessFlexible CreateProjectsTableRequestStrictness = "flexible"
+)
+
+type CreateProjectsTableResponse201ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode3                                    `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                   `json:"default,omitempty"`
+	Description  Nullable[string]                                  `json:"description,omitzero"`
+	Id           string                                            `json:"id"`
+	Instruction  Nullable[string]                                  `json:"instruction,omitzero"`
+	Name         string                                            `json:"name"`
+	Options      []string                                          `json:"options,omitempty"`
+	Required     bool                                              `json:"required"`
+	Searchable   *bool                                             `json:"searchable,omitempty"`
+	Type         CreateProjectsTableResponse201ColumnsJsonItemType `json:"type"`
+}
+
+type CreateProjectsTableResponse201ColumnsJsonItemType string
+
+const (
+	CreateProjectsTableResponse201ColumnsJsonItemTypeArray       CreateProjectsTableResponse201ColumnsJsonItemType = "array"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeBoolean     CreateProjectsTableResponse201ColumnsJsonItemType = "boolean"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeCurrency    CreateProjectsTableResponse201ColumnsJsonItemType = "currency"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeDate        CreateProjectsTableResponse201ColumnsJsonItemType = "date"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeEmail       CreateProjectsTableResponse201ColumnsJsonItemType = "email"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeEnum        CreateProjectsTableResponse201ColumnsJsonItemType = "enum"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeMultiSelect CreateProjectsTableResponse201ColumnsJsonItemType = "multi_select"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeNumber      CreateProjectsTableResponse201ColumnsJsonItemType = "number"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeString      CreateProjectsTableResponse201ColumnsJsonItemType = "string"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeText        CreateProjectsTableResponse201ColumnsJsonItemType = "text"
+	CreateProjectsTableResponse201ColumnsJsonItemTypeUrl         CreateProjectsTableResponse201ColumnsJsonItemType = "url"
+)
+
+type CreateProjectsTableResponse201InsertMode string
+
+const (
+	CreateProjectsTableResponse201InsertModeAppend  CreateProjectsTableResponse201InsertMode = "append"
+	CreateProjectsTableResponse201InsertModeDedup   CreateProjectsTableResponse201InsertMode = "dedup"
+	CreateProjectsTableResponse201InsertModeMerge   CreateProjectsTableResponse201InsertMode = "merge"
+	CreateProjectsTableResponse201InsertModeReplace CreateProjectsTableResponse201InsertMode = "replace"
+)
+
+type CreateProjectsTableResponse201Strictness string
+
+const (
+	CreateProjectsTableResponse201StrictnessStrict   CreateProjectsTableResponse201Strictness = "strict"
+	CreateProjectsTableResponse201StrictnessBalanced CreateProjectsTableResponse201Strictness = "balanced"
+	CreateProjectsTableResponse201StrictnessFlexible CreateProjectsTableResponse201Strictness = "flexible"
 )
 
 type CreateProjectsTableResponse402ErrorKey string
@@ -1894,7 +5623,7 @@ const (
 )
 
 type CreateProjectsTableTemplatesUseResponse201ColumnsJsonItem struct {
-	CurrencyCode *string                                                       `json:"currency_code,omitempty"`
+	CurrencyCode *CurrencyCode15                                               `json:"currency_code,omitempty"`
 	Default      json.RawMessage                                               `json:"default,omitempty"`
 	Description  Nullable[string]                                              `json:"description,omitzero"`
 	Id           string                                                        `json:"id"`
@@ -1975,6 +5704,52 @@ const (
 	CreateProjectsTablesColumnRequestTypeUrl         CreateProjectsTablesColumnRequestType = "url"
 )
 
+type CreateProjectsTablesColumnResponse200ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode9                                           `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                          `json:"default,omitempty"`
+	Description  Nullable[string]                                         `json:"description,omitzero"`
+	Id           string                                                   `json:"id"`
+	Instruction  Nullable[string]                                         `json:"instruction,omitzero"`
+	Name         string                                                   `json:"name"`
+	Options      []string                                                 `json:"options,omitempty"`
+	Required     bool                                                     `json:"required"`
+	Searchable   *bool                                                    `json:"searchable,omitempty"`
+	Type         CreateProjectsTablesColumnResponse200ColumnsJsonItemType `json:"type"`
+}
+
+type CreateProjectsTablesColumnResponse200ColumnsJsonItemType string
+
+const (
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeArray       CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "array"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeBoolean     CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "boolean"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeCurrency    CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "currency"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeDate        CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "date"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeEmail       CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "email"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeEnum        CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "enum"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeMultiSelect CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "multi_select"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeNumber      CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "number"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeString      CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "string"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeText        CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "text"
+	CreateProjectsTablesColumnResponse200ColumnsJsonItemTypeUrl         CreateProjectsTablesColumnResponse200ColumnsJsonItemType = "url"
+)
+
+type CreateProjectsTablesColumnResponse200InsertMode string
+
+const (
+	CreateProjectsTablesColumnResponse200InsertModeAppend  CreateProjectsTablesColumnResponse200InsertMode = "append"
+	CreateProjectsTablesColumnResponse200InsertModeDedup   CreateProjectsTablesColumnResponse200InsertMode = "dedup"
+	CreateProjectsTablesColumnResponse200InsertModeMerge   CreateProjectsTablesColumnResponse200InsertMode = "merge"
+	CreateProjectsTablesColumnResponse200InsertModeReplace CreateProjectsTablesColumnResponse200InsertMode = "replace"
+)
+
+type CreateProjectsTablesColumnResponse200Strictness string
+
+const (
+	CreateProjectsTablesColumnResponse200StrictnessStrict   CreateProjectsTablesColumnResponse200Strictness = "strict"
+	CreateProjectsTablesColumnResponse200StrictnessBalanced CreateProjectsTablesColumnResponse200Strictness = "balanced"
+	CreateProjectsTablesColumnResponse200StrictnessFlexible CreateProjectsTablesColumnResponse200Strictness = "flexible"
+)
+
 type CreateProjectsTablesColumnResponse402ErrorKey string
 
 const (
@@ -2015,6 +5790,52 @@ const (
 	CreateProjectsTablesColumnResponse500Status500 CreateProjectsTablesColumnResponse500Status = 500
 )
 
+type CreateProjectsTablesDuplicateResponse201ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode7                                              `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                             `json:"default,omitempty"`
+	Description  Nullable[string]                                            `json:"description,omitzero"`
+	Id           string                                                      `json:"id"`
+	Instruction  Nullable[string]                                            `json:"instruction,omitzero"`
+	Name         string                                                      `json:"name"`
+	Options      []string                                                    `json:"options,omitempty"`
+	Required     bool                                                        `json:"required"`
+	Searchable   *bool                                                       `json:"searchable,omitempty"`
+	Type         CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType `json:"type"`
+}
+
+type CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType string
+
+const (
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeArray       CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "array"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeBoolean     CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "boolean"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeCurrency    CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "currency"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeDate        CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "date"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeEmail       CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "email"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeEnum        CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "enum"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeMultiSelect CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "multi_select"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeNumber      CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "number"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeString      CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "string"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeText        CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "text"
+	CreateProjectsTablesDuplicateResponse201ColumnsJsonItemTypeUrl         CreateProjectsTablesDuplicateResponse201ColumnsJsonItemType = "url"
+)
+
+type CreateProjectsTablesDuplicateResponse201InsertMode string
+
+const (
+	CreateProjectsTablesDuplicateResponse201InsertModeAppend  CreateProjectsTablesDuplicateResponse201InsertMode = "append"
+	CreateProjectsTablesDuplicateResponse201InsertModeDedup   CreateProjectsTablesDuplicateResponse201InsertMode = "dedup"
+	CreateProjectsTablesDuplicateResponse201InsertModeMerge   CreateProjectsTablesDuplicateResponse201InsertMode = "merge"
+	CreateProjectsTablesDuplicateResponse201InsertModeReplace CreateProjectsTablesDuplicateResponse201InsertMode = "replace"
+)
+
+type CreateProjectsTablesDuplicateResponse201Strictness string
+
+const (
+	CreateProjectsTablesDuplicateResponse201StrictnessStrict   CreateProjectsTablesDuplicateResponse201Strictness = "strict"
+	CreateProjectsTablesDuplicateResponse201StrictnessBalanced CreateProjectsTablesDuplicateResponse201Strictness = "balanced"
+	CreateProjectsTablesDuplicateResponse201StrictnessFlexible CreateProjectsTablesDuplicateResponse201Strictness = "flexible"
+)
+
 type CreateProjectsTablesDuplicateResponse500ErrorKey string
 
 const (
@@ -2033,6 +5854,52 @@ type CreateProjectsTablesDuplicateResponse500Status int
 
 const (
 	CreateProjectsTablesDuplicateResponse500Status500 CreateProjectsTablesDuplicateResponse500Status = 500
+)
+
+type CreateProjectsTablesRestoreResponse200ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode6                                            `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                           `json:"default,omitempty"`
+	Description  Nullable[string]                                          `json:"description,omitzero"`
+	Id           string                                                    `json:"id"`
+	Instruction  Nullable[string]                                          `json:"instruction,omitzero"`
+	Name         string                                                    `json:"name"`
+	Options      []string                                                  `json:"options,omitempty"`
+	Required     bool                                                      `json:"required"`
+	Searchable   *bool                                                     `json:"searchable,omitempty"`
+	Type         CreateProjectsTablesRestoreResponse200ColumnsJsonItemType `json:"type"`
+}
+
+type CreateProjectsTablesRestoreResponse200ColumnsJsonItemType string
+
+const (
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeArray       CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "array"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeBoolean     CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "boolean"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeCurrency    CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "currency"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeDate        CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "date"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeEmail       CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "email"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeEnum        CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "enum"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeMultiSelect CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "multi_select"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeNumber      CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "number"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeString      CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "string"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeText        CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "text"
+	CreateProjectsTablesRestoreResponse200ColumnsJsonItemTypeUrl         CreateProjectsTablesRestoreResponse200ColumnsJsonItemType = "url"
+)
+
+type CreateProjectsTablesRestoreResponse200InsertMode string
+
+const (
+	CreateProjectsTablesRestoreResponse200InsertModeAppend  CreateProjectsTablesRestoreResponse200InsertMode = "append"
+	CreateProjectsTablesRestoreResponse200InsertModeDedup   CreateProjectsTablesRestoreResponse200InsertMode = "dedup"
+	CreateProjectsTablesRestoreResponse200InsertModeMerge   CreateProjectsTablesRestoreResponse200InsertMode = "merge"
+	CreateProjectsTablesRestoreResponse200InsertModeReplace CreateProjectsTablesRestoreResponse200InsertMode = "replace"
+)
+
+type CreateProjectsTablesRestoreResponse200Strictness string
+
+const (
+	CreateProjectsTablesRestoreResponse200StrictnessStrict   CreateProjectsTablesRestoreResponse200Strictness = "strict"
+	CreateProjectsTablesRestoreResponse200StrictnessBalanced CreateProjectsTablesRestoreResponse200Strictness = "balanced"
+	CreateProjectsTablesRestoreResponse200StrictnessFlexible CreateProjectsTablesRestoreResponse200Strictness = "flexible"
 )
 
 type CreateProjectsTablesRestoreResponse410ErrorKey string
@@ -2088,24 +5955,24 @@ func (s CreateProjectsTablesRowRequestDbbb57UpdatesItem) MarshalJSON() ([]byte, 
 	return json.Marshal(p)
 }
 
-type CreateProjectsTablesRowResponse500534f56ErrorKey string
+type CreateProjectsTablesRowResponse5009205f1ErrorKey string
 
 const (
-	CreateProjectsTablesRowResponse500534f56ErrorKeyCaptchaUnavailable  CreateProjectsTablesRowResponse500534f56ErrorKey = "captcha_unavailable"
-	CreateProjectsTablesRowResponse500534f56ErrorKeyInternalServerError CreateProjectsTablesRowResponse500534f56ErrorKey = "internal_server_error"
-	CreateProjectsTablesRowResponse500534f56ErrorKeyRowBulkFailed       CreateProjectsTablesRowResponse500534f56ErrorKey = "row_bulk_failed"
+	CreateProjectsTablesRowResponse5009205f1ErrorKeyCaptchaUnavailable  CreateProjectsTablesRowResponse5009205f1ErrorKey = "captcha_unavailable"
+	CreateProjectsTablesRowResponse5009205f1ErrorKeyInternalServerError CreateProjectsTablesRowResponse5009205f1ErrorKey = "internal_server_error"
+	CreateProjectsTablesRowResponse5009205f1ErrorKeyRowBulkFailed       CreateProjectsTablesRowResponse5009205f1ErrorKey = "row_bulk_failed"
 )
 
-type CreateProjectsTablesRowResponse500534f56FieldsItem struct {
+type CreateProjectsTablesRowResponse5009205f1FieldsItem struct {
 	ErrorKey string `json:"error_key"`
 	Message  string `json:"message"`
 	Path     string `json:"path"`
 }
 
-type CreateProjectsTablesRowResponse500534f56Status int
+type CreateProjectsTablesRowResponse5009205f1Status int
 
 const (
-	CreateProjectsTablesRowResponse500534f56Status500 CreateProjectsTablesRowResponse500534f56Status = 500
+	CreateProjectsTablesRowResponse5009205f1Status500 CreateProjectsTablesRowResponse5009205f1Status = 500
 )
 
 type CreateProjectsTablesRowResponse500ErrorKey string
@@ -2128,6 +5995,35 @@ const (
 	CreateProjectsTablesRowResponse500Status500 CreateProjectsTablesRowResponse500Status = 500
 )
 
+type CreateTableTemplateRequestColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode16                                `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                `json:"default,omitempty"`
+	Description  Nullable[string]                               `json:"description,omitzero"`
+	Id           string                                         `json:"id"`
+	Instruction  Nullable[string]                               `json:"instruction,omitzero"`
+	Name         string                                         `json:"name"`
+	Options      []string                                       `json:"options,omitempty"`
+	Required     *bool                                          `json:"required,omitempty"`
+	Searchable   *bool                                          `json:"searchable,omitempty"`
+	Type         *CreateTableTemplateRequestColumnsJsonItemType `json:"type,omitempty"`
+}
+
+type CreateTableTemplateRequestColumnsJsonItemType string
+
+const (
+	CreateTableTemplateRequestColumnsJsonItemTypeArray       CreateTableTemplateRequestColumnsJsonItemType = "array"
+	CreateTableTemplateRequestColumnsJsonItemTypeBoolean     CreateTableTemplateRequestColumnsJsonItemType = "boolean"
+	CreateTableTemplateRequestColumnsJsonItemTypeCurrency    CreateTableTemplateRequestColumnsJsonItemType = "currency"
+	CreateTableTemplateRequestColumnsJsonItemTypeDate        CreateTableTemplateRequestColumnsJsonItemType = "date"
+	CreateTableTemplateRequestColumnsJsonItemTypeEmail       CreateTableTemplateRequestColumnsJsonItemType = "email"
+	CreateTableTemplateRequestColumnsJsonItemTypeEnum        CreateTableTemplateRequestColumnsJsonItemType = "enum"
+	CreateTableTemplateRequestColumnsJsonItemTypeMultiSelect CreateTableTemplateRequestColumnsJsonItemType = "multi_select"
+	CreateTableTemplateRequestColumnsJsonItemTypeNumber      CreateTableTemplateRequestColumnsJsonItemType = "number"
+	CreateTableTemplateRequestColumnsJsonItemTypeString      CreateTableTemplateRequestColumnsJsonItemType = "string"
+	CreateTableTemplateRequestColumnsJsonItemTypeText        CreateTableTemplateRequestColumnsJsonItemType = "text"
+	CreateTableTemplateRequestColumnsJsonItemTypeUrl         CreateTableTemplateRequestColumnsJsonItemType = "url"
+)
+
 type CreateTableTemplateRequestInsertMode string
 
 const (
@@ -2143,6 +6039,52 @@ const (
 	CreateTableTemplateRequestStrictnessStrict   CreateTableTemplateRequestStrictness = "strict"
 	CreateTableTemplateRequestStrictnessBalanced CreateTableTemplateRequestStrictness = "balanced"
 	CreateTableTemplateRequestStrictnessFlexible CreateTableTemplateRequestStrictness = "flexible"
+)
+
+type CreateTableTemplateResponse201ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode17                                   `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                   `json:"default,omitempty"`
+	Description  Nullable[string]                                  `json:"description,omitzero"`
+	Id           string                                            `json:"id"`
+	Instruction  Nullable[string]                                  `json:"instruction,omitzero"`
+	Name         string                                            `json:"name"`
+	Options      []string                                          `json:"options,omitempty"`
+	Required     bool                                              `json:"required"`
+	Searchable   *bool                                             `json:"searchable,omitempty"`
+	Type         CreateTableTemplateResponse201ColumnsJsonItemType `json:"type"`
+}
+
+type CreateTableTemplateResponse201ColumnsJsonItemType string
+
+const (
+	CreateTableTemplateResponse201ColumnsJsonItemTypeArray       CreateTableTemplateResponse201ColumnsJsonItemType = "array"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeBoolean     CreateTableTemplateResponse201ColumnsJsonItemType = "boolean"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeCurrency    CreateTableTemplateResponse201ColumnsJsonItemType = "currency"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeDate        CreateTableTemplateResponse201ColumnsJsonItemType = "date"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeEmail       CreateTableTemplateResponse201ColumnsJsonItemType = "email"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeEnum        CreateTableTemplateResponse201ColumnsJsonItemType = "enum"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeMultiSelect CreateTableTemplateResponse201ColumnsJsonItemType = "multi_select"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeNumber      CreateTableTemplateResponse201ColumnsJsonItemType = "number"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeString      CreateTableTemplateResponse201ColumnsJsonItemType = "string"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeText        CreateTableTemplateResponse201ColumnsJsonItemType = "text"
+	CreateTableTemplateResponse201ColumnsJsonItemTypeUrl         CreateTableTemplateResponse201ColumnsJsonItemType = "url"
+)
+
+type CreateTableTemplateResponse201InsertMode string
+
+const (
+	CreateTableTemplateResponse201InsertModeAppend  CreateTableTemplateResponse201InsertMode = "append"
+	CreateTableTemplateResponse201InsertModeDedup   CreateTableTemplateResponse201InsertMode = "dedup"
+	CreateTableTemplateResponse201InsertModeMerge   CreateTableTemplateResponse201InsertMode = "merge"
+	CreateTableTemplateResponse201InsertModeReplace CreateTableTemplateResponse201InsertMode = "replace"
+)
+
+type CreateTableTemplateResponse201Strictness string
+
+const (
+	CreateTableTemplateResponse201StrictnessStrict   CreateTableTemplateResponse201Strictness = "strict"
+	CreateTableTemplateResponse201StrictnessBalanced CreateTableTemplateResponse201Strictness = "balanced"
+	CreateTableTemplateResponse201StrictnessFlexible CreateTableTemplateResponse201Strictness = "flexible"
 )
 
 type CreateTableTemplateResponse500ErrorKey string
@@ -2163,6 +6105,52 @@ type CreateTableTemplateResponse500Status int
 
 const (
 	CreateTableTemplateResponse500Status500 CreateTableTemplateResponse500Status = 500
+)
+
+type DeleteProjectsTablesColumnResponse200ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode11                                          `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                          `json:"default,omitempty"`
+	Description  Nullable[string]                                         `json:"description,omitzero"`
+	Id           string                                                   `json:"id"`
+	Instruction  Nullable[string]                                         `json:"instruction,omitzero"`
+	Name         string                                                   `json:"name"`
+	Options      []string                                                 `json:"options,omitempty"`
+	Required     bool                                                     `json:"required"`
+	Searchable   *bool                                                    `json:"searchable,omitempty"`
+	Type         DeleteProjectsTablesColumnResponse200ColumnsJsonItemType `json:"type"`
+}
+
+type DeleteProjectsTablesColumnResponse200ColumnsJsonItemType string
+
+const (
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeArray       DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "array"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeBoolean     DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "boolean"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeCurrency    DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "currency"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeDate        DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "date"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeEmail       DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "email"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeEnum        DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "enum"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeMultiSelect DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "multi_select"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeNumber      DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "number"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeString      DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "string"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeText        DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "text"
+	DeleteProjectsTablesColumnResponse200ColumnsJsonItemTypeUrl         DeleteProjectsTablesColumnResponse200ColumnsJsonItemType = "url"
+)
+
+type DeleteProjectsTablesColumnResponse200InsertMode string
+
+const (
+	DeleteProjectsTablesColumnResponse200InsertModeAppend  DeleteProjectsTablesColumnResponse200InsertMode = "append"
+	DeleteProjectsTablesColumnResponse200InsertModeDedup   DeleteProjectsTablesColumnResponse200InsertMode = "dedup"
+	DeleteProjectsTablesColumnResponse200InsertModeMerge   DeleteProjectsTablesColumnResponse200InsertMode = "merge"
+	DeleteProjectsTablesColumnResponse200InsertModeReplace DeleteProjectsTablesColumnResponse200InsertMode = "replace"
+)
+
+type DeleteProjectsTablesColumnResponse200Strictness string
+
+const (
+	DeleteProjectsTablesColumnResponse200StrictnessStrict   DeleteProjectsTablesColumnResponse200Strictness = "strict"
+	DeleteProjectsTablesColumnResponse200StrictnessBalanced DeleteProjectsTablesColumnResponse200Strictness = "balanced"
+	DeleteProjectsTablesColumnResponse200StrictnessFlexible DeleteProjectsTablesColumnResponse200Strictness = "flexible"
 )
 
 type DeleteProjectsTablesColumnResponse400ErrorKey string
@@ -2431,47 +6419,49 @@ const (
 	Err402ApiRequestLimitExceededFeatureNotAvailableStatus402 Err402ApiRequestLimitExceededFeatureNotAvailableStatus = 402
 )
 
-type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey string
+type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKey string
 
 const (
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyEmailNotVerified       Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "email_not_verified"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyForbidden              Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "forbidden"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyImpersonationForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "impersonation_forbidden"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKeyOrgSuspended           Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedErrorKey = "org_suspended"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKeyEmailNotVerified       Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKey = "email_not_verified"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKeyForbidden              Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKey = "forbidden"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKeyImpersonationForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKey = "impersonation_forbidden"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKeyOrgSuspended           Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKey = "org_suspended"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKeyTableTemplateForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKey = "table_template_forbidden"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKeyTokenContextMismatch   Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchErrorKey = "token_context_mismatch"
 )
 
-type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedFieldsItem struct {
+type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchFieldsItem struct {
 	ErrorKey string `json:"error_key"`
 	Message  string `json:"message"`
 	Path     string `json:"path"`
 }
 
-type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus int
+type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchStatus int
 
 const (
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus403 Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedStatus = 403
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchStatus403 Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenTokenContextMismatchStatus = 403
 )
 
-type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey string
+type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKey string
 
 const (
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyEmailNotVerified       Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "email_not_verified"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyForbidden              Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "forbidden"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyImpersonationForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "impersonation_forbidden"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyOrgSuspended           Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "org_suspended"
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKeyTableTemplateForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenErrorKey = "table_template_forbidden"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKeyEmailNotVerified       Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKey = "email_not_verified"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKeyForbidden              Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKey = "forbidden"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKeyImpersonationForbidden Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKey = "impersonation_forbidden"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKeyOrgSuspended           Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKey = "org_suspended"
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKeyTokenContextMismatch   Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchErrorKey = "token_context_mismatch"
 )
 
-type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenFieldsItem struct {
+type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchFieldsItem struct {
 	ErrorKey string `json:"error_key"`
 	Message  string `json:"message"`
 	Path     string `json:"path"`
 }
 
-type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus int
+type Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchStatus int
 
 const (
-	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus403 Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTableTemplateForbiddenStatus = 403
+	Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchStatus403 Err403EmailNotVerifiedForbiddenImpersonationForbiddenOrgSuspendedTokenContextMismatchStatus = 403
 )
 
 type Err404BatchNotFoundBatchResultEmptyNotFoundErrorKey string
@@ -2588,25 +6578,6 @@ type Err404NotFoundTableTemplateNotFoundStatus int
 
 const (
 	Err404NotFoundTableTemplateNotFoundStatus404 Err404NotFoundTableTemplateNotFoundStatus = 404
-)
-
-type Err404NotFoundWebhookNotFoundErrorKey string
-
-const (
-	Err404NotFoundWebhookNotFoundErrorKeyNotFound        Err404NotFoundWebhookNotFoundErrorKey = "not_found"
-	Err404NotFoundWebhookNotFoundErrorKeyWebhookNotFound Err404NotFoundWebhookNotFoundErrorKey = "webhook_not_found"
-)
-
-type Err404NotFoundWebhookNotFoundFieldsItem struct {
-	ErrorKey string `json:"error_key"`
-	Message  string `json:"message"`
-	Path     string `json:"path"`
-}
-
-type Err404NotFoundWebhookNotFoundStatus int
-
-const (
-	Err404NotFoundWebhookNotFoundStatus404 Err404NotFoundWebhookNotFoundStatus = 404
 )
 
 type Err408RequestTimeoutErrorKey string
@@ -2852,26 +6823,6 @@ const (
 	Err500CaptchaUnavailableInternalServerErrorTableCreateFailedStatus500 Err500CaptchaUnavailableInternalServerErrorTableCreateFailedStatus = 500
 )
 
-type Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey string
-
-const (
-	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKeyCaptchaUnavailable  Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey = "captcha_unavailable"
-	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKeyInternalServerError Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey = "internal_server_error"
-	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKeyWebhookUpdateFailed Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedErrorKey = "webhook_update_failed"
-)
-
-type Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedFieldsItem struct {
-	ErrorKey string `json:"error_key"`
-	Message  string `json:"message"`
-	Path     string `json:"path"`
-}
-
-type Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus int
-
-const (
-	Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus500 Err500CaptchaUnavailableInternalServerErrorWebhookUpdateFailedStatus = 500
-)
-
 type Err502BadGatewayEmailSendFailedErrorKey string
 
 const (
@@ -2996,13 +6947,191 @@ type ExtractTableStreamBody struct {
 	Text *string
 }
 
-type GetOrganizationsWebhookResponse200EventsItem string
+type GetOrganizationsProjectResponse200DefaultInsertMode string
 
 const (
-	GetOrganizationsWebhookResponse200EventsItemBatchComplete GetOrganizationsWebhookResponse200EventsItem = "batch.complete"
-	GetOrganizationsWebhookResponse200EventsItemBatchFailed   GetOrganizationsWebhookResponse200EventsItem = "batch.failed"
-	GetOrganizationsWebhookResponse200EventsItemBatchPartial  GetOrganizationsWebhookResponse200EventsItem = "batch.partial"
-	GetOrganizationsWebhookResponse200EventsItemPing          GetOrganizationsWebhookResponse200EventsItem = "ping"
+	GetOrganizationsProjectResponse200DefaultInsertModeAppend  GetOrganizationsProjectResponse200DefaultInsertMode = "append"
+	GetOrganizationsProjectResponse200DefaultInsertModeDedup   GetOrganizationsProjectResponse200DefaultInsertMode = "dedup"
+	GetOrganizationsProjectResponse200DefaultInsertModeMerge   GetOrganizationsProjectResponse200DefaultInsertMode = "merge"
+	GetOrganizationsProjectResponse200DefaultInsertModeReplace GetOrganizationsProjectResponse200DefaultInsertMode = "replace"
+)
+
+type GetOrganizationsProjectResponse200DefaultStrictness string
+
+const (
+	GetOrganizationsProjectResponse200DefaultStrictnessStrict   GetOrganizationsProjectResponse200DefaultStrictness = "strict"
+	GetOrganizationsProjectResponse200DefaultStrictnessBalanced GetOrganizationsProjectResponse200DefaultStrictness = "balanced"
+	GetOrganizationsProjectResponse200DefaultStrictnessFlexible GetOrganizationsProjectResponse200DefaultStrictness = "flexible"
+)
+
+type GetOrganizationsProjectResponse200Status string
+
+const (
+	GetOrganizationsProjectResponse200StatusActive   GetOrganizationsProjectResponse200Status = "active"
+	GetOrganizationsProjectResponse200StatusArchived GetOrganizationsProjectResponse200Status = "archived"
+)
+
+type GetOrganizationsProjectResponse200Viewer struct {
+	Permissions []GetOrganizationsProjectResponse200ViewerPermissionsItem `json:"permissions"`
+	Sources     GetOrganizationsProjectResponse200ViewerSources           `json:"sources"`
+}
+
+func (s GetOrganizationsProjectResponse200Viewer) MarshalJSON() ([]byte, error) {
+	type plain GetOrganizationsProjectResponse200Viewer
+	p := plain(s)
+	if p.Permissions == nil {
+		p.Permissions = []GetOrganizationsProjectResponse200ViewerPermissionsItem{}
+	}
+	return json.Marshal(p)
+}
+
+type GetOrganizationsProjectResponse200ViewerPermissionsItem string
+
+const (
+	GetOrganizationsProjectResponse200ViewerPermissionsItemApiKeysDelete      GetOrganizationsProjectResponse200ViewerPermissionsItem = "api-keys:delete"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemApiKeysRead        GetOrganizationsProjectResponse200ViewerPermissionsItem = "api-keys:read"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemApiKeysWrite       GetOrganizationsProjectResponse200ViewerPermissionsItem = "api-keys:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemAuditLogsRead      GetOrganizationsProjectResponse200ViewerPermissionsItem = "audit-logs:read"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemColumnsWrite       GetOrganizationsProjectResponse200ViewerPermissionsItem = "columns:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemContentWrite       GetOrganizationsProjectResponse200ViewerPermissionsItem = "content:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemDomainsManage      GetOrganizationsProjectResponse200ViewerPermissionsItem = "domains:manage"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemExportRead         GetOrganizationsProjectResponse200ViewerPermissionsItem = "export:read"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemExtractWrite       GetOrganizationsProjectResponse200ViewerPermissionsItem = "extract:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemMembersDelete      GetOrganizationsProjectResponse200ViewerPermissionsItem = "members:delete"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemMembersInvite      GetOrganizationsProjectResponse200ViewerPermissionsItem = "members:invite"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemMembersRead        GetOrganizationsProjectResponse200ViewerPermissionsItem = "members:read"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemMembersWrite       GetOrganizationsProjectResponse200ViewerPermissionsItem = "members:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemOrganizationDelete GetOrganizationsProjectResponse200ViewerPermissionsItem = "organization:delete"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemOrganizationRead   GetOrganizationsProjectResponse200ViewerPermissionsItem = "organization:read"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemOrganizationWrite  GetOrganizationsProjectResponse200ViewerPermissionsItem = "organization:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemProjectsDelete     GetOrganizationsProjectResponse200ViewerPermissionsItem = "projects:delete"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemProjectsRead       GetOrganizationsProjectResponse200ViewerPermissionsItem = "projects:read"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemProjectsWrite      GetOrganizationsProjectResponse200ViewerPermissionsItem = "projects:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemRowsDelete         GetOrganizationsProjectResponse200ViewerPermissionsItem = "rows:delete"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemRowsRead           GetOrganizationsProjectResponse200ViewerPermissionsItem = "rows:read"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemRowsWrite          GetOrganizationsProjectResponse200ViewerPermissionsItem = "rows:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemTablesDelete       GetOrganizationsProjectResponse200ViewerPermissionsItem = "tables:delete"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemTablesRead         GetOrganizationsProjectResponse200ViewerPermissionsItem = "tables:read"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemTablesWrite        GetOrganizationsProjectResponse200ViewerPermissionsItem = "tables:write"
+	GetOrganizationsProjectResponse200ViewerPermissionsItemWebhooksManage     GetOrganizationsProjectResponse200ViewerPermissionsItem = "webhooks:manage"
+)
+
+type GetOrganizationsProjectResponse200ViewerSources struct {
+	ApiKey  []GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem  `json:"api_key,omitempty"`
+	Org     []GetOrganizationsProjectResponse200ViewerSourcesOrgItem     `json:"org,omitempty"`
+	Project []GetOrganizationsProjectResponse200ViewerSourcesProjectItem `json:"project,omitempty"`
+}
+
+type GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem string
+
+const (
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemApiKeysDelete      GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "api-keys:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemApiKeysRead        GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "api-keys:read"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemApiKeysWrite       GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "api-keys:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemAuditLogsRead      GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "audit-logs:read"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemColumnsWrite       GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "columns:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemContentWrite       GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "content:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemDomainsManage      GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "domains:manage"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemExportRead         GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "export:read"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemExtractWrite       GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "extract:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemMembersDelete      GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "members:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemMembersInvite      GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "members:invite"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemMembersRead        GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "members:read"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemMembersWrite       GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "members:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemOrganizationDelete GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "organization:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemOrganizationRead   GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "organization:read"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemOrganizationWrite  GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "organization:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemProjectsDelete     GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "projects:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemProjectsRead       GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "projects:read"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemProjectsWrite      GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "projects:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemRowsDelete         GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "rows:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemRowsRead           GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "rows:read"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemRowsWrite          GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "rows:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemTablesDelete       GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "tables:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemTablesRead         GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "tables:read"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemTablesWrite        GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "tables:write"
+	GetOrganizationsProjectResponse200ViewerSourcesApiKeyItemWebhooksManage     GetOrganizationsProjectResponse200ViewerSourcesApiKeyItem = "webhooks:manage"
+)
+
+type GetOrganizationsProjectResponse200ViewerSourcesOrgItem string
+
+const (
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemApiKeysDelete      GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "api-keys:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemApiKeysRead        GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "api-keys:read"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemApiKeysWrite       GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "api-keys:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemAuditLogsRead      GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "audit-logs:read"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemColumnsWrite       GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "columns:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemContentWrite       GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "content:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemDomainsManage      GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "domains:manage"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemExportRead         GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "export:read"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemExtractWrite       GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "extract:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemMembersDelete      GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "members:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemMembersInvite      GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "members:invite"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemMembersRead        GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "members:read"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemMembersWrite       GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "members:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemOrganizationDelete GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "organization:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemOrganizationRead   GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "organization:read"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemOrganizationWrite  GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "organization:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemProjectsDelete     GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "projects:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemProjectsRead       GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "projects:read"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemProjectsWrite      GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "projects:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemRowsDelete         GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "rows:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemRowsRead           GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "rows:read"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemRowsWrite          GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "rows:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemTablesDelete       GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "tables:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemTablesRead         GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "tables:read"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemTablesWrite        GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "tables:write"
+	GetOrganizationsProjectResponse200ViewerSourcesOrgItemWebhooksManage     GetOrganizationsProjectResponse200ViewerSourcesOrgItem = "webhooks:manage"
+)
+
+type GetOrganizationsProjectResponse200ViewerSourcesProjectItem string
+
+const (
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemApiKeysDelete      GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "api-keys:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemApiKeysRead        GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "api-keys:read"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemApiKeysWrite       GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "api-keys:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemAuditLogsRead      GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "audit-logs:read"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemColumnsWrite       GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "columns:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemContentWrite       GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "content:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemDomainsManage      GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "domains:manage"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemExportRead         GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "export:read"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemExtractWrite       GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "extract:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemMembersDelete      GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "members:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemMembersInvite      GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "members:invite"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemMembersRead        GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "members:read"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemMembersWrite       GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "members:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemOrganizationDelete GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "organization:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemOrganizationRead   GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "organization:read"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemOrganizationWrite  GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "organization:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemProjectsDelete     GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "projects:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemProjectsRead       GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "projects:read"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemProjectsWrite      GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "projects:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemRowsDelete         GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "rows:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemRowsRead           GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "rows:read"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemRowsWrite          GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "rows:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemTablesDelete       GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "tables:delete"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemTablesRead         GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "tables:read"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemTablesWrite        GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "tables:write"
+	GetOrganizationsProjectResponse200ViewerSourcesProjectItemWebhooksManage     GetOrganizationsProjectResponse200ViewerSourcesProjectItem = "webhooks:manage"
+)
+
+type GetOrganizationsProjectResponse404ErrorKey string
+
+const (
+	GetOrganizationsProjectResponse404ErrorKeyNotFound        GetOrganizationsProjectResponse404ErrorKey = "not_found"
+	GetOrganizationsProjectResponse404ErrorKeyProjectNotFound GetOrganizationsProjectResponse404ErrorKey = "project_not_found"
+)
+
+type GetOrganizationsProjectResponse404FieldsItem struct {
+	ErrorKey string `json:"error_key"`
+	Message  string `json:"message"`
+	Path     string `json:"path"`
+}
+
+type GetOrganizationsProjectResponse404Status int
+
+const (
+	GetOrganizationsProjectResponse404Status404 GetOrganizationsProjectResponse404Status = 404
 )
 
 type GetProjectsBatcheResponse200ActorType string
@@ -3160,8 +7289,54 @@ const (
 	GetProjectsExportResponse404Status404 GetProjectsExportResponse404Status = 404
 )
 
+type GetProjectsTableResponse200ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode4                                 `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                `json:"default,omitempty"`
+	Description  Nullable[string]                               `json:"description,omitzero"`
+	Id           string                                         `json:"id"`
+	Instruction  Nullable[string]                               `json:"instruction,omitzero"`
+	Name         string                                         `json:"name"`
+	Options      []string                                       `json:"options,omitempty"`
+	Required     bool                                           `json:"required"`
+	Searchable   *bool                                          `json:"searchable,omitempty"`
+	Type         GetProjectsTableResponse200ColumnsJsonItemType `json:"type"`
+}
+
+type GetProjectsTableResponse200ColumnsJsonItemType string
+
+const (
+	GetProjectsTableResponse200ColumnsJsonItemTypeArray       GetProjectsTableResponse200ColumnsJsonItemType = "array"
+	GetProjectsTableResponse200ColumnsJsonItemTypeBoolean     GetProjectsTableResponse200ColumnsJsonItemType = "boolean"
+	GetProjectsTableResponse200ColumnsJsonItemTypeCurrency    GetProjectsTableResponse200ColumnsJsonItemType = "currency"
+	GetProjectsTableResponse200ColumnsJsonItemTypeDate        GetProjectsTableResponse200ColumnsJsonItemType = "date"
+	GetProjectsTableResponse200ColumnsJsonItemTypeEmail       GetProjectsTableResponse200ColumnsJsonItemType = "email"
+	GetProjectsTableResponse200ColumnsJsonItemTypeEnum        GetProjectsTableResponse200ColumnsJsonItemType = "enum"
+	GetProjectsTableResponse200ColumnsJsonItemTypeMultiSelect GetProjectsTableResponse200ColumnsJsonItemType = "multi_select"
+	GetProjectsTableResponse200ColumnsJsonItemTypeNumber      GetProjectsTableResponse200ColumnsJsonItemType = "number"
+	GetProjectsTableResponse200ColumnsJsonItemTypeString      GetProjectsTableResponse200ColumnsJsonItemType = "string"
+	GetProjectsTableResponse200ColumnsJsonItemTypeText        GetProjectsTableResponse200ColumnsJsonItemType = "text"
+	GetProjectsTableResponse200ColumnsJsonItemTypeUrl         GetProjectsTableResponse200ColumnsJsonItemType = "url"
+)
+
+type GetProjectsTableResponse200InsertMode string
+
+const (
+	GetProjectsTableResponse200InsertModeAppend  GetProjectsTableResponse200InsertMode = "append"
+	GetProjectsTableResponse200InsertModeDedup   GetProjectsTableResponse200InsertMode = "dedup"
+	GetProjectsTableResponse200InsertModeMerge   GetProjectsTableResponse200InsertMode = "merge"
+	GetProjectsTableResponse200InsertModeReplace GetProjectsTableResponse200InsertMode = "replace"
+)
+
+type GetProjectsTableResponse200Strictness string
+
+const (
+	GetProjectsTableResponse200StrictnessStrict   GetProjectsTableResponse200Strictness = "strict"
+	GetProjectsTableResponse200StrictnessBalanced GetProjectsTableResponse200Strictness = "balanced"
+	GetProjectsTableResponse200StrictnessFlexible GetProjectsTableResponse200Strictness = "flexible"
+)
+
 type GetProjectsTableTemplateResponse200ColumnsJsonItem struct {
-	CurrencyCode *string                                                `json:"currency_code,omitempty"`
+	CurrencyCode *CurrencyCode14                                        `json:"currency_code,omitempty"`
 	Default      json.RawMessage                                        `json:"default,omitempty"`
 	Description  Nullable[string]                                       `json:"description,omitzero"`
 	Id           string                                                 `json:"id"`
@@ -3204,69 +7379,6 @@ const (
 	GetProjectsTableTemplateResponse200StrictnessStrict   GetProjectsTableTemplateResponse200Strictness = "strict"
 	GetProjectsTableTemplateResponse200StrictnessBalanced GetProjectsTableTemplateResponse200Strictness = "balanced"
 	GetProjectsTableTemplateResponse200StrictnessFlexible GetProjectsTableTemplateResponse200Strictness = "flexible"
-)
-
-type ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItem struct {
-	Attempt      int64                                                              `json:"attempt"`
-	CreatedAt    int64                                                              `json:"created_at"`
-	DeliveredAt  *int64                                                             `json:"delivered_at"`
-	Event        ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent  `json:"event"`
-	HttpStatus   *int64                                                             `json:"http_status"`
-	Id           string                                                             `json:"id"`
-	NextRetryAt  *int64                                                             `json:"next_retry_at"`
-	PayloadJson  string                                                             `json:"payload_json"`
-	ResponseBody *string                                                            `json:"response_body"`
-	Status       ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus `json:"status"`
-	WebhookId    string                                                             `json:"webhook_id"`
-}
-
-type ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent string
-
-const (
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventBatchComplete ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "batch.complete"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventBatchFailed   ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "batch.failed"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventBatchPartial  ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "batch.partial"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEventPing          ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemEvent = "ping"
-)
-
-type ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus string
-
-const (
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatusPending ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus = "pending"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatusSuccess ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus = "success"
-	ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatusFailed  ListOrganizationsWebhooksDeliveriesResponse200DeliveriesItemStatus = "failed"
-)
-
-type ListOrganizationsWebhooksResponse200WebhooksItem struct {
-	Active          bool                                                         `json:"active"`
-	CreatedAt       int64                                                        `json:"created_at"`
-	Events          []ListOrganizationsWebhooksResponse200WebhooksItemEventsItem `json:"events"`
-	FailureCount    int64                                                        `json:"failure_count"`
-	Id              string                                                       `json:"id"`
-	LastTriggeredAt *int64                                                       `json:"last_triggered_at"`
-	Name            *string                                                      `json:"name"`
-	OrganizationId  string                                                       `json:"organization_id"`
-	SecretRotatedAt *int64                                                       `json:"secret_rotated_at"`
-	UpdatedAt       int64                                                        `json:"updated_at"`
-	Url             string                                                       `json:"url"`
-}
-
-func (s ListOrganizationsWebhooksResponse200WebhooksItem) MarshalJSON() ([]byte, error) {
-	type plain ListOrganizationsWebhooksResponse200WebhooksItem
-	p := plain(s)
-	if p.Events == nil {
-		p.Events = []ListOrganizationsWebhooksResponse200WebhooksItemEventsItem{}
-	}
-	return json.Marshal(p)
-}
-
-type ListOrganizationsWebhooksResponse200WebhooksItemEventsItem string
-
-const (
-	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemBatchComplete ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "batch.complete"
-	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemBatchFailed   ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "batch.failed"
-	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemBatchPartial  ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "batch.partial"
-	ListOrganizationsWebhooksResponse200WebhooksItemEventsItemPing          ListOrganizationsWebhooksResponse200WebhooksItemEventsItem = "ping"
 )
 
 type ListProjectsBatchesResponse200BatchesItem struct {
@@ -3395,7 +7507,7 @@ func (s ListProjectsTableTemplatesResponse200TemplatesItem) MarshalJSON() ([]byt
 }
 
 type ListProjectsTableTemplatesResponse200TemplatesItemColumnsJsonItem struct {
-	CurrencyCode *string                                                               `json:"currency_code,omitempty"`
+	CurrencyCode *CurrencyCode13                                                       `json:"currency_code,omitempty"`
 	Default      json.RawMessage                                                       `json:"default,omitempty"`
 	Description  Nullable[string]                                                      `json:"description,omitzero"`
 	Id           string                                                                `json:"id"`
@@ -3514,7 +7626,7 @@ func (s ListProjectsTablesResponse200TablesItem) MarshalJSON() ([]byte, error) {
 }
 
 type ListProjectsTablesResponse200TablesItemColumnsJsonItem struct {
-	CurrencyCode *string                                                    `json:"currency_code,omitempty"`
+	CurrencyCode *CurrencyCode                                              `json:"currency_code,omitempty"`
 	Default      json.RawMessage                                            `json:"default,omitempty"`
 	Description  Nullable[string]                                           `json:"description,omitzero"`
 	Id           string                                                     `json:"id"`
@@ -3602,6 +7714,127 @@ const (
 	ListProjectsTablesRowsSourceResponse404Status404 ListProjectsTablesRowsSourceResponse404Status = 404
 )
 
+type ListTableTemplatesResponse200TemplatesItem struct {
+	Category           string                                                      `json:"category"`
+	ColumnsJson        []ListTableTemplatesResponse200TemplatesItemColumnsJsonItem `json:"columns_json"`
+	CreatedAt          int64                                                       `json:"created_at"`
+	CreatorDisplayName *string                                                     `json:"creator_display_name"`
+	CreatorUserId      *string                                                     `json:"creator_user_id"`
+	Description        *string                                                     `json:"description"`
+	Id                 string                                                      `json:"id"`
+	InsertMode         ListTableTemplatesResponse200TemplatesItemInsertMode        `json:"insert_mode"`
+	Instruction        *string                                                     `json:"instruction"`
+	MergeColumnsJson   []string                                                    `json:"merge_columns_json"`
+	Name               string                                                      `json:"name"`
+	Strictness         ListTableTemplatesResponse200TemplatesItemStrictness        `json:"strictness"`
+	UpdatedAt          int64                                                       `json:"updated_at"`
+	UsageCount         int64                                                       `json:"usage_count"`
+}
+
+func (s ListTableTemplatesResponse200TemplatesItem) MarshalJSON() ([]byte, error) {
+	type plain ListTableTemplatesResponse200TemplatesItem
+	p := plain(s)
+	if p.ColumnsJson == nil {
+		p.ColumnsJson = []ListTableTemplatesResponse200TemplatesItemColumnsJsonItem{}
+	}
+	if p.MergeColumnsJson == nil {
+		p.MergeColumnsJson = []string{}
+	}
+	return json.Marshal(p)
+}
+
+type ListTableTemplatesResponse200TemplatesItemColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode18                                               `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                               `json:"default,omitempty"`
+	Description  Nullable[string]                                              `json:"description,omitzero"`
+	Id           string                                                        `json:"id"`
+	Instruction  Nullable[string]                                              `json:"instruction,omitzero"`
+	Name         string                                                        `json:"name"`
+	Options      []string                                                      `json:"options,omitempty"`
+	Required     bool                                                          `json:"required"`
+	Searchable   *bool                                                         `json:"searchable,omitempty"`
+	Type         ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType `json:"type"`
+}
+
+type ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType string
+
+const (
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeArray       ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "array"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeBoolean     ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "boolean"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeCurrency    ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "currency"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeDate        ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "date"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeEmail       ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "email"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeEnum        ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "enum"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeMultiSelect ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "multi_select"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeNumber      ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "number"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeString      ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "string"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeText        ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "text"
+	ListTableTemplatesResponse200TemplatesItemColumnsJsonItemTypeUrl         ListTableTemplatesResponse200TemplatesItemColumnsJsonItemType = "url"
+)
+
+type ListTableTemplatesResponse200TemplatesItemInsertMode string
+
+const (
+	ListTableTemplatesResponse200TemplatesItemInsertModeAppend  ListTableTemplatesResponse200TemplatesItemInsertMode = "append"
+	ListTableTemplatesResponse200TemplatesItemInsertModeDedup   ListTableTemplatesResponse200TemplatesItemInsertMode = "dedup"
+	ListTableTemplatesResponse200TemplatesItemInsertModeMerge   ListTableTemplatesResponse200TemplatesItemInsertMode = "merge"
+	ListTableTemplatesResponse200TemplatesItemInsertModeReplace ListTableTemplatesResponse200TemplatesItemInsertMode = "replace"
+)
+
+type ListTableTemplatesResponse200TemplatesItemStrictness string
+
+const (
+	ListTableTemplatesResponse200TemplatesItemStrictnessStrict   ListTableTemplatesResponse200TemplatesItemStrictness = "strict"
+	ListTableTemplatesResponse200TemplatesItemStrictnessBalanced ListTableTemplatesResponse200TemplatesItemStrictness = "balanced"
+	ListTableTemplatesResponse200TemplatesItemStrictnessFlexible ListTableTemplatesResponse200TemplatesItemStrictness = "flexible"
+)
+
+type ReplaceProjectsTablesColumnResponse200ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode12                                           `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                           `json:"default,omitempty"`
+	Description  Nullable[string]                                          `json:"description,omitzero"`
+	Id           string                                                    `json:"id"`
+	Instruction  Nullable[string]                                          `json:"instruction,omitzero"`
+	Name         string                                                    `json:"name"`
+	Options      []string                                                  `json:"options,omitempty"`
+	Required     bool                                                      `json:"required"`
+	Searchable   *bool                                                     `json:"searchable,omitempty"`
+	Type         ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType `json:"type"`
+}
+
+type ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType string
+
+const (
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeArray       ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "array"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeBoolean     ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "boolean"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeCurrency    ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "currency"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeDate        ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "date"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeEmail       ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "email"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeEnum        ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "enum"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeMultiSelect ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "multi_select"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeNumber      ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "number"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeString      ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "string"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeText        ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "text"
+	ReplaceProjectsTablesColumnResponse200ColumnsJsonItemTypeUrl         ReplaceProjectsTablesColumnResponse200ColumnsJsonItemType = "url"
+)
+
+type ReplaceProjectsTablesColumnResponse200InsertMode string
+
+const (
+	ReplaceProjectsTablesColumnResponse200InsertModeAppend  ReplaceProjectsTablesColumnResponse200InsertMode = "append"
+	ReplaceProjectsTablesColumnResponse200InsertModeDedup   ReplaceProjectsTablesColumnResponse200InsertMode = "dedup"
+	ReplaceProjectsTablesColumnResponse200InsertModeMerge   ReplaceProjectsTablesColumnResponse200InsertMode = "merge"
+	ReplaceProjectsTablesColumnResponse200InsertModeReplace ReplaceProjectsTablesColumnResponse200InsertMode = "replace"
+)
+
+type ReplaceProjectsTablesColumnResponse200Strictness string
+
+const (
+	ReplaceProjectsTablesColumnResponse200StrictnessStrict   ReplaceProjectsTablesColumnResponse200Strictness = "strict"
+	ReplaceProjectsTablesColumnResponse200StrictnessBalanced ReplaceProjectsTablesColumnResponse200Strictness = "balanced"
+	ReplaceProjectsTablesColumnResponse200StrictnessFlexible ReplaceProjectsTablesColumnResponse200Strictness = "flexible"
+)
+
 type ReplaceProjectsTablesColumnResponse400ErrorKey string
 
 const (
@@ -3669,15 +7902,6 @@ const (
 	TableExportOptsSchemaFalse TableExportOptsSchema = "false"
 )
 
-type UpdateOrganizationsWebhookRequestEventsItem string
-
-const (
-	UpdateOrganizationsWebhookRequestEventsItemBatchComplete UpdateOrganizationsWebhookRequestEventsItem = "batch.complete"
-	UpdateOrganizationsWebhookRequestEventsItemBatchFailed   UpdateOrganizationsWebhookRequestEventsItem = "batch.failed"
-	UpdateOrganizationsWebhookRequestEventsItemBatchPartial  UpdateOrganizationsWebhookRequestEventsItem = "batch.partial"
-	UpdateOrganizationsWebhookRequestEventsItemPing          UpdateOrganizationsWebhookRequestEventsItem = "ping"
-)
-
 type UpdateProjectsTableRequestInsertMode string
 
 const (
@@ -3693,6 +7917,52 @@ const (
 	UpdateProjectsTableRequestStrictnessStrict   UpdateProjectsTableRequestStrictness = "strict"
 	UpdateProjectsTableRequestStrictnessBalanced UpdateProjectsTableRequestStrictness = "balanced"
 	UpdateProjectsTableRequestStrictnessFlexible UpdateProjectsTableRequestStrictness = "flexible"
+)
+
+type UpdateProjectsTableResponse200ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode5                                    `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                   `json:"default,omitempty"`
+	Description  Nullable[string]                                  `json:"description,omitzero"`
+	Id           string                                            `json:"id"`
+	Instruction  Nullable[string]                                  `json:"instruction,omitzero"`
+	Name         string                                            `json:"name"`
+	Options      []string                                          `json:"options,omitempty"`
+	Required     bool                                              `json:"required"`
+	Searchable   *bool                                             `json:"searchable,omitempty"`
+	Type         UpdateProjectsTableResponse200ColumnsJsonItemType `json:"type"`
+}
+
+type UpdateProjectsTableResponse200ColumnsJsonItemType string
+
+const (
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeArray       UpdateProjectsTableResponse200ColumnsJsonItemType = "array"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeBoolean     UpdateProjectsTableResponse200ColumnsJsonItemType = "boolean"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeCurrency    UpdateProjectsTableResponse200ColumnsJsonItemType = "currency"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeDate        UpdateProjectsTableResponse200ColumnsJsonItemType = "date"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeEmail       UpdateProjectsTableResponse200ColumnsJsonItemType = "email"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeEnum        UpdateProjectsTableResponse200ColumnsJsonItemType = "enum"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeMultiSelect UpdateProjectsTableResponse200ColumnsJsonItemType = "multi_select"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeNumber      UpdateProjectsTableResponse200ColumnsJsonItemType = "number"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeString      UpdateProjectsTableResponse200ColumnsJsonItemType = "string"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeText        UpdateProjectsTableResponse200ColumnsJsonItemType = "text"
+	UpdateProjectsTableResponse200ColumnsJsonItemTypeUrl         UpdateProjectsTableResponse200ColumnsJsonItemType = "url"
+)
+
+type UpdateProjectsTableResponse200InsertMode string
+
+const (
+	UpdateProjectsTableResponse200InsertModeAppend  UpdateProjectsTableResponse200InsertMode = "append"
+	UpdateProjectsTableResponse200InsertModeDedup   UpdateProjectsTableResponse200InsertMode = "dedup"
+	UpdateProjectsTableResponse200InsertModeMerge   UpdateProjectsTableResponse200InsertMode = "merge"
+	UpdateProjectsTableResponse200InsertModeReplace UpdateProjectsTableResponse200InsertMode = "replace"
+)
+
+type UpdateProjectsTableResponse200Strictness string
+
+const (
+	UpdateProjectsTableResponse200StrictnessStrict   UpdateProjectsTableResponse200Strictness = "strict"
+	UpdateProjectsTableResponse200StrictnessBalanced UpdateProjectsTableResponse200Strictness = "balanced"
+	UpdateProjectsTableResponse200StrictnessFlexible UpdateProjectsTableResponse200Strictness = "flexible"
 )
 
 type UpdateProjectsTableResponse500ErrorKey string
@@ -3729,6 +7999,52 @@ const (
 	UpdateProjectsTablesColumnRequestTypeString      UpdateProjectsTablesColumnRequestType = "string"
 	UpdateProjectsTablesColumnRequestTypeText        UpdateProjectsTablesColumnRequestType = "text"
 	UpdateProjectsTablesColumnRequestTypeUrl         UpdateProjectsTablesColumnRequestType = "url"
+)
+
+type UpdateProjectsTablesColumnResponse200ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode10                                          `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                          `json:"default,omitempty"`
+	Description  Nullable[string]                                         `json:"description,omitzero"`
+	Id           string                                                   `json:"id"`
+	Instruction  Nullable[string]                                         `json:"instruction,omitzero"`
+	Name         string                                                   `json:"name"`
+	Options      []string                                                 `json:"options,omitempty"`
+	Required     bool                                                     `json:"required"`
+	Searchable   *bool                                                    `json:"searchable,omitempty"`
+	Type         UpdateProjectsTablesColumnResponse200ColumnsJsonItemType `json:"type"`
+}
+
+type UpdateProjectsTablesColumnResponse200ColumnsJsonItemType string
+
+const (
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeArray       UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "array"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeBoolean     UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "boolean"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeCurrency    UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "currency"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeDate        UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "date"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeEmail       UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "email"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeEnum        UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "enum"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeMultiSelect UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "multi_select"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeNumber      UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "number"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeString      UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "string"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeText        UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "text"
+	UpdateProjectsTablesColumnResponse200ColumnsJsonItemTypeUrl         UpdateProjectsTablesColumnResponse200ColumnsJsonItemType = "url"
+)
+
+type UpdateProjectsTablesColumnResponse200InsertMode string
+
+const (
+	UpdateProjectsTablesColumnResponse200InsertModeAppend  UpdateProjectsTablesColumnResponse200InsertMode = "append"
+	UpdateProjectsTablesColumnResponse200InsertModeDedup   UpdateProjectsTablesColumnResponse200InsertMode = "dedup"
+	UpdateProjectsTablesColumnResponse200InsertModeMerge   UpdateProjectsTablesColumnResponse200InsertMode = "merge"
+	UpdateProjectsTablesColumnResponse200InsertModeReplace UpdateProjectsTablesColumnResponse200InsertMode = "replace"
+)
+
+type UpdateProjectsTablesColumnResponse200Strictness string
+
+const (
+	UpdateProjectsTablesColumnResponse200StrictnessStrict   UpdateProjectsTablesColumnResponse200Strictness = "strict"
+	UpdateProjectsTablesColumnResponse200StrictnessBalanced UpdateProjectsTablesColumnResponse200Strictness = "balanced"
+	UpdateProjectsTablesColumnResponse200StrictnessFlexible UpdateProjectsTablesColumnResponse200Strictness = "flexible"
 )
 
 type UpdateProjectsTablesColumnResponse422ErrorKey string
@@ -3790,6 +8106,35 @@ const (
 	UpdateProjectsTablesRowResponse500Status500 UpdateProjectsTablesRowResponse500Status = 500
 )
 
+type UpdateTableTemplateRequestColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode19                                `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                `json:"default,omitempty"`
+	Description  Nullable[string]                               `json:"description,omitzero"`
+	Id           string                                         `json:"id"`
+	Instruction  Nullable[string]                               `json:"instruction,omitzero"`
+	Name         string                                         `json:"name"`
+	Options      []string                                       `json:"options,omitempty"`
+	Required     *bool                                          `json:"required,omitempty"`
+	Searchable   *bool                                          `json:"searchable,omitempty"`
+	Type         *UpdateTableTemplateRequestColumnsJsonItemType `json:"type,omitempty"`
+}
+
+type UpdateTableTemplateRequestColumnsJsonItemType string
+
+const (
+	UpdateTableTemplateRequestColumnsJsonItemTypeArray       UpdateTableTemplateRequestColumnsJsonItemType = "array"
+	UpdateTableTemplateRequestColumnsJsonItemTypeBoolean     UpdateTableTemplateRequestColumnsJsonItemType = "boolean"
+	UpdateTableTemplateRequestColumnsJsonItemTypeCurrency    UpdateTableTemplateRequestColumnsJsonItemType = "currency"
+	UpdateTableTemplateRequestColumnsJsonItemTypeDate        UpdateTableTemplateRequestColumnsJsonItemType = "date"
+	UpdateTableTemplateRequestColumnsJsonItemTypeEmail       UpdateTableTemplateRequestColumnsJsonItemType = "email"
+	UpdateTableTemplateRequestColumnsJsonItemTypeEnum        UpdateTableTemplateRequestColumnsJsonItemType = "enum"
+	UpdateTableTemplateRequestColumnsJsonItemTypeMultiSelect UpdateTableTemplateRequestColumnsJsonItemType = "multi_select"
+	UpdateTableTemplateRequestColumnsJsonItemTypeNumber      UpdateTableTemplateRequestColumnsJsonItemType = "number"
+	UpdateTableTemplateRequestColumnsJsonItemTypeString      UpdateTableTemplateRequestColumnsJsonItemType = "string"
+	UpdateTableTemplateRequestColumnsJsonItemTypeText        UpdateTableTemplateRequestColumnsJsonItemType = "text"
+	UpdateTableTemplateRequestColumnsJsonItemTypeUrl         UpdateTableTemplateRequestColumnsJsonItemType = "url"
+)
+
 type UpdateTableTemplateRequestInsertMode string
 
 const (
@@ -3805,6 +8150,52 @@ const (
 	UpdateTableTemplateRequestStrictnessStrict   UpdateTableTemplateRequestStrictness = "strict"
 	UpdateTableTemplateRequestStrictnessBalanced UpdateTableTemplateRequestStrictness = "balanced"
 	UpdateTableTemplateRequestStrictnessFlexible UpdateTableTemplateRequestStrictness = "flexible"
+)
+
+type UpdateTableTemplateResponse200ColumnsJsonItem struct {
+	CurrencyCode *CurrencyCode20                                   `json:"currency_code,omitempty"`
+	Default      json.RawMessage                                   `json:"default,omitempty"`
+	Description  Nullable[string]                                  `json:"description,omitzero"`
+	Id           string                                            `json:"id"`
+	Instruction  Nullable[string]                                  `json:"instruction,omitzero"`
+	Name         string                                            `json:"name"`
+	Options      []string                                          `json:"options,omitempty"`
+	Required     bool                                              `json:"required"`
+	Searchable   *bool                                             `json:"searchable,omitempty"`
+	Type         UpdateTableTemplateResponse200ColumnsJsonItemType `json:"type"`
+}
+
+type UpdateTableTemplateResponse200ColumnsJsonItemType string
+
+const (
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeArray       UpdateTableTemplateResponse200ColumnsJsonItemType = "array"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeBoolean     UpdateTableTemplateResponse200ColumnsJsonItemType = "boolean"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeCurrency    UpdateTableTemplateResponse200ColumnsJsonItemType = "currency"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeDate        UpdateTableTemplateResponse200ColumnsJsonItemType = "date"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeEmail       UpdateTableTemplateResponse200ColumnsJsonItemType = "email"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeEnum        UpdateTableTemplateResponse200ColumnsJsonItemType = "enum"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeMultiSelect UpdateTableTemplateResponse200ColumnsJsonItemType = "multi_select"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeNumber      UpdateTableTemplateResponse200ColumnsJsonItemType = "number"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeString      UpdateTableTemplateResponse200ColumnsJsonItemType = "string"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeText        UpdateTableTemplateResponse200ColumnsJsonItemType = "text"
+	UpdateTableTemplateResponse200ColumnsJsonItemTypeUrl         UpdateTableTemplateResponse200ColumnsJsonItemType = "url"
+)
+
+type UpdateTableTemplateResponse200InsertMode string
+
+const (
+	UpdateTableTemplateResponse200InsertModeAppend  UpdateTableTemplateResponse200InsertMode = "append"
+	UpdateTableTemplateResponse200InsertModeDedup   UpdateTableTemplateResponse200InsertMode = "dedup"
+	UpdateTableTemplateResponse200InsertModeMerge   UpdateTableTemplateResponse200InsertMode = "merge"
+	UpdateTableTemplateResponse200InsertModeReplace UpdateTableTemplateResponse200InsertMode = "replace"
+)
+
+type UpdateTableTemplateResponse200Strictness string
+
+const (
+	UpdateTableTemplateResponse200StrictnessStrict   UpdateTableTemplateResponse200Strictness = "strict"
+	UpdateTableTemplateResponse200StrictnessBalanced UpdateTableTemplateResponse200Strictness = "balanced"
+	UpdateTableTemplateResponse200StrictnessFlexible UpdateTableTemplateResponse200Strictness = "flexible"
 )
 
 type UpdateTableTemplateResponse500ErrorKey string
@@ -3827,19 +8218,79 @@ const (
 	UpdateTableTemplateResponse500Status500 UpdateTableTemplateResponse500Status = 500
 )
 
-type WebhookDeliveriesOptsEvent string
-
+// The error keys the API declares: errors.Is(err, key) matches a *ClientError carrying key.
 const (
-	WebhookDeliveriesOptsEventBatchComplete WebhookDeliveriesOptsEvent = "batch.complete"
-	WebhookDeliveriesOptsEventBatchFailed   WebhookDeliveriesOptsEvent = "batch.failed"
-	WebhookDeliveriesOptsEventBatchPartial  WebhookDeliveriesOptsEvent = "batch.partial"
-	WebhookDeliveriesOptsEventPing          WebhookDeliveriesOptsEvent = "ping"
-)
-
-type WebhookDeliveriesOptsStatus string
-
-const (
-	WebhookDeliveriesOptsStatusPending WebhookDeliveriesOptsStatus = "pending"
-	WebhookDeliveriesOptsStatusSuccess WebhookDeliveriesOptsStatus = "success"
-	WebhookDeliveriesOptsStatusFailed  WebhookDeliveriesOptsStatus = "failed"
+	ErrApiRequestLimitExceeded     ErrorKey = "api_request_limit_exceeded"
+	ErrBadGateway                  ErrorKey = "bad_gateway"
+	ErrBatchDownloadFailed         ErrorKey = "batch_download_failed"
+	ErrBatchNotComplete            ErrorKey = "batch_not_complete"
+	ErrBatchNotFound               ErrorKey = "batch_not_found"
+	ErrBatchResultEmpty            ErrorKey = "batch_result_empty"
+	ErrCaptchaFailed               ErrorKey = "captcha_failed"
+	ErrCaptchaRequired             ErrorKey = "captcha_required"
+	ErrCaptchaUnavailable          ErrorKey = "captcha_unavailable"
+	ErrColumnAddFailed             ErrorKey = "column_add_failed"
+	ErrColumnInMergeKey            ErrorKey = "column_in_merge_key"
+	ErrColumnLimitReached          ErrorKey = "column_limit_reached"
+	ErrColumnMinimumRequired       ErrorKey = "column_minimum_required"
+	ErrColumnNameTaken             ErrorKey = "column_name_taken"
+	ErrColumnNotFound              ErrorKey = "column_not_found"
+	ErrColumnRemoveFailed          ErrorKey = "column_remove_failed"
+	ErrColumnRenameFailed          ErrorKey = "column_rename_failed"
+	ErrColumnReorderMismatch       ErrorKey = "column_reorder_mismatch"
+	ErrColumnRetypeTooLarge        ErrorKey = "column_retype_too_large"
+	ErrContentTooLarge             ErrorKey = "content_too_large"
+	ErrCreditLimitExceeded         ErrorKey = "credit_limit_exceeded"
+	ErrEmailNotVerified            ErrorKey = "email_not_verified"
+	ErrEmailSendFailed             ErrorKey = "email_send_failed"
+	ErrExportFailed                ErrorKey = "export_failed"
+	ErrExportLimitExceeded         ErrorKey = "export_limit_exceeded"
+	ErrExportNotFound              ErrorKey = "export_not_found"
+	ErrExtractionFailed            ErrorKey = "extraction_failed"
+	ErrExtractionUnavailable       ErrorKey = "extraction_unavailable"
+	ErrExtractionUnprocessable     ErrorKey = "extraction_unprocessable"
+	ErrFeatureNotAvailable         ErrorKey = "feature_not_available"
+	ErrFileCountPlanLimit          ErrorKey = "file_count_plan_limit"
+	ErrFileSizePlanLimit           ErrorKey = "file_size_plan_limit"
+	ErrForbidden                   ErrorKey = "forbidden"
+	ErrGatewayTimeout              ErrorKey = "gateway_timeout"
+	ErrImpersonationEnded          ErrorKey = "impersonation_ended"
+	ErrImpersonationForbidden      ErrorKey = "impersonation_forbidden"
+	ErrInternalServerError         ErrorKey = "internal_server_error"
+	ErrInvalidAggregation          ErrorKey = "invalid_aggregation"
+	ErrInvalidFilter               ErrorKey = "invalid_filter"
+	ErrInvalidInput                ErrorKey = "invalid_input"
+	ErrNotFound                    ErrorKey = "not_found"
+	ErrOptimisticLockConflict      ErrorKey = "optimistic_lock_conflict"
+	ErrOrgSuspended                ErrorKey = "org_suspended"
+	ErrProjectNotFound             ErrorKey = "project_not_found"
+	ErrRequestTimeout              ErrorKey = "request_timeout"
+	ErrRowBulkFailed               ErrorKey = "row_bulk_failed"
+	ErrRowCreateFailed             ErrorKey = "row_create_failed"
+	ErrRowDeleteFailed             ErrorKey = "row_delete_failed"
+	ErrRowNotFound                 ErrorKey = "row_not_found"
+	ErrRowPlanLimit                ErrorKey = "row_plan_limit"
+	ErrRowSourceNotFound           ErrorKey = "row_source_not_found"
+	ErrRowUpdateFailed             ErrorKey = "row_update_failed"
+	ErrRowValidationFailed         ErrorKey = "row_validation_failed"
+	ErrServiceUnavailable          ErrorKey = "service_unavailable"
+	ErrTableCreateFailed           ErrorKey = "table_create_failed"
+	ErrTableDeleteExpired          ErrorKey = "table_delete_expired"
+	ErrTableDuplicateFailed        ErrorKey = "table_duplicate_failed"
+	ErrTableNotFound               ErrorKey = "table_not_found"
+	ErrTablePlanLimit              ErrorKey = "table_plan_limit"
+	ErrTableProjectIdSlugDuplicate ErrorKey = "table_project_id_slug_duplicate"
+	ErrTableRestoreFailed          ErrorKey = "table_restore_failed"
+	ErrTableSoftDeleted            ErrorKey = "table_soft_deleted"
+	ErrTableTemplateCreateFailed   ErrorKey = "table_template_create_failed"
+	ErrTableTemplateDeleteFailed   ErrorKey = "table_template_delete_failed"
+	ErrTableTemplateForbidden      ErrorKey = "table_template_forbidden"
+	ErrTableTemplateNotFound       ErrorKey = "table_template_not_found"
+	ErrTableTemplateUpdateFailed   ErrorKey = "table_template_update_failed"
+	ErrTableUpdateFailed           ErrorKey = "table_update_failed"
+	ErrTokenContextMismatch        ErrorKey = "token_context_mismatch"
+	ErrTooManyRequests             ErrorKey = "too_many_requests"
+	ErrUnauthorized                ErrorKey = "unauthorized"
+	ErrUnprocessableEntity         ErrorKey = "unprocessable_entity"
+	ErrUnsupportedMediaType        ErrorKey = "unsupported_media_type"
 )

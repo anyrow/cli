@@ -6,7 +6,8 @@ cmd/
 internal/
 go.mod
 go.sum
-install.sh
-install.ps1
 skills/
 .honey-generated.json
+.goreleaser.yaml
+installgen.config.mts
+.github/

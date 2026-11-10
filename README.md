@@ -6,7 +6,30 @@ Command-line interface for the [Anyrow](https://anyrow.ai) API.
 
 ## Install
 
-Download a prebuilt binary from [Releases](https://github.com/anyrow/cli/releases), or build from source:
+macOS and Linux:
+
+```bash
+curl -fsSL https://anyrow.ai/cli/install.sh | sh
+```
+
+Windows (PowerShell):
+
+```powershell
+irm https://anyrow.ai/cli/install.ps1 | iex
+```
+
+Both install the latest release to `~/.local/bin` and check the archive's sha256. When [cosign](https://docs.sigstore.dev/cosign/system_config/installation/) is on your `PATH`, they also verify the release's signature; set `ANYROW_INSTALL_VERIFY=require` to refuse an install without it. `ANYROW_VERSION` pins a version and `ANYROW_INSTALL_DIR` picks the directory.
+
+Package managers:
+
+```bash
+brew install --cask anyrow/tap/anyrow                                                  # Homebrew
+scoop bucket add anyrow https://github.com/anyrow/scoop-bucket && scoop install anyrow  # Scoop
+winget install Anyrow.anyrow                                                           # winget
+yay -S anyrow-bin                                                                      # AUR
+```
+
+`.deb`, `.rpm` and `.apk` packages and every archive are on [Releases](https://github.com/anyrow/cli/releases). From source:
 
 ```bash
 go install github.com/anyrow/cli@latest

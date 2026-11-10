@@ -16,17 +16,17 @@ type Client struct {
 	Column        *ColumnResource
 	Export        *ExportResource
 	Extract       *ExtractResource
+	Project       *ProjectResource
 	Row           *RowResource
 	Suggest       *SuggestResource
 	Table         *TableResource
 	TableTemplate *TableTemplateResource
-	Webhook       *WebhookResource
 }
 
-// NewClient returns a client for cfg. An empty Config.BaseURL defaults to the API's first server, /api.
+// NewClient returns a client for cfg. An empty Config.BaseURL defaults to the API's first server, https://api.anyrow.ai/api.
 func NewClient(cfg Config) *Client {
 	if cfg.BaseURL == "" {
-		cfg.BaseURL = "/api"
+		cfg.BaseURL = "https://api.anyrow.ai/api"
 	}
 	if cfg.AuthHeaderName == "" {
 		cfg.AuthHeaderName = "Authorization"
@@ -42,11 +42,11 @@ func NewClient(cfg Config) *Client {
 	r.Export = &ExportResource{client: r}
 	r.Extract = &ExtractResource{client: r}
 	r.Extract.Table = &ExtractTableResource{client: r}
+	r.Project = &ProjectResource{client: r}
 	r.Row = &RowResource{client: r}
 	r.Suggest = &SuggestResource{client: r}
 	r.Table = &TableResource{client: r}
 	r.TableTemplate = &TableTemplateResource{client: r}
-	r.Webhook = &WebhookResource{client: r}
 	r.safe = &SafeClient{}
 	r.safe.Batch = &SafeBatchResource{
 		List:     call3(r.Batch.List),
@@ -74,6 +74,9 @@ func NewClient(cfg Config) *Client {
 	r.safe.Extract.Table = &SafeExtractTableResource{
 		Once:   call5(r.Extract.Table.Once),
 		Stream: stream5(r.Extract.Table.Stream),
+	}
+	r.safe.Project = &SafeProjectResource{
+		Retrieve: call4(r.Project.Retrieve),
 	}
 	r.safe.Row = &SafeRowResource{
 		Aggregate: call4(r.Row.Aggregate),
@@ -106,16 +109,6 @@ func NewClient(cfg Config) *Client {
 		ProjectRetrieve: call4(r.TableTemplate.ProjectRetrieve),
 		Update:          call4(r.TableTemplate.Update),
 		Use:             call5(r.TableTemplate.Use),
-	}
-	r.safe.Webhook = &SafeWebhookResource{
-		Create:       call4(r.Webhook.Create),
-		Delete:       call4(r.Webhook.Delete),
-		Deliveries:   call4(r.Webhook.Deliveries),
-		List:         call3(r.Webhook.List),
-		Retrieve:     call4(r.Webhook.Retrieve),
-		RotateSecret: call4(r.Webhook.RotateSecret),
-		Test:         call4(r.Webhook.Test),
-		Update:       call5(r.Webhook.Update),
 	}
 	return r
 }
@@ -218,7 +211,7 @@ func (r *BatchDownloadResource) Xlsx(ctx context.Context, projectId string, batc
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "GET", path: path, operation: "GET /v1/projects/{project_id}/batches/{batch_id}/download/xlsx", headers: map[string]string{"Accept": "application/octet-stream"}, stale: r.client.stale, params: params}
+	c := &call{method: "GET", path: path, operation: "GET /v1/projects/{project_id}/batches/{batch_id}/download/xlsx", headers: map[string]string{"Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
@@ -234,18 +227,18 @@ type ColumnResource struct {
 // Add calls POST /v1/projects/{project_id}/tables/{table_id}/columns.
 //
 // Add column
-func (r *ColumnResource) Add(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesColumnRequest, opts *ColumnAddOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *ColumnResource) Add(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesColumnRequest, opts *ColumnAddOpts, reqOpts ...RequestOption) (*CreateProjectsTablesColumnResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/columns", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/columns", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables/:table_id", "GET /v1/projects/:project_id/tables/:table_id/rows"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[CreateProjectsTablesColumnResponse200](result)
 }
 
 // Distinct calls GET /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}/distinct.
@@ -272,52 +265,52 @@ func (r *ColumnResource) Distinct(ctx context.Context, projectId string, tableId
 // Remove calls DELETE /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}.
 //
 // Remove column
-func (r *ColumnResource) Remove(ctx context.Context, projectId string, tableId string, colId string, opts *ColumnRemoveOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *ColumnResource) Remove(ctx context.Context, projectId string, tableId string, colId string, opts *ColumnRemoveOpts, reqOpts ...RequestOption) (*DeleteProjectsTablesColumnResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId, "col_id": colId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", headers: map[string]string{}, stale: r.client.stale, params: params}
+	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", headers: map[string]string{}, invalidates: []string{"GET /v1/projects/:project_id/tables/:table_id", "GET /v1/projects/:project_id/tables/:table_id/rows"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[DeleteProjectsTablesColumnResponse200](result)
 }
 
 // Reorder calls PUT /v1/projects/{project_id}/tables/{table_id}/columns/order.
 //
 // Reorder columns
-func (r *ColumnResource) Reorder(ctx context.Context, projectId string, tableId string, body ReplaceProjectsTablesColumnRequest, opts *ColumnReorderOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *ColumnResource) Reorder(ctx context.Context, projectId string, tableId string, body ReplaceProjectsTablesColumnRequest, opts *ColumnReorderOpts, reqOpts ...RequestOption) (*ReplaceProjectsTablesColumnResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns/order", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "PUT", path: path, operation: "PUT /v1/projects/{project_id}/tables/{table_id}/columns/order", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "PUT", path: path, operation: "PUT /v1/projects/{project_id}/tables/{table_id}/columns/order", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables/:table_id"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[ReplaceProjectsTablesColumnResponse200](result)
 }
 
 // Update calls PATCH /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}.
 //
 // Update column
-func (r *ColumnResource) Update(ctx context.Context, projectId string, tableId string, colId string, body UpdateProjectsTablesColumnRequest, opts *ColumnUpdateOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *ColumnResource) Update(ctx context.Context, projectId string, tableId string, colId string, body UpdateProjectsTablesColumnRequest, opts *ColumnUpdateOpts, reqOpts ...RequestOption) (*UpdateProjectsTablesColumnResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId, "col_id": colId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/projects/{project_id}/tables/{table_id}/columns/{col_id}", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables/:table_id", "GET /v1/projects/:project_id/tables/:table_id/rows"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[UpdateProjectsTablesColumnResponse200](result)
 }
 
 // ExportResource groups the export operations.
@@ -380,7 +373,7 @@ func (r *ExtractResource) Once(ctx context.Context, projectId string, body Extra
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/extract", headers: map[string]string{}, body: mp, stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/extract", headers: map[string]string{}, body: mp, invalidates: []string{"GET /v1/projects/:project_id/batches", "GET /v1/projects/:project_id/tables"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
@@ -420,7 +413,7 @@ func (r *ExtractResource) Stream(ctx context.Context, projectId string, body Ext
 	if err != nil {
 		return sseFail[string](err)
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/extract-stream", headers: map[string]string{}, body: mp, stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/extract-stream", headers: map[string]string{}, body: mp, invalidates: []string{"GET /v1/projects/:project_id/batches", "GET /v1/projects/:project_id/tables"}, stale: r.client.stale, params: params}
 	if opts != nil {
 		if opts.LastEventID != "" {
 			c.headers["Last-Event-ID"] = opts.LastEventID
@@ -454,7 +447,7 @@ func (r *ExtractTableResource) Once(ctx context.Context, projectId string, table
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/extract", headers: map[string]string{}, body: mp, stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/extract", headers: map[string]string{}, body: mp, invalidates: []string{"GET /v1/projects/:project_id/batches", "GET /v1/projects/:project_id/tables/:table_id/rows"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
@@ -482,13 +475,35 @@ func (r *ExtractTableResource) Stream(ctx context.Context, projectId string, tab
 	if err != nil {
 		return sseFail[string](err)
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/extract-stream", headers: map[string]string{}, body: mp, stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/extract-stream", headers: map[string]string{}, body: mp, invalidates: []string{"GET /v1/projects/:project_id/batches", "GET /v1/projects/:project_id/tables/:table_id/rows"}, stale: r.client.stale, params: params}
 	if opts != nil {
 		if opts.LastEventID != "" {
 			c.headers["Last-Event-ID"] = opts.LastEventID
 		}
 	}
 	return streamText(ctx, r.client.cfg, c, reqOpts)
+}
+
+// ProjectResource groups the project operations.
+type ProjectResource struct {
+	client *Client
+}
+
+// Retrieve calls GET /v1/organizations/{organization_id}/projects/{project_id}.
+//
+// Get project
+func (r *ProjectResource) Retrieve(ctx context.Context, organizationId string, projectId string, opts *ProjectRetrieveOpts, reqOpts ...RequestOption) (*GetOrganizationsProjectResponse200, error) {
+	params := map[string]string{"organization_id": organizationId, "project_id": projectId}
+	path, err := expandPath("/v1/organizations/{organization_id}/projects/{project_id}", params)
+	if err != nil {
+		return nil, err
+	}
+	c := &call{method: "GET", path: path, operation: "GET /v1/organizations/{organization_id}/projects/{project_id}", headers: map[string]string{}, stale: r.client.stale, params: params}
+	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[GetOrganizationsProjectResponse200](result)
 }
 
 // RowResource groups the row operations.
@@ -526,7 +541,7 @@ func (r *RowResource) Bulk(ctx context.Context, projectId string, tableId string
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/rows/bulk", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/rows/bulk", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables/:table_id/rows", "GET /v1/projects/:project_id/tables/:table_id/rows/aggregate"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
@@ -543,7 +558,7 @@ func (r *RowResource) Create(ctx context.Context, projectId string, tableId stri
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/rows", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/rows", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables/:table_id/rows", "GET /v1/projects/:project_id/tables/:table_id/rows/aggregate"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
@@ -554,18 +569,18 @@ func (r *RowResource) Create(ctx context.Context, projectId string, tableId stri
 // Delete calls DELETE /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}.
 //
 // Delete row
-func (r *RowResource) Delete(ctx context.Context, projectId string, tableId string, rowId string, opts *RowDeleteOpts, reqOpts ...RequestOption) (*DeleteOrganizationsWebhookResponse200, error) {
+func (r *RowResource) Delete(ctx context.Context, projectId string, tableId string, rowId string, opts *RowDeleteOpts, reqOpts ...RequestOption) (*DeleteProjectsTableResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId, "row_id": rowId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", headers: map[string]string{}, stale: r.client.stale, params: params}
+	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", headers: map[string]string{}, invalidates: []string{"GET /v1/projects/:project_id/tables/:table_id/rows", "GET /v1/projects/:project_id/tables/:table_id/rows/:row_id", "GET /v1/projects/:project_id/tables/:table_id/rows/aggregate"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[DeleteOrganizationsWebhookResponse200](result)
+	return decodeJSON[DeleteProjectsTableResponse200](result)
 }
 
 // List calls GET /v1/projects/{project_id}/tables/{table_id}/rows.
@@ -639,7 +654,7 @@ func (r *RowResource) Update(ctx context.Context, projectId string, tableId stri
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/projects/{project_id}/tables/{table_id}/rows/{row_id}", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables/:table_id/rows", "GET /v1/projects/:project_id/tables/:table_id/rows/:row_id", "GET /v1/projects/:project_id/tables/:table_id/rows/aggregate"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
@@ -688,52 +703,52 @@ type TableResource struct {
 // Create calls POST /v1/projects/{project_id}/tables.
 //
 // Create table
-func (r *TableResource) Create(ctx context.Context, projectId string, body CreateProjectsTableRequest, opts *TableCreateOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *TableResource) Create(ctx context.Context, projectId string, body CreateProjectsTableRequest, opts *TableCreateOpts, reqOpts ...RequestOption) (*CreateProjectsTableResponse201, error) {
 	params := map[string]string{"project_id": projectId}
 	path, err := expandPath("/v1/projects/{project_id}/tables", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[CreateProjectsTableResponse201](result)
 }
 
 // Delete calls DELETE /v1/projects/{project_id}/tables/{table_id}.
 //
 // Delete table (soft, 72h grace)
-func (r *TableResource) Delete(ctx context.Context, projectId string, tableId string, opts *TableDeleteOpts, reqOpts ...RequestOption) (*DeleteOrganizationsWebhookResponse200, error) {
+func (r *TableResource) Delete(ctx context.Context, projectId string, tableId string, opts *TableDeleteOpts, reqOpts ...RequestOption) (*DeleteProjectsTableResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/projects/{project_id}/tables/{table_id}", headers: map[string]string{}, stale: r.client.stale, params: params}
+	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/projects/{project_id}/tables/{table_id}", headers: map[string]string{}, invalidates: []string{"GET /v1/projects/:project_id/tables", "GET /v1/projects/:project_id/tables/:table_id"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[DeleteOrganizationsWebhookResponse200](result)
+	return decodeJSON[DeleteProjectsTableResponse200](result)
 }
 
 // Duplicate calls POST /v1/projects/{project_id}/tables/{table_id}/duplicate.
 //
 // Duplicate table structure
-func (r *TableResource) Duplicate(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesDuplicateRequest, opts *TableDuplicateOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *TableResource) Duplicate(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesDuplicateRequest, opts *TableDuplicateOpts, reqOpts ...RequestOption) (*CreateProjectsTablesDuplicateResponse201, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/duplicate", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/duplicate", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/duplicate", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[CreateProjectsTablesDuplicateResponse201](result)
 }
 
 // Export calls GET /v1/projects/{project_id}/tables/{table_id}/export.
@@ -789,24 +804,24 @@ func (r *TableResource) List(ctx context.Context, projectId string, opts *TableL
 // Restore calls POST /v1/projects/{project_id}/tables/{table_id}/restore.
 //
 // Restore deleted table
-func (r *TableResource) Restore(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesRestoreRequest, opts *TableRestoreOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *TableResource) Restore(ctx context.Context, projectId string, tableId string, body CreateProjectsTablesRestoreRequest, opts *TableRestoreOpts, reqOpts ...RequestOption) (*CreateProjectsTablesRestoreResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}/restore", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/restore", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/tables/{table_id}/restore", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables", "GET /v1/projects/:project_id/tables/:table_id"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[CreateProjectsTablesRestoreResponse200](result)
 }
 
 // Retrieve calls GET /v1/projects/{project_id}/tables/{table_id}.
 //
 // Get table
-func (r *TableResource) Retrieve(ctx context.Context, projectId string, tableId string, opts *TableRetrieveOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *TableResource) Retrieve(ctx context.Context, projectId string, tableId string, opts *TableRetrieveOpts, reqOpts ...RequestOption) (*GetProjectsTableResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}", params)
 	if err != nil {
@@ -817,24 +832,24 @@ func (r *TableResource) Retrieve(ctx context.Context, projectId string, tableId 
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[GetProjectsTableResponse200](result)
 }
 
 // Update calls PATCH /v1/projects/{project_id}/tables/{table_id}.
 //
 // Update table
-func (r *TableResource) Update(ctx context.Context, projectId string, tableId string, body UpdateProjectsTableRequest, opts *TableUpdateOpts, reqOpts ...RequestOption) (*CreateProjectsTableTemplatesUseResponse201, error) {
+func (r *TableResource) Update(ctx context.Context, projectId string, tableId string, body UpdateProjectsTableRequest, opts *TableUpdateOpts, reqOpts ...RequestOption) (*UpdateProjectsTableResponse200, error) {
 	params := map[string]string{"project_id": projectId, "table_id": tableId}
 	path, err := expandPath("/v1/projects/{project_id}/tables/{table_id}", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/projects/{project_id}/tables/{table_id}", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/projects/{project_id}/tables/{table_id}", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables", "GET /v1/projects/:project_id/tables/:table_id"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
+	return decodeJSON[UpdateProjectsTableResponse200](result)
 }
 
 // TableTemplateResource groups the tableTemplate operations.
@@ -845,36 +860,36 @@ type TableTemplateResource struct {
 // Create calls POST /v1/table-templates.
 //
 // Create table template
-func (r *TableTemplateResource) Create(ctx context.Context, body CreateTableTemplateRequest, opts *TableTemplateCreateOpts, reqOpts ...RequestOption) (*GetProjectsTableTemplateResponse200, error) {
-	c := &call{method: "POST", path: "/v1/table-templates", operation: "POST /v1/table-templates", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale}
+func (r *TableTemplateResource) Create(ctx context.Context, body CreateTableTemplateRequest, opts *TableTemplateCreateOpts, reqOpts ...RequestOption) (*CreateTableTemplateResponse201, error) {
+	c := &call{method: "POST", path: "/v1/table-templates", operation: "POST /v1/table-templates", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/table-templates"}, stale: r.client.stale}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[GetProjectsTableTemplateResponse200](result)
+	return decodeJSON[CreateTableTemplateResponse201](result)
 }
 
 // Delete calls DELETE /v1/table-templates/{template_id}.
 //
 // Delete table template
-func (r *TableTemplateResource) Delete(ctx context.Context, templateId string, opts *TableTemplateDeleteOpts, reqOpts ...RequestOption) (*DeleteOrganizationsWebhookResponse200, error) {
+func (r *TableTemplateResource) Delete(ctx context.Context, templateId string, opts *TableTemplateDeleteOpts, reqOpts ...RequestOption) (*DeleteProjectsTableResponse200, error) {
 	params := map[string]string{"template_id": templateId}
 	path, err := expandPath("/v1/table-templates/{template_id}", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/table-templates/{template_id}", headers: map[string]string{}, stale: r.client.stale, params: params}
+	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/table-templates/{template_id}", headers: map[string]string{}, invalidates: []string{"GET /v1/table-templates", "GET /v1/table-templates/:template_id"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[DeleteOrganizationsWebhookResponse200](result)
+	return decodeJSON[DeleteProjectsTableResponse200](result)
 }
 
 // ListMine calls GET /v1/table-templates/mine.
 //
 // List my table templates
-func (r *TableTemplateResource) ListMine(ctx context.Context, opts *TableTemplateListMineOpts, reqOpts ...RequestOption) (*ListProjectsTableTemplatesResponse200, error) {
+func (r *TableTemplateResource) ListMine(ctx context.Context, opts *TableTemplateListMineOpts, reqOpts ...RequestOption) (*ListTableTemplatesResponse200, error) {
 	c := &call{method: "GET", path: "/v1/table-templates/mine", operation: "GET /v1/table-templates/mine", headers: map[string]string{}, stale: r.client.stale}
 	if opts != nil {
 		c.query.set("cursor", opts.Cursor)
@@ -889,7 +904,7 @@ func (r *TableTemplateResource) ListMine(ctx context.Context, opts *TableTemplat
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[ListProjectsTableTemplatesResponse200](result)
+	return decodeJSON[ListTableTemplatesResponse200](result)
 }
 
 // ProjectList calls GET /v1/projects/{project_id}/table-templates.
@@ -939,18 +954,18 @@ func (r *TableTemplateResource) ProjectRetrieve(ctx context.Context, projectId s
 // Update calls PATCH /v1/table-templates/{template_id}.
 //
 // Update table template
-func (r *TableTemplateResource) Update(ctx context.Context, templateId string, body UpdateTableTemplateRequest, opts *TableTemplateUpdateOpts, reqOpts ...RequestOption) (*GetProjectsTableTemplateResponse200, error) {
+func (r *TableTemplateResource) Update(ctx context.Context, templateId string, body UpdateTableTemplateRequest, opts *TableTemplateUpdateOpts, reqOpts ...RequestOption) (*UpdateTableTemplateResponse200, error) {
 	params := map[string]string{"template_id": templateId}
 	path, err := expandPath("/v1/table-templates/{template_id}", params)
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/table-templates/{template_id}", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/table-templates/{template_id}", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/table-templates", "GET /v1/table-templates/:template_id"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[GetProjectsTableTemplateResponse200](result)
+	return decodeJSON[UpdateTableTemplateResponse200](result)
 }
 
 // Use calls POST /v1/projects/{project_id}/table-templates/{template_id}/use.
@@ -962,169 +977,12 @@ func (r *TableTemplateResource) Use(ctx context.Context, projectId string, templ
 	if err != nil {
 		return nil, err
 	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/table-templates/{template_id}/use", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
+	c := &call{method: "POST", path: path, operation: "POST /v1/projects/{project_id}/table-templates/{template_id}/use", headers: map[string]string{}, body: jsonBody(body), invalidates: []string{"GET /v1/projects/:project_id/tables"}, stale: r.client.stale, params: params}
 	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[CreateProjectsTableTemplatesUseResponse201](result)
-}
-
-// WebhookResource groups the webhook operations.
-type WebhookResource struct {
-	client *Client
-}
-
-// Create calls POST /v1/organizations/{organization_id}/webhooks.
-//
-// Create webhook
-func (r *WebhookResource) Create(ctx context.Context, organizationId string, body CreateOrganizationsWebhookRequest, opts *WebhookCreateOpts, reqOpts ...RequestOption) (*CreateOrganizationsWebhookResponse201, error) {
-	params := map[string]string{"organization_id": organizationId}
-	path, err := expandPath("/v1/organizations/{organization_id}/webhooks", params)
-	if err != nil {
-		return nil, err
-	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/organizations/{organization_id}/webhooks", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
-	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[CreateOrganizationsWebhookResponse201](result)
-}
-
-// Delete calls DELETE /v1/organizations/{organization_id}/webhooks/{id}.
-//
-// Delete webhook
-func (r *WebhookResource) Delete(ctx context.Context, organizationId string, id string, opts *WebhookDeleteOpts, reqOpts ...RequestOption) (*DeleteOrganizationsWebhookResponse200, error) {
-	params := map[string]string{"organization_id": organizationId, "id": id}
-	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}", params)
-	if err != nil {
-		return nil, err
-	}
-	c := &call{method: "DELETE", path: path, operation: "DELETE /v1/organizations/{organization_id}/webhooks/{id}", headers: map[string]string{}, stale: r.client.stale, params: params}
-	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[DeleteOrganizationsWebhookResponse200](result)
-}
-
-// Deliveries calls GET /v1/organizations/{organization_id}/webhooks/{id}/deliveries.
-//
-// List webhook deliveries
-func (r *WebhookResource) Deliveries(ctx context.Context, organizationId string, id string, opts *WebhookDeliveriesOpts, reqOpts ...RequestOption) (*ListOrganizationsWebhooksDeliveriesResponse200, error) {
-	params := map[string]string{"organization_id": organizationId, "id": id}
-	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}/deliveries", params)
-	if err != nil {
-		return nil, err
-	}
-	c := &call{method: "GET", path: path, operation: "GET /v1/organizations/{organization_id}/webhooks/{id}/deliveries", headers: map[string]string{}, stale: r.client.stale, params: params}
-	if opts != nil {
-		c.query.set("cursor", opts.Cursor)
-		c.query.set("event", opts.Event)
-		c.query.set("limit", opts.Limit)
-		c.query.set("order", opts.Order)
-		c.query.set("page", opts.Page)
-		c.query.set("status", opts.Status)
-	}
-	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[ListOrganizationsWebhooksDeliveriesResponse200](result)
-}
-
-// List calls GET /v1/organizations/{organization_id}/webhooks.
-//
-// List webhooks
-func (r *WebhookResource) List(ctx context.Context, organizationId string, opts *WebhookListOpts, reqOpts ...RequestOption) (*ListOrganizationsWebhooksResponse200, error) {
-	params := map[string]string{"organization_id": organizationId}
-	path, err := expandPath("/v1/organizations/{organization_id}/webhooks", params)
-	if err != nil {
-		return nil, err
-	}
-	c := &call{method: "GET", path: path, operation: "GET /v1/organizations/{organization_id}/webhooks", headers: map[string]string{}, stale: r.client.stale, params: params}
-	if opts != nil {
-		c.query.set("cursor", opts.Cursor)
-		c.query.set("filter", opts.Filter)
-		c.query.set("limit", opts.Limit)
-		c.query.set("order", opts.Order)
-		c.query.set("page", opts.Page)
-		c.query.set("q", opts.Q)
-	}
-	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[ListOrganizationsWebhooksResponse200](result)
-}
-
-// Retrieve calls GET /v1/organizations/{organization_id}/webhooks/{id}.
-//
-// Get webhook
-func (r *WebhookResource) Retrieve(ctx context.Context, organizationId string, id string, opts *WebhookRetrieveOpts, reqOpts ...RequestOption) (*GetOrganizationsWebhookResponse200, error) {
-	params := map[string]string{"organization_id": organizationId, "id": id}
-	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}", params)
-	if err != nil {
-		return nil, err
-	}
-	c := &call{method: "GET", path: path, operation: "GET /v1/organizations/{organization_id}/webhooks/{id}", headers: map[string]string{}, stale: r.client.stale, params: params}
-	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[GetOrganizationsWebhookResponse200](result)
-}
-
-// RotateSecret calls POST /v1/organizations/{organization_id}/webhooks/{id}/rotate-secret.
-//
-// Rotate webhook secret
-func (r *WebhookResource) RotateSecret(ctx context.Context, organizationId string, id string, opts *WebhookRotateSecretOpts, reqOpts ...RequestOption) (*CreateOrganizationsWebhookResponse201, error) {
-	params := map[string]string{"organization_id": organizationId, "id": id}
-	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}/rotate-secret", params)
-	if err != nil {
-		return nil, err
-	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/organizations/{organization_id}/webhooks/{id}/rotate-secret", headers: map[string]string{}, stale: r.client.stale, params: params}
-	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[CreateOrganizationsWebhookResponse201](result)
-}
-
-// Test calls POST /v1/organizations/{organization_id}/webhooks/{id}/test.
-//
-// Send test webhook
-func (r *WebhookResource) Test(ctx context.Context, organizationId string, id string, opts *WebhookTestOpts, reqOpts ...RequestOption) (*CreateOrganizationsWebhooksTestResponse200, error) {
-	params := map[string]string{"organization_id": organizationId, "id": id}
-	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}/test", params)
-	if err != nil {
-		return nil, err
-	}
-	c := &call{method: "POST", path: path, operation: "POST /v1/organizations/{organization_id}/webhooks/{id}/test", headers: map[string]string{}, stale: r.client.stale, params: params}
-	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[CreateOrganizationsWebhooksTestResponse200](result)
-}
-
-// Update calls PATCH /v1/organizations/{organization_id}/webhooks/{id}.
-//
-// Update webhook
-func (r *WebhookResource) Update(ctx context.Context, organizationId string, id string, body UpdateOrganizationsWebhookRequest, opts *WebhookUpdateOpts, reqOpts ...RequestOption) (*GetOrganizationsWebhookResponse200, error) {
-	params := map[string]string{"organization_id": organizationId, "id": id}
-	path, err := expandPath("/v1/organizations/{organization_id}/webhooks/{id}", params)
-	if err != nil {
-		return nil, err
-	}
-	c := &call{method: "PATCH", path: path, operation: "PATCH /v1/organizations/{organization_id}/webhooks/{id}", headers: map[string]string{}, body: jsonBody(body), stale: r.client.stale, params: params}
-	result, err := doRequest(ctx, r.client.cfg, c, reqOpts)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[GetOrganizationsWebhookResponse200](result)
 }
 
 // SafeClient is Client answering as Client.Safe() does: each method a field of its name.
@@ -1133,11 +991,11 @@ type SafeClient struct {
 	Column        *SafeColumnResource
 	Export        *SafeExportResource
 	Extract       *SafeExtractResource
+	Project       *SafeProjectResource
 	Row           *SafeRowResource
 	Suggest       *SafeSuggestResource
 	Table         *SafeTableResource
 	TableTemplate *SafeTableTemplateResource
-	Webhook       *SafeWebhookResource
 }
 
 // SafeBatchResource is BatchResource answering as Client.Safe() does: each method a field of its name.
@@ -1156,11 +1014,11 @@ type SafeBatchDownloadResource struct {
 
 // SafeColumnResource is ColumnResource answering as Client.Safe() does: each method a field of its name.
 type SafeColumnResource struct {
-	Add      Call5[context.Context, string, string, CreateProjectsTablesColumnRequest, *ColumnAddOpts, *CreateProjectsTableTemplatesUseResponse201]
+	Add      Call5[context.Context, string, string, CreateProjectsTablesColumnRequest, *ColumnAddOpts, *CreateProjectsTablesColumnResponse200]
 	Distinct Call5[context.Context, string, string, string, *ColumnDistinctOpts, *ListProjectsTablesColumnsDistinctResponse200]
-	Remove   Call5[context.Context, string, string, string, *ColumnRemoveOpts, *CreateProjectsTableTemplatesUseResponse201]
-	Reorder  Call5[context.Context, string, string, ReplaceProjectsTablesColumnRequest, *ColumnReorderOpts, *CreateProjectsTableTemplatesUseResponse201]
-	Update   Call6[context.Context, string, string, string, UpdateProjectsTablesColumnRequest, *ColumnUpdateOpts, *CreateProjectsTableTemplatesUseResponse201]
+	Remove   Call5[context.Context, string, string, string, *ColumnRemoveOpts, *DeleteProjectsTablesColumnResponse200]
+	Reorder  Call5[context.Context, string, string, ReplaceProjectsTablesColumnRequest, *ColumnReorderOpts, *ReplaceProjectsTablesColumnResponse200]
+	Update   Call6[context.Context, string, string, string, UpdateProjectsTablesColumnRequest, *ColumnUpdateOpts, *UpdateProjectsTablesColumnResponse200]
 }
 
 // SafeExportResource is ExportResource answering as Client.Safe() does: each method a field of its name.
@@ -1181,12 +1039,17 @@ type SafeExtractTableResource struct {
 	Stream Stream5[context.Context, string, string, ExtractTableStreamBody, *ExtractTableStreamOpts, SSEEvent[string]]
 }
 
+// SafeProjectResource is ProjectResource answering as Client.Safe() does: each method a field of its name.
+type SafeProjectResource struct {
+	Retrieve Call4[context.Context, string, string, *ProjectRetrieveOpts, *GetOrganizationsProjectResponse200]
+}
+
 // SafeRowResource is RowResource answering as Client.Safe() does: each method a field of its name.
 type SafeRowResource struct {
 	Aggregate Call4[context.Context, string, string, *RowAggregateOpts, *ListProjectsTablesRowsResponse20021d74b]
 	Bulk      Call5[context.Context, string, string, CreateProjectsTablesRowRequestDbbb57, *RowBulkOpts, *CreateProjectsTablesRowResponse200]
 	Create    Call5[context.Context, string, string, CreateProjectsTablesRowRequest, *RowCreateOpts, *CreateProjectsTablesRowRequest]
-	Delete    Call5[context.Context, string, string, string, *RowDeleteOpts, *DeleteOrganizationsWebhookResponse200]
+	Delete    Call5[context.Context, string, string, string, *RowDeleteOpts, *DeleteProjectsTableResponse200]
 	List      Call4[context.Context, string, string, *RowListOpts, *ListProjectsTablesRowsResponse200]
 	Retrieve  Call5[context.Context, string, string, string, *RowRetrieveOpts, *CreateProjectsTablesRowRequest]
 	Source    Call5[context.Context, string, string, string, *RowSourceOpts, []byte]
@@ -1200,37 +1063,25 @@ type SafeSuggestResource struct {
 
 // SafeTableResource is TableResource answering as Client.Safe() does: each method a field of its name.
 type SafeTableResource struct {
-	Create    Call4[context.Context, string, CreateProjectsTableRequest, *TableCreateOpts, *CreateProjectsTableTemplatesUseResponse201]
-	Delete    Call4[context.Context, string, string, *TableDeleteOpts, *DeleteOrganizationsWebhookResponse200]
-	Duplicate Call5[context.Context, string, string, CreateProjectsTablesDuplicateRequest, *TableDuplicateOpts, *CreateProjectsTableTemplatesUseResponse201]
+	Create    Call4[context.Context, string, CreateProjectsTableRequest, *TableCreateOpts, *CreateProjectsTableResponse201]
+	Delete    Call4[context.Context, string, string, *TableDeleteOpts, *DeleteProjectsTableResponse200]
+	Duplicate Call5[context.Context, string, string, CreateProjectsTablesDuplicateRequest, *TableDuplicateOpts, *CreateProjectsTablesDuplicateResponse201]
 	Export    Call4[context.Context, string, string, *TableExportOpts, *ListProjectsTablesExportResponse200]
 	List      Call3[context.Context, string, *TableListOpts, *ListProjectsTablesResponse200]
-	Restore   Call5[context.Context, string, string, CreateProjectsTablesRestoreRequest, *TableRestoreOpts, *CreateProjectsTableTemplatesUseResponse201]
-	Retrieve  Call4[context.Context, string, string, *TableRetrieveOpts, *CreateProjectsTableTemplatesUseResponse201]
-	Update    Call5[context.Context, string, string, UpdateProjectsTableRequest, *TableUpdateOpts, *CreateProjectsTableTemplatesUseResponse201]
+	Restore   Call5[context.Context, string, string, CreateProjectsTablesRestoreRequest, *TableRestoreOpts, *CreateProjectsTablesRestoreResponse200]
+	Retrieve  Call4[context.Context, string, string, *TableRetrieveOpts, *GetProjectsTableResponse200]
+	Update    Call5[context.Context, string, string, UpdateProjectsTableRequest, *TableUpdateOpts, *UpdateProjectsTableResponse200]
 }
 
 // SafeTableTemplateResource is TableTemplateResource answering as Client.Safe() does: each method a field of its name.
 type SafeTableTemplateResource struct {
-	Create          Call3[context.Context, CreateTableTemplateRequest, *TableTemplateCreateOpts, *GetProjectsTableTemplateResponse200]
-	Delete          Call3[context.Context, string, *TableTemplateDeleteOpts, *DeleteOrganizationsWebhookResponse200]
-	ListMine        Call2[context.Context, *TableTemplateListMineOpts, *ListProjectsTableTemplatesResponse200]
+	Create          Call3[context.Context, CreateTableTemplateRequest, *TableTemplateCreateOpts, *CreateTableTemplateResponse201]
+	Delete          Call3[context.Context, string, *TableTemplateDeleteOpts, *DeleteProjectsTableResponse200]
+	ListMine        Call2[context.Context, *TableTemplateListMineOpts, *ListTableTemplatesResponse200]
 	ProjectList     Call3[context.Context, string, *TableTemplateProjectListOpts, *ListProjectsTableTemplatesResponse200]
 	ProjectRetrieve Call4[context.Context, string, string, *TableTemplateProjectRetrieveOpts, *GetProjectsTableTemplateResponse200]
-	Update          Call4[context.Context, string, UpdateTableTemplateRequest, *TableTemplateUpdateOpts, *GetProjectsTableTemplateResponse200]
+	Update          Call4[context.Context, string, UpdateTableTemplateRequest, *TableTemplateUpdateOpts, *UpdateTableTemplateResponse200]
 	Use             Call5[context.Context, string, string, CreateProjectsTableTemplatesUseRequest, *TableTemplateUseOpts, *CreateProjectsTableTemplatesUseResponse201]
-}
-
-// SafeWebhookResource is WebhookResource answering as Client.Safe() does: each method a field of its name.
-type SafeWebhookResource struct {
-	Create       Call4[context.Context, string, CreateOrganizationsWebhookRequest, *WebhookCreateOpts, *CreateOrganizationsWebhookResponse201]
-	Delete       Call4[context.Context, string, string, *WebhookDeleteOpts, *DeleteOrganizationsWebhookResponse200]
-	Deliveries   Call4[context.Context, string, string, *WebhookDeliveriesOpts, *ListOrganizationsWebhooksDeliveriesResponse200]
-	List         Call3[context.Context, string, *WebhookListOpts, *ListOrganizationsWebhooksResponse200]
-	Retrieve     Call4[context.Context, string, string, *WebhookRetrieveOpts, *GetOrganizationsWebhookResponse200]
-	RotateSecret Call4[context.Context, string, string, *WebhookRotateSecretOpts, *CreateOrganizationsWebhookResponse201]
-	Test         Call4[context.Context, string, string, *WebhookTestOpts, *CreateOrganizationsWebhooksTestResponse200]
-	Update       Call5[context.Context, string, string, UpdateOrganizationsWebhookRequest, *WebhookUpdateOpts, *GetOrganizationsWebhookResponse200]
 }
 
 // Call2 is a Client.Safe() method taking 2 arguments before its RequestOptions and answering a Result of T.
@@ -1377,6 +1228,10 @@ type ExtractTableStreamOpts struct {
 	LastEventID string
 }
 
+// ProjectRetrieveOpts holds the optional parameters of project.retrieve.
+type ProjectRetrieveOpts struct {
+}
+
 // RowAggregateOpts holds the optional parameters of row.aggregate.
 type RowAggregateOpts struct {
 	Aggs   string
@@ -1505,48 +1360,4 @@ type TableTemplateUseOpts struct {
 
 // TableUpdateOpts holds the optional parameters of table.update.
 type TableUpdateOpts struct {
-}
-
-// WebhookCreateOpts holds the optional parameters of webhook.create.
-type WebhookCreateOpts struct {
-}
-
-// WebhookDeleteOpts holds the optional parameters of webhook.delete.
-type WebhookDeleteOpts struct {
-}
-
-// WebhookDeliveriesOpts holds the optional parameters of webhook.deliveries.
-type WebhookDeliveriesOpts struct {
-	Cursor *string
-	Event  *WebhookDeliveriesOptsEvent
-	Limit  *int64
-	Order  *string
-	Page   *int64
-	Status *WebhookDeliveriesOptsStatus
-}
-
-// WebhookListOpts holds the optional parameters of webhook.list.
-type WebhookListOpts struct {
-	Cursor *string
-	Filter *string
-	Limit  *int64
-	Order  *string
-	Page   *int64
-	Q      *string
-}
-
-// WebhookRetrieveOpts holds the optional parameters of webhook.retrieve.
-type WebhookRetrieveOpts struct {
-}
-
-// WebhookRotateSecretOpts holds the optional parameters of webhook.rotateSecret.
-type WebhookRotateSecretOpts struct {
-}
-
-// WebhookTestOpts holds the optional parameters of webhook.test.
-type WebhookTestOpts struct {
-}
-
-// WebhookUpdateOpts holds the optional parameters of webhook.update.
-type WebhookUpdateOpts struct {
 }

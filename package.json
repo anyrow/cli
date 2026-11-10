@@ -8,7 +8,7 @@
 		"email": "oss@anyrow.ai",
 		"url": "https://github.com/anyrow/cli/issues"
 	},
-	"description": "AI-native operations platform — extract, store, review, sync. Turn any document, photo, call, email, or website into a row in your table.",
+	"description": "Official command-line client for Anyrow (anyrow.ai): turn any document, photo, call, email or website into a row in your table.",
 	"homepage": "https://anyrow.ai",
 	"keywords": [
 		"anyrow",

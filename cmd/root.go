@@ -11,5 +11,5 @@ import (
 
 // Root is the anyrow command, skill the agent skill it ships; every other command hangs under it.
 func Root(skill string) *cobra.Command {
-	return cli.Root(cli.App{Name: "anyrow", Short: "Anyrow API", EnvPrefix: "ANYROW", Server: "https://api.anyrow.ai", Discovery: discovery, Skill: skill}, newBatchCmd(), newColumnCmd(), newExportCmd(), newExtractCmd(), newRowCmd(), newSuggestCmd(), newTableCmd(), newTableTemplateCmd(), newWebhookCmd())
+	return cli.Root(cli.App{Name: "anyrow", Short: "Anyrow API", EnvPrefix: "ANYROW", Server: "https://api.anyrow.ai", Discovery: discovery, Skill: skill}, newBatchCmd(), newColumnCmd(), newExportCmd(), newExtractCmd(), newProjectCmd(), newRowCmd(), newSuggestCmd(), newTableCmd(), newTableTemplateCmd())
 }
